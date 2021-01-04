@@ -1,15 +1,15 @@
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { Request, Response } from 'express';
 import { parse } from 'url';
-import { TableListItem, TableListParams } from '@/pages/TableList/data';
+import { QuestionListItem, QuestionListParams } from '@/pages/QuestionList/data';
 
-// mock tableListDataSource
+// mock questionListDataSource
 const genList = (current: number, pageSize: number) => {
-  const tableListDataSource: TableListItem[] = [];
+  const questionListDataSource: QuestionListItem[] = [];
 
   for (let i = 0; i < pageSize; i += 1) {
     const index = (current - 1) * 10 + i;
-    tableListDataSource.push({
+    questionListDataSource.push({
       key: index,
       disabled: i % 6 === 0,
       href: 'https://ant.design',
@@ -27,11 +27,11 @@ const genList = (current: number, pageSize: number) => {
       progress: Math.ceil(Math.random() * 100),
     });
   }
-  tableListDataSource.reverse();
-  return tableListDataSource;
+  questionListDataSource.reverse();
+  return questionListDataSource;
 };
 
-let tableListDataSource = genList(1, 100);
+let questionListDataSource = genList(1, 100);
 
 function getRule(req: Request, res: Response, u: string) {
   let realUrl = u;
@@ -39,9 +39,9 @@ function getRule(req: Request, res: Response, u: string) {
     realUrl = req.url;
   }
   const { current = 1, pageSize = 10 } = req.query;
-  const params = (parse(realUrl, true).query as unknown) as TableListParams;
-
-  let dataSource = [...tableListDataSource].slice(
+  const params = (parse(realUrl, true).query as unknown) as QuestionListParams;
+  console.log(params);
+  let dataSource = [...questionListDataSource].slice(
     ((current as number) - 1) * (pageSize as number),
     (current as number) * (pageSize as number),
   );
@@ -77,10 +77,7 @@ function getRule(req: Request, res: Response, u: string) {
           if (!filter[key]) {
             return true;
           }
-          if (filter[key].includes(`${item[key]}`)) {
-            return true;
-          }
-          return false;
+          return filter[key].includes(`${item[key]}`);
         });
       });
     }
@@ -91,7 +88,7 @@ function getRule(req: Request, res: Response, u: string) {
   }
   const result = {
     data: dataSource,
-    total: tableListDataSource.length,
+    total: questionListDataSource.length,
     success: true,
     pageSize,
     current: parseInt(`${params.currentPage}`, 10) || 1,
@@ -112,13 +109,15 @@ function postRule(req: Request, res: Response, u: string, b: Request) {
   switch (method) {
     /* eslint no-case-declarations:0 */
     case 'delete':
-      tableListDataSource = tableListDataSource.filter((item) => key.indexOf(item.key) === -1);
+      questionListDataSource = questionListDataSource.filter(
+        (item) => key.indexOf(item.key) === -1,
+      );
       break;
     case 'post':
       (() => {
         const i = Math.ceil(Math.random() * 10000);
         const newRule = {
-          key: tableListDataSource.length,
+          key: questionListDataSource.length,
           href: 'https://ant.design',
           avatar: [
             'https://gw.alipayobjects.com/zos/rmsportal/eeHMaZBwmTvLdIwMfBpg.png',
@@ -133,7 +132,7 @@ function postRule(req: Request, res: Response, u: string, b: Request) {
           createdAt: new Date(),
           progress: Math.ceil(Math.random() * 100),
         };
-        tableListDataSource.unshift(newRule);
+        questionListDataSource.unshift(newRule);
         return res.json(newRule);
       })();
       return;
@@ -141,7 +140,7 @@ function postRule(req: Request, res: Response, u: string, b: Request) {
     case 'update':
       (() => {
         let newRule = {};
-        tableListDataSource = tableListDataSource.map((item) => {
+        questionListDataSource = questionListDataSource.map((item) => {
           if (item.key === key) {
             newRule = { ...item, desc, name };
             return { ...item, desc, name };
@@ -156,9 +155,9 @@ function postRule(req: Request, res: Response, u: string, b: Request) {
   }
 
   const result = {
-    list: tableListDataSource,
+    list: questionListDataSource,
     pagination: {
-      total: tableListDataSource.length,
+      total: questionListDataSource.length,
     },
   };
 

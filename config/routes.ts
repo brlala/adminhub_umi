@@ -40,7 +40,7 @@
     name: 'list.table-list',
     icon: 'table',
     path: '/list',
-    component: './TableList',
+    component: './QuestionList',
   },
   {
     path: '/',
