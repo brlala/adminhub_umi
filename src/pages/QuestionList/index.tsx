@@ -10,14 +10,14 @@ import type { ProDescriptionsItemProps } from '@ant-design/pro-descriptions';
 import ProDescriptions from '@ant-design/pro-descriptions';
 import type { FormValueType } from './components/UpdateForm';
 import UpdateForm from './components/UpdateForm';
-import type { TableListItem } from './data.d';
+import type { QuestionListItem } from './data.d';
 import { queryRule, updateRule, addRule, removeRule } from './service';
 
 /**
  * 添加节点
  * @param fields
  */
-const handleAdd = async (fields: TableListItem) => {
+const handleAdd = async (fields: QuestionListItem) => {
   const hide = message.loading('正在添加');
   try {
     await addRule({ ...fields });
@@ -58,7 +58,7 @@ const handleUpdate = async (fields: FormValueType) => {
  *  删除节点
  * @param selectedRows
  */
-const handleRemove = async (selectedRows: TableListItem[]) => {
+const handleRemove = async (selectedRows: QuestionListItem[]) => {
   const hide = message.loading('正在删除');
   if (!selectedRows) return true;
   try {
@@ -75,7 +75,7 @@ const handleRemove = async (selectedRows: TableListItem[]) => {
   }
 };
 
-const TableList: React.FC = () => {
+const QuestionList: React.FC = () => {
   /**
    * 新建窗口的弹窗
    */
@@ -88,15 +88,15 @@ const TableList: React.FC = () => {
   const [showDetail, setShowDetail] = useState<boolean>(false);
 
   const actionRef = useRef<ActionType>();
-  const [currentRow, setCurrentRow] = useState<TableListItem>();
-  const [selectedRowsState, setSelectedRows] = useState<TableListItem[]>([]);
+  const [currentRow, setCurrentRow] = useState<QuestionListItem>();
+  const [selectedRowsState, setSelectedRows] = useState<QuestionListItem[]>([]);
 
   /**
    * 国际化配置
    */
   const intl = useIntl();
 
-  const columns: ProColumns<TableListItem>[] = [
+  const columns: ProColumns<QuestionListItem>[] = [
     {
       title: (
         <FormattedMessage
@@ -215,7 +215,7 @@ const TableList: React.FC = () => {
 
   return (
     <PageContainer>
-      <ProTable<TableListItem>
+      <ProTable<QuestionListItem>
         headerTitle={intl.formatMessage({
           id: 'pages.searchTable.title',
           defaultMessage: '查询表格',
@@ -286,7 +286,7 @@ const TableList: React.FC = () => {
         visible={createModalVisible}
         onVisibleChange={handleModalVisible}
         onFinish={async (value) => {
-          const success = await handleAdd(value as TableListItem);
+          const success = await handleAdd(value as QuestionListItem);
           if (success) {
             handleModalVisible(false);
             if (actionRef.current) {
@@ -341,7 +341,7 @@ const TableList: React.FC = () => {
         closable={false}
       >
         {currentRow?.name && (
-          <ProDescriptions<TableListItem>
+          <ProDescriptions<QuestionListItem>
             column={2}
             title={currentRow?.name}
             request={async () => ({
@@ -350,7 +350,7 @@ const TableList: React.FC = () => {
             params={{
               id: currentRow?.name,
             }}
-            columns={columns as ProDescriptionsItemProps<TableListItem>[]}
+            columns={columns as ProDescriptionsItemProps<QuestionListItem>[]}
           />
         )}
       </Drawer>
@@ -358,4 +358,4 @@ const TableList: React.FC = () => {
   );
 };
 
-export default TableList;
+export default QuestionList;

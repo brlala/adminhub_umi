@@ -1,4 +1,4 @@
-export type TableListItem = {
+export type QuestionListItem = {
   key: number;
   disabled?: boolean;
   href: string;
@@ -13,18 +13,18 @@ export type TableListItem = {
   progress: number;
 };
 
-export type TableListPagination = {
+export type QuestionListPagination = {
   total: number;
   pageSize: number;
   current: number;
 };
 
-export type TableListData = {
-  list: TableListItem[];
-  pagination: Partial<TableListPagination>;
+export type QuestionListData = {
+  list: QuestionListItem[];
+  pagination: Partial<QuestionListPagination>;
 };
 
-export type TableListParams = {
+export type QuestionListParams = {
   status?: string;
   name?: string;
   desc?: string;
