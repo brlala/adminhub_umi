@@ -1,26 +1,26 @@
 import React from 'react';
-import { GithubOutlined } from '@ant-design/icons';
+import { GitlabOutlined } from '@ant-design/icons';
 import { DefaultFooter } from '@ant-design/pro-layout';
 
 export default () => (
   <DefaultFooter
-    copyright="2020 蚂蚁集团体验技术部出品"
+    copyright="2021 Product of Pand.ai Pte. Ltd."
     links={[
       {
         key: 'Ant Design Pro',
-        title: 'Ant Design Pro',
+        title: 'Official Website',
         href: 'https://pro.ant.design',
         blankTarget: true,
       },
       {
         key: 'github',
-        title: <GithubOutlined />,
+        title: <GitlabOutlined />,
         href: 'https://github.com/ant-design/ant-design-pro',
         blankTarget: true,
       },
       {
         key: 'Ant Design',
-        title: 'Ant Design',
+        title: 'Contact Us',
         href: 'https://ant.design',
         blankTarget: true,
       },
