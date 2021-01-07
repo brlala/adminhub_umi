@@ -1,6 +1,7 @@
 import { PlusOutlined } from '@ant-design/icons';
 import { Button, message, Input, Drawer } from 'antd';
 import React, { useState, useRef } from 'react';
+// @ts-ignore
 import { useIntl, FormattedMessage } from 'umi';
 import { PageContainer, FooterToolbar } from '@ant-design/pro-layout';
 import type { ProColumns, ActionType } from '@ant-design/pro-table';
@@ -18,15 +19,15 @@ import { queryRule, updateRule, addRule, removeRule } from './service';
  * @param fields
  */
 const handleAdd = async (fields: QuestionListItem) => {
-  const hide = message.loading('正在添加');
+  const hide = message.loading('Adding');
   try {
     await addRule({ ...fields });
     hide();
-    message.success('添加成功');
+    message.success('Add success');
     return true;
   } catch (error) {
     hide();
-    message.error('添加失败请重试！');
+    message.error('Add fail, please retry!');
     return false;
   }
 };
@@ -36,7 +37,7 @@ const handleAdd = async (fields: QuestionListItem) => {
  * @param fields
  */
 const handleUpdate = async (fields: FormValueType) => {
-  const hide = message.loading('正在配置');
+  const hide = message.loading('Updating');
   try {
     await updateRule({
       name: fields.name,
@@ -45,11 +46,11 @@ const handleUpdate = async (fields: FormValueType) => {
     });
     hide();
 
-    message.success('配置成功');
+    message.success('Update success');
     return true;
   } catch (error) {
     hide();
-    message.error('配置失败请重试！');
+    message.error('Update fail, please retry!');
     return false;
   }
 };
@@ -59,18 +60,18 @@ const handleUpdate = async (fields: FormValueType) => {
  * @param selectedRows
  */
 const handleRemove = async (selectedRows: QuestionListItem[]) => {
-  const hide = message.loading('正在删除');
+  const hide = message.loading('Deleting');
   if (!selectedRows) return true;
   try {
     await removeRule({
       key: selectedRows.map((row) => row.key),
     });
     hide();
-    message.success('删除成功，即将刷新');
+    message.success('Delete success, reloading page');
     return true;
   } catch (error) {
     hide();
-    message.error('删除失败，请重试');
+    message.error('Delete fail, please retry!');
     return false;
   }
 };
@@ -98,14 +99,19 @@ const QuestionList: React.FC = () => {
 
   const columns: ProColumns<QuestionListItem>[] = [
     {
+      title: <FormattedMessage id="pages.question.topic.topicLabel" defaultMessage="Topic" />,
+      dataIndex: 'name',
+      valueType: 'textarea',
+    },
+    {
       title: (
         <FormattedMessage
-          id="pages.searchTable.updateForm.ruleName.nameLabel"
-          defaultMessage="规则名称"
+          id="pages.question.mainQuestion.mainQuestionLabel"
+          defaultMessage="Main Question"
         />
       ),
-      dataIndex: 'name',
-      tip: '规则名称是唯一的 key',
+      dataIndex: 'desc',
+      valueType: 'textarea',
       render: (dom, entity) => {
         return (
           <a
@@ -117,23 +123,27 @@ const QuestionList: React.FC = () => {
             {dom}
           </a>
         );
+        // tip: 'Each question should be unique',
       },
     },
     {
-      title: <FormattedMessage id="pages.searchTable.titleDesc" defaultMessage="描述" />,
+      title: (
+        <FormattedMessage id="pages.question.response.responseLabel" defaultMessage="Response" />
+      ),
       dataIndex: 'desc',
       valueType: 'textarea',
+      hideInSearch: true,
+      render: (dom, entity) => {
+        return <>This is the answer for the intents at the left</>;
+      },
     },
     {
-      title: <FormattedMessage id="pages.searchTable.titleCallNo" defaultMessage="服务调用次数" />,
+      title: (
+        <FormattedMessage id="pages.searchTable.timesTriggerNo" defaultMessage="Times Triggered" />
+      ),
       dataIndex: 'callNo',
       sorter: true,
       hideInForm: true,
-      renderText: (val: string) =>
-        `${val}${intl.formatMessage({
-          id: 'pages.searchTable.tenThousand',
-          defaultMessage: ' 万 ',
-        })}`,
     },
     {
       title: <FormattedMessage id="pages.searchTable.titleStatus" defaultMessage="状态" />,
@@ -142,25 +152,31 @@ const QuestionList: React.FC = () => {
       valueEnum: {
         0: {
           text: (
-            <FormattedMessage id="pages.searchTable.nameStatus.default" defaultMessage="关闭" />
+            <FormattedMessage
+              id="pages.searchTable.nameStatus.inactive"
+              defaultMessage="inactive"
+            />
           ),
           status: 'Default',
         },
         1: {
           text: (
-            <FormattedMessage id="pages.searchTable.nameStatus.running" defaultMessage="运行中" />
+            <FormattedMessage
+              id="pages.searchTable.nameStatus.scheduled"
+              defaultMessage="scheduled"
+            />
           ),
           status: 'Processing',
         },
         2: {
           text: (
-            <FormattedMessage id="pages.searchTable.nameStatus.online" defaultMessage="已上线" />
+            <FormattedMessage id="pages.searchTable.nameStatus.online" defaultMessage="online" />
           ),
           status: 'Success',
         },
         3: {
           text: (
-            <FormattedMessage id="pages.searchTable.nameStatus.abnormal" defaultMessage="异常" />
+            <FormattedMessage id="pages.searchTable.nameStatus.deleted" defaultMessage="deleted" />
           ),
           status: 'Error',
         },
@@ -168,7 +184,10 @@ const QuestionList: React.FC = () => {
     },
     {
       title: (
-        <FormattedMessage id="pages.searchTable.titleUpdatedAt" defaultMessage="上次调度时间" />
+        <FormattedMessage
+          id="pages.searchTable.titleUpdatedAt"
+          defaultMessage="Last Triggered at"
+        />
       ),
       sorter: true,
       dataIndex: 'updatedAt',
@@ -184,7 +203,7 @@ const QuestionList: React.FC = () => {
               {...rest}
               placeholder={intl.formatMessage({
                 id: 'pages.searchTable.exception',
-                defaultMessage: '请输入异常原因！',
+                defaultMessage: 'Please enter the reason for the exception!',
               })}
             />
           );
@@ -193,7 +212,7 @@ const QuestionList: React.FC = () => {
       },
     },
     {
-      title: <FormattedMessage id="pages.searchTable.titleOption" defaultMessage="操作" />,
+      title: <FormattedMessage id="pages.searchTable.titleOption" defaultMessage="Option" />,
       dataIndex: 'option',
       valueType: 'option',
       render: (_, record) => [
@@ -204,10 +223,7 @@ const QuestionList: React.FC = () => {
             setCurrentRow(record);
           }}
         >
-          <FormattedMessage id="pages.searchTable.config" defaultMessage="配置" />
-        </a>,
-        <a key="subscribeAlert" href="https://procomponents.ant.design/">
-          <FormattedMessage id="pages.searchTable.subscribeAlert" defaultMessage="订阅警报" />
+          <FormattedMessage id="pages.searchTable.edit" defaultMessage="Edit" />
         </a>,
       ],
     },
@@ -218,7 +234,7 @@ const QuestionList: React.FC = () => {
       <ProTable<QuestionListItem>
         headerTitle={intl.formatMessage({
           id: 'pages.searchTable.title',
-          defaultMessage: '查询表格',
+          defaultMessage: 'Status',
         })}
         actionRef={actionRef}
         rowKey="key"
@@ -233,7 +249,7 @@ const QuestionList: React.FC = () => {
               handleModalVisible(true);
             }}
           >
-            <PlusOutlined /> <FormattedMessage id="pages.searchTable.new" defaultMessage="新建" />
+            <PlusOutlined /> <FormattedMessage id="pages.searchTable.new" defaultMessage="New" />
           </Button>,
         ]}
         request={(params, sorter, filter) => queryRule({ ...params, sorter, filter })}
@@ -248,14 +264,14 @@ const QuestionList: React.FC = () => {
         <FooterToolbar
           extra={
             <div>
-              <FormattedMessage id="pages.searchTable.chosen" defaultMessage="已选择" />{' '}
+              <FormattedMessage id="pages.searchTable.chosen" defaultMessage="chosen" />{' '}
               <a style={{ fontWeight: 600 }}>{selectedRowsState.length}</a>{' '}
-              <FormattedMessage id="pages.searchTable.item" defaultMessage="项" />
+              <FormattedMessage id="pages.searchTable.item" defaultMessage="item" />
               &nbsp;&nbsp;
               <span>
                 <FormattedMessage
                   id="pages.searchTable.totalServiceCalls"
-                  defaultMessage="服务调用次数总计"
+                  defaultMessage="Total Number of Service Calls"
                 />{' '}
                 {selectedRowsState.reduce((pre, item) => pre + item.callNo, 0)}{' '}
                 <FormattedMessage id="pages.searchTable.tenThousand" defaultMessage="万" />
@@ -270,17 +286,17 @@ const QuestionList: React.FC = () => {
               actionRef.current?.reloadAndRest?.();
             }}
           >
-            <FormattedMessage id="pages.searchTable.batchDeletion" defaultMessage="批量删除" />
-          </Button>
-          <Button type="primary">
-            <FormattedMessage id="pages.searchTable.batchApproval" defaultMessage="批量审批" />
+            <FormattedMessage
+              id="pages.searchTable.batchDeletion"
+              defaultMessage="Batch deletion"
+            />
           </Button>
         </FooterToolbar>
       )}
       <ModalForm
         title={intl.formatMessage({
-          id: 'pages.searchTable.createForm.newRule',
-          defaultMessage: '新建规则',
+          id: 'pages.searchTable.createForm.newQuestion',
+          defaultMessage: 'New Question',
         })}
         width="400px"
         visible={createModalVisible}
@@ -302,7 +318,7 @@ const QuestionList: React.FC = () => {
               message: (
                 <FormattedMessage
                   id="pages.searchTable.ruleName"
-                  defaultMessage="规则名称为必填项"
+                  defaultMessage="Rule name is required"
                 />
               ),
             },

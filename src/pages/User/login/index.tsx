@@ -2,13 +2,14 @@ import { LockTwoTone, UserOutlined } from '@ant-design/icons';
 import { Alert, message, Tabs } from 'antd';
 import React, { useState } from 'react';
 import ProForm, { ProFormCheckbox, ProFormText } from '@ant-design/pro-form';
-import { useIntl, Link, history, FormattedMessage, SelectLang, useModel } from 'umi';
+// @ts-ignore
+import { useIntl, Link, history, FormattedMessage, SelectLang, useModel, setLocale } from 'umi';
 import Footer from '@/components/Footer';
 import type { LoginParamsType } from '@/services/login';
 import { accountLogin } from '@/services/login';
 
 import styles from './index.less';
-
+setLocale('en-US');
 const LoginMessage: React.FC<{
   content: string;
 }> = ({ content }) => (
@@ -58,8 +59,9 @@ const Login: React.FC = () => {
     try {
       // Login
       const msg = await accountLogin({ ...values, type });
+      console.log(msg);
       if (msg.status === 'ok') {
-        localStorage.setItem('token', msg.access_token);
+        localStorage.setItem('token', msg.access_token!);
         message.success('Login successfully!');
         await fetchUserInfo();
         goto();
@@ -142,7 +144,7 @@ const Login: React.FC = () => {
                   }}
                   placeholder={intl.formatMessage({
                     id: 'pages.login.username.placeholder',
-                    defaultMessage: 'Username: admin or user',
+                    defaultMessage: 'Username: admin',
                   })}
                   rules={[
                     {
@@ -164,7 +166,7 @@ const Login: React.FC = () => {
                   }}
                   placeholder={intl.formatMessage({
                     id: 'pages.login.password.placeholder',
-                    defaultMessage: 'Password: ant.design',
+                    defaultMessage: 'Password: test',
                   })}
                   rules={[
                     {

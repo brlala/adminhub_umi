@@ -13,14 +13,14 @@ export default defineConfig({
     hmr: true,
   },
   layout: {
-    name: 'Ant Design Pro',
+    name: 'Administrator Hub',
     locale: true,
     siderWidth: 208,
     ...defaultSettings,
   },
   locale: {
     // default zh-CN
-    default: 'en-US',
+    default: 'zh-CN',
     antd: true,
     // default true, when it is true, will use `navigator.language` overwrite default
     baseNavigator: true,

@@ -7,7 +7,7 @@ export default () => (
     copyright="2021 Product of Pand.ai Pte. Ltd."
     links={[
       {
-        key: 'Ant Design Pro',
+        key: 'Administrator Hub',
         title: 'Official Website',
         href: 'https://pro.ant.design',
         blankTarget: true,
@@ -19,7 +19,7 @@ export default () => (
         blankTarget: true,
       },
       {
-        key: 'Ant Design',
+        key: 'Contact Us',
         title: 'Contact Us',
         href: 'https://ant.design',
         blankTarget: true,
