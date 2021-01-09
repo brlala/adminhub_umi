@@ -27,7 +27,7 @@ export type UpdateFormProps = {
   values: Partial<QuestionListItem>;
 };
 
-const UpdateForm: React.FC<UpdateFormProps> = (props) => {
+const UpdateForm: React.FC<UpdateFormProps> = ({updateModalVisible, onCancel, onSubmit, values}) => {
   const intl = useIntl();
   return (
     <StepsForm
@@ -44,22 +44,22 @@ const UpdateForm: React.FC<UpdateFormProps> = (props) => {
               id: 'pages.searchTable.updateForm.ruleConfig',
               defaultMessage: '规则配置',
             })}
-            visible={props.updateModalVisible}
+            visible={updateModalVisible}
             footer={submitter}
             onCancel={() => {
-              props.onCancel();
+              onCancel();
             }}
           >
             {dom}
           </Modal>
         );
       }}
-      onFinish={props.onSubmit}
+      onFinish={onSubmit}
     >
       <StepsForm.StepForm
         initialValues={{
-          name: props.values.name,
-          desc: props.values.desc,
+          name: values.name,
+          desc: values.desc,
         }}
         title={intl.formatMessage({
           id: 'pages.searchTable.updateForm.basicConfig',

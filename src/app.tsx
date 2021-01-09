@@ -122,8 +122,15 @@ const addTokenInterceptor = (url: null | string, options: RequestOptionsInit) =>
     },
   };
 };
+/**
+ * Print headers in response
+ */
+// const responseInterceptor = (response: Response, options: RequestOptionsInit) => {
+//   return response;
+// };
 
 export const request: RequestConfig = {
   errorHandler, // 默认错误处理
   requestInterceptors: [addTokenInterceptor],
+  // responseInterceptors: [responseInterceptor]
 };

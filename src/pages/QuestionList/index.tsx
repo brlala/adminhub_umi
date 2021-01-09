@@ -6,13 +6,13 @@ import { useIntl, FormattedMessage } from 'umi';
 import { PageContainer, FooterToolbar } from '@ant-design/pro-layout';
 import type { ProColumns, ActionType } from '@ant-design/pro-table';
 import ProTable from '@ant-design/pro-table';
-import { ModalForm, ProFormText, ProFormTextArea } from '@ant-design/pro-form';
 import type { ProDescriptionsItemProps } from '@ant-design/pro-descriptions';
 import ProDescriptions from '@ant-design/pro-descriptions';
 import type { FormValueType } from './components/UpdateForm';
 import UpdateForm from './components/UpdateForm';
 import type { QuestionListItem } from './data.d';
 import { queryRule, updateRule, addRule, removeRule } from './service';
+import NewForm from '@/pages/QuestionList/components/NewForm';
 
 /**
  * 添加节点
@@ -80,7 +80,7 @@ const QuestionList: React.FC = () => {
   /**
    * 新建窗口的弹窗
    */
-  const [createModalVisible, handleModalVisible] = useState<boolean>(false);
+  const [createModalVisible, handleModalVisible] = useState<boolean>(true);
   /**
    * 分布更新窗口的弹窗
    */
@@ -293,41 +293,12 @@ const QuestionList: React.FC = () => {
           </Button>
         </FooterToolbar>
       )}
-      <ModalForm
-        title={intl.formatMessage({
-          id: 'pages.searchTable.createForm.newQuestion',
-          defaultMessage: 'New Question',
-        })}
-        width="400px"
-        visible={createModalVisible}
-        onVisibleChange={handleModalVisible}
-        onFinish={async (value) => {
-          const success = await handleAdd(value as QuestionListItem);
-          if (success) {
-            handleModalVisible(false);
-            if (actionRef.current) {
-              actionRef.current.reload();
-            }
-          }
-        }}
-      >
-        <ProFormText
-          rules={[
-            {
-              required: true,
-              message: (
-                <FormattedMessage
-                  id="pages.searchTable.ruleName"
-                  defaultMessage="Rule name is required"
-                />
-              ),
-            },
-          ]}
-          width="md"
-          name="name"
-        />
-        <ProFormTextArea width="md" name="desc" />
-      </ModalForm>
+      <NewForm
+        actionRef={actionRef}
+        handleAdd={handleAdd}
+        createModalVisible={createModalVisible}
+        handleModalVisible={handleModalVisible}
+      />
       <UpdateForm
         onSubmit={async (value) => {
           const success = await handleUpdate(value);

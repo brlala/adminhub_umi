@@ -13,6 +13,10 @@ export type QuestionListItem = {
   progress: number;
 };
 
+export type VariationListItem = {
+  text: string;
+};
+
 export type QuestionListPagination = {
   total: number;
   pageSize: number;
