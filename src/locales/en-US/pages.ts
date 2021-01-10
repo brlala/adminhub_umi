@@ -65,4 +65,12 @@ export default {
   'pages.searchTable.tenThousand': '0000',
   'pages.searchTable.batchDeletion': 'Batch deletion',
   'pages.searchTable.batchApproval': 'Batch approval',
+  'pages.searchTable.edit': 'Edit',
+  'pages.searchTable.nameStatus.deleted': 'deleted',
+  'pages.searchTable.nameStatus.inactive': 'inactive',
+  'pages.searchTable.nameStatus.scheduled': 'scheduled',
+  'pages.searchTable.timesTriggerNo': 'Times Triggered',
+  'pages.question.mainQuestion.mainQuestionLabel': 'Main Question',
+  'pages.question.topic.topicLabel': 'Topic',
+  'pages.question.response.responseLabel': 'Response',
 };

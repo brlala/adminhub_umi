@@ -1,19 +1,15 @@
 import React, { useState } from 'react';
-import ProForm, {
+import {
   ProFormText,
   ProFormDateRangePicker,
   ProFormSelect,
   ProFormTextArea,
   StepsForm,
-  ProFormCheckbox,
-  ProFormDatePicker,
 } from '@ant-design/pro-form';
-import { useIntl, FormattedMessage } from 'umi';
-import { Button, Form, Input, message, Modal, Radio } from 'antd';
-import { MinusCircleOutlined, PlusOutlined, SwapOutlined } from '@ant-design/icons';
-import styles from './NewForm.less';
-import type { QuestionListItem, VariationListItem } from '../data.d';
+import { message, Modal, Radio } from 'antd';
+import type { QuestionListItem } from '../data.d';
 import type { ActionType } from '@ant-design/pro-table';
+import EditableTagGroup from '@/pages/QuestionList/components/Tag';
 
 export type FormValueType = {
   target?: string;
@@ -44,11 +40,31 @@ const NewForm: React.FC<NewFormProps> = ({
   actionRef,
   handleAdd,
 }) => {
-  const intl = useIntl();
+  const [responseType, setResponseType] = useState<string>('text');
+  const [tags, setTags] = useState<string[]>(['hi', 'hi2']);
+
+  let responseArea;
+  if (responseType === 'text') {
+    responseArea = <ProFormTextArea width="xl" label="Response" name="response" />;
+  } else {
+    responseArea = (
+      <ProFormSelect
+        width="xl"
+        name="response"
+        label="Response"
+        showSearch
+        valueEnum={{
+          1: 'Flow 1',
+          2: 'Flow 2',
+        }}
+      />
+    );
+  }
   return (
     <StepsForm
       onFinish={async (values) => {
-        console.log(values);
+        const newValues = { ...values, responseType, tags };
+        console.log(newValues);
         await waitTime(1000);
         handleModalVisible(false);
         message.success('提交成功');
@@ -97,7 +113,7 @@ const NewForm: React.FC<NewFormProps> = ({
         />
         <ProFormText
           width="xl"
-          name="main-question"
+          name="mainQuestion"
           label="Main Question"
           placeholder="Please type the main question"
         />
@@ -106,40 +122,37 @@ const NewForm: React.FC<NewFormProps> = ({
         {/*<ProFormTextArea width="md" label="Variations" name="variations" />*/}
         {/*<ProFormTextArea width="lg" label="Variations" name="variations" />*/}
         <ProFormTextArea width="xl" label="Variations" name="variations" />
-        <ProFormTextArea width="xl" label="Response" name="response" />
       </StepsForm.StepForm>
       <StepsForm.StepForm name="checkbox" title="Creating Response">
-        <ProFormCheckbox.Group
-          name="checkbox"
-          label="迁移类型"
-          width="lg"
-          options={['结构迁移', '全量迁移', '增量迁移', '全量校验']}
-        />
-        <ProForm.Group>
-          <ProFormText width="md" name="dbname" label="业务 DB 用户名" />
-          <ProFormDatePicker name="datetime" label="记录保存时间" width="sm" />
-          <ProFormCheckbox.Group
-            name="checkbox"
-            label="迁移类型"
-            options={['完整 LOB', '不同步 LOB', '受限制 LOB']}
-          />
-        </ProForm.Group>
+        <div className="ant-row ant-form-item">
+          <div className="ant-col ant-form-item-label">
+            <label title="Type of Response">Type of Response</label>
+          </div>
+          <div className="ant-col ant-form-item-control">
+            <Radio.Group
+              onChange={(event) => setResponseType(event.target.value)}
+              defaultValue="text"
+              name="responseSelect"
+            >
+              <Radio.Button value="text">Text</Radio.Button>
+              <Radio.Button value="flow">Flow</Radio.Button>
+            </Radio.Group>
+          </div>
+        </div>
+        {responseArea}
       </StepsForm.StepForm>
       <StepsForm.StepForm name="time" title="Configuration">
-        <ProFormSelect
-          width="xl"
-          name="keywords"
-          label="Keywords"
-          valueEnum={{
-            red: 'Red',
-            green: 'Green',
-            blue: 'Blue',
-          }}
-          fieldProps={{
-            mode: 'multiple',
-          }}
-          placeholder="Please add keywords for question"
-        />
+        <div className="ant-row ant-form-item">
+          <div className="ant-col ant-form-item-label">
+            <label htmlFor="time_questionTime" className="" title="Keyword Tags">
+              Keyword Tags
+            </label>
+          </div>
+          <div className="ant-col ant-form-item-control">
+            <EditableTagGroup tags={tags} setTags={setTags} />
+          </div>
+        </div>
+
         <ProFormDateRangePicker width="xl" name="questionTime" label="Question Active Time" />
       </StepsForm.StepForm>
     </StepsForm>
