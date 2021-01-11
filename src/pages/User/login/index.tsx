@@ -9,7 +9,11 @@ import type { LoginParamsType } from '@/services/login';
 import { accountLogin } from '@/services/login';
 
 import styles from './index.less';
-setLocale('en-US');
+import { setIntl } from '@@/plugin-locale/localeExports';
+import moment from 'moment';
+import { changeLanguage } from '@/utils/language';
+changeLanguage('en-US');
+
 const LoginMessage: React.FC<{
   content: string;
 }> = ({ content }) => (

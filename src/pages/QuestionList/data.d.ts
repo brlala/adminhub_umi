@@ -1,16 +1,21 @@
+import { FlowDb } from '../../../models/flows';
+
 export type QuestionListItem = {
-  key: number;
-  disabled?: boolean;
-  href: string;
-  avatar: string;
-  name: string;
-  owner: string;
-  desc: string;
-  callNo: number;
-  status: number;
-  updatedAt: Date;
-  createdAt: Date;
-  progress: number;
+  id: string;
+  activeAt?: boolean;
+  alternateQuestions: Object[];
+  answers: Object[];
+  createdAt: string;
+  createdBy: string;
+  expireAt?: string;
+  internal: boolean;
+  isActive: boolean;
+  keyword: string[];
+  text: Object[];
+  topic: string;
+  updatedAt: string;
+  updatedBy: string;
+  answerFlow: FlowDb;
 };
 
 export type VariationListItem = {

@@ -1,5 +1,5 @@
 import { PlusOutlined } from '@ant-design/icons';
-import { Button, message, Input, Drawer } from 'antd';
+import { Button, message, Input, Drawer, Space, Tag } from 'antd';
 import React, { useState, useRef } from 'react';
 // @ts-ignore
 import { useIntl, FormattedMessage } from 'umi';
@@ -11,8 +11,11 @@ import ProDescriptions from '@ant-design/pro-descriptions';
 import type { FormValueType } from './components/UpdateForm';
 import UpdateForm from './components/UpdateForm';
 import type { QuestionListItem } from './data.d';
-import { queryRule, updateRule, addRule, removeRule } from './service';
+import { queryQuestion, updateRule, addRule, removeRule } from './service';
 import NewForm from '@/pages/QuestionList/components/NewForm';
+import moment from 'moment';
+import { changeLanguage } from '@/utils/language';
+import { readMore } from '@/utils/utils';
 
 /**
  * 添加节点
@@ -64,7 +67,7 @@ const handleRemove = async (selectedRows: QuestionListItem[]) => {
   if (!selectedRows) return true;
   try {
     await removeRule({
-      key: selectedRows.map((row) => row.key),
+      key: selectedRows.map((row) => row.id),
     });
     hide();
     message.success('Delete success, reloading page');
@@ -76,11 +79,12 @@ const handleRemove = async (selectedRows: QuestionListItem[]) => {
   }
 };
 
+changeLanguage('en-US');
 const QuestionList: React.FC = () => {
   /**
    * 新建窗口的弹窗
    */
-  const [createModalVisible, handleModalVisible] = useState<boolean>(true);
+  const [createModalVisible, handleModalVisible] = useState<boolean>(false);
   /**
    * 分布更新窗口的弹窗
    */
@@ -100,8 +104,9 @@ const QuestionList: React.FC = () => {
   const columns: ProColumns<QuestionListItem>[] = [
     {
       title: <FormattedMessage id="pages.question.topic.topicLabel" defaultMessage="Topic" />,
-      dataIndex: 'name',
+      dataIndex: 'topic',
       valueType: 'textarea',
+      width: '10%',
     },
     {
       title: (
@@ -110,7 +115,8 @@ const QuestionList: React.FC = () => {
           defaultMessage="Main Question"
         />
       ),
-      dataIndex: 'desc',
+      width: '25%',
+      dataIndex: 'questionText',
       valueType: 'textarea',
       render: (dom, entity) => {
         return (
@@ -120,21 +126,44 @@ const QuestionList: React.FC = () => {
               setShowDetail(true);
             }}
           >
-            {dom}
+            {(entity.text as any).EN}
           </a>
         );
-        // tip: 'Each question should be unique',
       },
     },
     {
       title: (
         <FormattedMessage id="pages.question.response.responseLabel" defaultMessage="Response" />
       ),
-      dataIndex: 'desc',
+      dataIndex: 'answerFlow',
       valueType: 'textarea',
+      width: '30%',
       hideInSearch: true,
+      ellipsis: true,
       render: (dom, entity) => {
-        return <>This is the answer for the intents at the left</>;
+        let content;
+        if (entity.answerFlow) {
+          if (!entity.answerFlow.name) {
+            content = (
+              <>
+                <Tag color={'magenta'} key={entity.answerFlow.name}>
+                  Text
+                </Tag>
+                {readMore((entity.answerFlow.flow[0].data.text as any).EN, 15)}
+              </>
+            );
+          } else {
+            content = (
+              <>
+                <Tag color={'green'} key={entity.answerFlow.name}>
+                  Flow
+                </Tag>
+                {entity.answerFlow.name}
+              </>
+            );
+          }
+        }
+        return <Space>{content}</Space>;
       },
     },
     {
@@ -144,11 +173,14 @@ const QuestionList: React.FC = () => {
       dataIndex: 'callNo',
       sorter: true,
       hideInForm: true,
+      hideInSearch: true,
     },
     {
       title: <FormattedMessage id="pages.searchTable.titleStatus" defaultMessage="状态" />,
       dataIndex: 'status',
       hideInForm: true,
+      hideInTable: true,
+      hideInSearch: true,
       valueEnum: {
         0: {
           text: (
@@ -184,31 +216,29 @@ const QuestionList: React.FC = () => {
     },
     {
       title: (
-        <FormattedMessage
-          id="pages.searchTable.titleUpdatedAt"
-          defaultMessage="Last Triggered at"
-        />
+        <FormattedMessage id="pages.searchTable.titleUpdatedAt" defaultMessage="Last Updated" />
+      ),
+      sorter: true,
+      dataIndex: 'createdAt',
+      valueType: 'dateTime',
+      hideInSearch: true,
+      width: '8%',
+      render: (dom, entity) => {
+        let date = moment(entity.createdAt).format('dd, DD-MMM-YY');
+        return date;
+      },
+    },
+    {
+      title: (
+        <FormattedMessage id="pages.searchTable.titleTriggeredAt" defaultMessage="Last Triggered" />
       ),
       sorter: true,
       dataIndex: 'updatedAt',
-      valueType: 'dateTime',
-      renderFormItem: (item, { defaultRender, ...rest }, form) => {
-        const status = form.getFieldValue('status');
-        if (`${status}` === '0') {
-          return false;
-        }
-        if (`${status}` === '3') {
-          return (
-            <Input
-              {...rest}
-              placeholder={intl.formatMessage({
-                id: 'pages.searchTable.exception',
-                defaultMessage: 'Please enter the reason for the exception!',
-              })}
-            />
-          );
-        }
-        return defaultRender(item);
+      valueType: 'dateRange',
+      width: '8%',
+      render: (dom, entity) => {
+        let date = moment(entity.updatedAt).format('dd, DD-MMM-YY');
+        return date;
       },
     },
     {
@@ -232,12 +262,13 @@ const QuestionList: React.FC = () => {
   return (
     <PageContainer>
       <ProTable<QuestionListItem>
+        style={{ whiteSpace: 'pre-line' }}
         headerTitle={intl.formatMessage({
           id: 'pages.searchTable.title',
           defaultMessage: 'Status',
         })}
         actionRef={actionRef}
-        rowKey="key"
+        rowKey="id"
         search={{
           labelWidth: 120,
         }}
@@ -252,7 +283,11 @@ const QuestionList: React.FC = () => {
             <PlusOutlined /> <FormattedMessage id="pages.searchTable.new" defaultMessage="New" />
           </Button>,
         ]}
-        request={(params, sorter, filter) => queryRule({ ...params, sorter, filter })}
+        request={async (params, sorter, filter) => {
+          const p = queryQuestion({ sorter, filter, ...params });
+          console.log(await p);
+          return p;
+        }}
         columns={columns}
         rowSelection={{
           onChange: (_, selectedRows) => {
@@ -273,7 +308,7 @@ const QuestionList: React.FC = () => {
                   id="pages.searchTable.totalServiceCalls"
                   defaultMessage="Total Number of Service Calls"
                 />{' '}
-                {selectedRowsState.reduce((pre, item) => pre + item.callNo, 0)}{' '}
+                {selectedRowsState.reduce((pre, item) => pre + 11000, 0)}{' '}
                 <FormattedMessage id="pages.searchTable.tenThousand" defaultMessage="万" />
               </span>
             </div>
@@ -327,15 +362,15 @@ const QuestionList: React.FC = () => {
         }}
         closable={false}
       >
-        {currentRow?.name && (
+        {currentRow?.key && (
           <ProDescriptions<QuestionListItem>
             column={2}
-            title={currentRow?.name}
+            title={currentRow?.key}
             request={async () => ({
               data: currentRow || {},
             })}
             params={{
-              id: currentRow?.name,
+              id: currentRow?.key,
             }}
             columns={columns as ProDescriptionsItemProps<QuestionListItem>[]}
           />

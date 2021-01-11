@@ -52,7 +52,7 @@ export default {
   'pages.searchTable.nameStatus.running': 'running',
   'pages.searchTable.nameStatus.online': 'online',
   'pages.searchTable.nameStatus.abnormal': 'abnormal',
-  'pages.searchTable.titleUpdatedAt': 'Last Triggered at',
+  'pages.searchTable.titleTriggeredAt': 'Last Triggered',
   'pages.searchTable.exception': 'Please enter the reason for the exception!',
   'pages.searchTable.titleOption': 'Option',
   'pages.searchTable.config': 'Configuration',

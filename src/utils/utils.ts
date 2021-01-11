@@ -18,3 +18,15 @@ export const isAntDesignProOrDev = (): boolean => {
   }
   return isAntDesignPro();
 };
+
+export const readMore = (str: string, maxWords: number) => {
+  const array = str.split(' ');
+  const wordCount = array.length;
+  let result = array.splice(0, maxWords).join(' ');
+
+  if (wordCount > maxWords) {
+    result += '...';
+  }
+
+  return result;
+};
