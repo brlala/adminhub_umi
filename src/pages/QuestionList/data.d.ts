@@ -18,6 +18,22 @@ export type QuestionListItem = {
   answerFlow: FlowDb;
 };
 
+export type newQuestionItem = {
+  mainQuestion: string;
+  questionTime?: string[];
+  response: string;
+  responseType: string;
+  tags?: string[];
+  topic: string;
+  variations: string;
+};
+
+export type DropdownProps = {
+  value: string;
+  label: string;
+  key: string;
+};
+
 export type VariationListItem = {
   text: string;
 };

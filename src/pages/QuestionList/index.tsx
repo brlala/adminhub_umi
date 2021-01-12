@@ -11,29 +11,11 @@ import ProDescriptions from '@ant-design/pro-descriptions';
 import type { FormValueType } from './components/UpdateForm';
 import UpdateForm from './components/UpdateForm';
 import type { QuestionListItem } from './data.d';
-import { queryQuestion, updateRule, addRule, removeRule } from './service';
+import { queryQuestion, updateRule, removeQuestion } from './service';
 import NewForm from '@/pages/QuestionList/components/NewForm';
 import moment from 'moment';
 import { changeLanguage } from '@/utils/language';
 import { readMore } from '@/utils/utils';
-
-/**
- * 添加节点
- * @param fields
- */
-const handleAdd = async (fields: QuestionListItem) => {
-  const hide = message.loading('Adding');
-  try {
-    await addRule({ ...fields });
-    hide();
-    message.success('Add success');
-    return true;
-  } catch (error) {
-    hide();
-    message.error('Add fail, please retry!');
-    return false;
-  }
-};
 
 /**
  * 更新节点
@@ -66,7 +48,7 @@ const handleRemove = async (selectedRows: QuestionListItem[]) => {
   const hide = message.loading('Deleting');
   if (!selectedRows) return true;
   try {
-    await removeRule({
+    await removeQuestion({
       key: selectedRows.map((row) => row.id),
     });
     hide();
@@ -149,7 +131,8 @@ const QuestionList: React.FC = () => {
                 <Tag color={'magenta'} key={entity.answerFlow.name}>
                   Text
                 </Tag>
-                {readMore((entity.answerFlow.flow[0].data.text as any).EN, 15)}
+                {/*{(entity.answerFlow.flow[0].data.text as any).EN}*/}
+                {readMore((entity.answerFlow.flow[0].data.text as any).EN, 10)}
               </>
             );
           } else {
@@ -262,7 +245,7 @@ const QuestionList: React.FC = () => {
   return (
     <PageContainer>
       <ProTable<QuestionListItem>
-        style={{ whiteSpace: 'pre-line' }}
+        // style={{ whiteSpace: 'pre-line' }}
         headerTitle={intl.formatMessage({
           id: 'pages.searchTable.title',
           defaultMessage: 'Status',
@@ -284,9 +267,7 @@ const QuestionList: React.FC = () => {
           </Button>,
         ]}
         request={async (params, sorter, filter) => {
-          const p = queryQuestion({ sorter, filter, ...params });
-          console.log(await p);
-          return p;
+          return queryQuestion({ sorter, filter, ...params });
         }}
         columns={columns}
         rowSelection={{
@@ -302,15 +283,6 @@ const QuestionList: React.FC = () => {
               <FormattedMessage id="pages.searchTable.chosen" defaultMessage="chosen" />{' '}
               <a style={{ fontWeight: 600 }}>{selectedRowsState.length}</a>{' '}
               <FormattedMessage id="pages.searchTable.item" defaultMessage="item" />
-              &nbsp;&nbsp;
-              <span>
-                <FormattedMessage
-                  id="pages.searchTable.totalServiceCalls"
-                  defaultMessage="Total Number of Service Calls"
-                />{' '}
-                {selectedRowsState.reduce((pre, item) => pre + 11000, 0)}{' '}
-                <FormattedMessage id="pages.searchTable.tenThousand" defaultMessage="万" />
-              </span>
             </div>
           }
         >
@@ -330,7 +302,6 @@ const QuestionList: React.FC = () => {
       )}
       <NewForm
         actionRef={actionRef}
-        handleAdd={handleAdd}
         createModalVisible={createModalVisible}
         handleModalVisible={handleModalVisible}
       />

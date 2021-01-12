@@ -1,5 +1,5 @@
 import { request } from 'umi';
-import type { QuestionListParams, QuestionListItem } from './data.d';
+import type { QuestionListParams, newQuestionItem, DropdownProps } from './data.d';
 
 export async function queryQuestion(params?: QuestionListParams) {
   let { sorter, filter, ...searchParam } = params;
@@ -20,27 +20,40 @@ export async function queryQuestion(params?: QuestionListParams) {
   params = { ...searchParam };
 
   // return request('/api/rule', {
-  return request('http://localhost:5000/questions', {
+  return request('http://localhost:5000/questions/', {
     params,
   });
 }
 
-export async function removeRule(params: { key: number[] }) {
-  return request('/api/rule', {
-    method: 'POST',
+export async function queryTopics() {
+  const topics: string[] = await request('http://localhost:5000/questions/topics');
+  let results: DropdownProps[] = [];
+  topics.forEach((topic) => results.push({ label: topic, value: topic, key: topic }));
+  return results;
+}
+
+export async function queryFlows(field: string) {
+  const flows: any = await request(`http://localhost:5000/flows/fields?field=${field}`);
+  let results: DropdownProps[] = [];
+  flows.forEach((flow: any) => results.push({ label: flow.name, value: flow.id, key: flow.id }));
+  return results;
+}
+
+export async function removeQuestion(params: { key: string[] }) {
+  console.log(params);
+  return request('http://localhost:5000/questions', {
+    method: 'DELETE',
     data: {
       ...params,
-      method: 'delete',
     },
   });
 }
 
-export async function addRule(params: QuestionListItem) {
-  return request('/api/rule', {
+export async function addQuestion(params: newQuestionItem) {
+  return request('http://localhost:5000/questions', {
     method: 'POST',
     data: {
       ...params,
-      method: 'post',
     },
   });
 }
