@@ -1,5 +1,5 @@
 import { PlusOutlined } from '@ant-design/icons';
-import { Button, message, Input, Drawer, Space, Tag } from 'antd';
+import { Button, message, Drawer, Space, Tag } from 'antd';
 import React, { useState, useRef } from 'react';
 // @ts-ignore
 import { useIntl, FormattedMessage } from 'umi';
@@ -9,12 +9,12 @@ import ProTable from '@ant-design/pro-table';
 import type { ProDescriptionsItemProps } from '@ant-design/pro-descriptions';
 import ProDescriptions from '@ant-design/pro-descriptions';
 import type { FormValueType } from './components/UpdateForm';
-import UpdateForm from './components/UpdateForm';
 import type { QuestionListItem } from './data.d';
 import { queryQuestion, updateRule, removeQuestion } from './service';
 import NewForm from '@/pages/QuestionList/components/NewForm';
 import moment from 'moment';
 import { changeLanguage } from '@/utils/language';
+import UpdateForm from './components/UpdateForm';
 import { readMore } from '@/utils/utils';
 
 /**
@@ -68,10 +68,12 @@ const QuestionList: React.FC = () => {
    */
   const [createModalVisible, handleModalVisible] = useState<boolean>(false);
   /**
+   * 编辑窗口的弹窗
+   */
+  const [editModalVisible, handleEditModalVisible] = useState<boolean>(false);
+  /**
    * 分布更新窗口的弹窗
    */
-  const [updateModalVisible, handleUpdateModalVisible] = useState<boolean>(false);
-
   const [showDetail, setShowDetail] = useState<boolean>(false);
 
   const actionRef = useRef<ActionType>();
@@ -232,7 +234,7 @@ const QuestionList: React.FC = () => {
         <a
           key="config"
           onClick={() => {
-            handleUpdateModalVisible(true);
+            handleEditModalVisible(true);
             setCurrentRow(record);
           }}
         >
@@ -306,22 +308,10 @@ const QuestionList: React.FC = () => {
         handleModalVisible={handleModalVisible}
       />
       <UpdateForm
-        onSubmit={async (value) => {
-          const success = await handleUpdate(value);
-          if (success) {
-            handleUpdateModalVisible(false);
-            setCurrentRow(undefined);
-            if (actionRef.current) {
-              actionRef.current.reload();
-            }
-          }
-        }}
-        onCancel={() => {
-          handleUpdateModalVisible(false);
-          setCurrentRow(undefined);
-        }}
-        updateModalVisible={updateModalVisible}
-        values={currentRow || {}}
+        actionRef={actionRef}
+        editModalVisible={editModalVisible}
+        handleEditModalVisible={handleEditModalVisible}
+        values={currentRow}
       />
 
       <Drawer
@@ -333,15 +323,15 @@ const QuestionList: React.FC = () => {
         }}
         closable={false}
       >
-        {currentRow?.key && (
+        {currentRow?.id && (
           <ProDescriptions<QuestionListItem>
-            column={2}
-            title={currentRow?.key}
+            column={1}
+            title={currentRow?.id}
             request={async () => ({
               data: currentRow || {},
             })}
             params={{
-              id: currentRow?.key,
+              id: currentRow?.id,
             }}
             columns={columns as ProDescriptionsItemProps<QuestionListItem>[]}
           />

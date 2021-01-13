@@ -9,7 +9,6 @@ import {
 import { Divider, Form, Input, message, Modal, Radio } from 'antd';
 import type { DropdownProps, newQuestionItem, QuestionListItem } from '../data.d';
 import type { ActionType } from '@ant-design/pro-table';
-import EditableTagGroup from '@/pages/QuestionList/components/Tag';
 import { addQuestion, queryFlows, queryTopics } from '@/pages/QuestionList/service';
 import { FormattedMessage } from '@@/plugin-locale/localeExports';
 import PlusOutlined from '@ant-design/icons/lib/icons/PlusOutlined';
@@ -26,6 +25,7 @@ export type NewFormProps = {
   actionRef: React.MutableRefObject<ActionType | undefined>;
   createModalVisible: boolean;
   handleModalVisible: (modalVisible: boolean) => void;
+  values: Partial<newQuestionItem>;
   // handleAdd: (fields: QuestionListItem) => Promise<boolean>;
 };
 
@@ -121,7 +121,7 @@ const NewForm: React.FC<NewFormProps> = ({ createModalVisible, handleModalVisibl
   return (
     <StepsForm
       onFinish={async (values) => {
-        const newValues = { ...values, responseType, tags };
+        const newValues = { ...values, responseType };
         console.log(newValues);
         const success = await handleAdd((newValues as unknown) as newQuestionItem);
         if (success) {
@@ -248,7 +248,19 @@ const NewForm: React.FC<NewFormProps> = ({ createModalVisible, handleModalVisibl
             </label>
           </div>
           <div className="ant-col ant-form-item-control">
-            <EditableTagGroup tags={tags} setTags={setTags} />
+            <ProFormSelect
+              name="tags"
+              label="Keywords"
+              fieldProps={{
+                mode: 'tags',
+              }}
+              width="lg"
+              initialValue={[]}
+              options={['keyword1', 'keyword2', 'keyword3'].map((item) => ({
+                label: item,
+                value: item,
+              }))}
+            />
           </div>
         </div>
 
