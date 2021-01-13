@@ -25,8 +25,6 @@ export type NewFormProps = {
   actionRef: React.MutableRefObject<ActionType | undefined>;
   createModalVisible: boolean;
   handleModalVisible: (modalVisible: boolean) => void;
-  values: Partial<newQuestionItem>;
-  // handleAdd: (fields: QuestionListItem) => Promise<boolean>;
 };
 
 /**
@@ -49,7 +47,6 @@ const handleAdd = async (fields: newQuestionItem) => {
 
 const NewForm: React.FC<NewFormProps> = ({ createModalVisible, handleModalVisible, actionRef }) => {
   const [responseType, setResponseType] = useState<string>('text');
-  const [tags, setTags] = useState<string[]>([]);
   const [newTopic, setNewTopic] = useState<string>('');
   const [topics, setTopics] = useState<DropdownProps[]>([]);
   const [flows, setFlows] = useState<DropdownProps[]>([]);
@@ -72,7 +69,7 @@ const NewForm: React.FC<NewFormProps> = ({ createModalVisible, handleModalVisibl
       <ProFormTextArea
         width="xl"
         label="Response"
-        name="response"
+        name="textResponse"
         rules={[
           {
             required: true,
@@ -91,7 +88,8 @@ const NewForm: React.FC<NewFormProps> = ({ createModalVisible, handleModalVisibl
     responseArea = (
       <ProFormSelect
         width="xl"
-        name="response"
+        prop
+        name="flowResponse"
         label="Response"
         showSearch
         // request={async () => {
@@ -241,28 +239,19 @@ const NewForm: React.FC<NewFormProps> = ({ createModalVisible, handleModalVisibl
         {responseArea}
       </StepsForm.StepForm>
       <StepsForm.StepForm name="time" title="Configuration (Optional)">
-        <div className="ant-row ant-form-item">
-          <div className="ant-col ant-form-item-label">
-            <label htmlFor="time_questionTime" className="" title="Keyword Tags">
-              Keyword Tags
-            </label>
-          </div>
-          <div className="ant-col ant-form-item-control">
-            <ProFormSelect
-              name="tags"
-              label="Keywords"
-              fieldProps={{
-                mode: 'tags',
-              }}
-              width="lg"
-              initialValue={[]}
-              options={['keyword1', 'keyword2', 'keyword3'].map((item) => ({
-                label: item,
-                value: item,
-              }))}
-            />
-          </div>
-        </div>
+        <ProFormSelect
+          name="tags"
+          label="Keywords"
+          fieldProps={{
+            mode: 'tags',
+          }}
+          width="lg"
+          initialValue={[]}
+          options={['keyword1', 'keyword2', 'keyword3'].map((item) => ({
+            label: item,
+            value: item,
+          }))}
+        />
 
         <ProFormDateRangePicker width="xl" name="questionTime" label="Question Active Time" />
       </StepsForm.StepForm>

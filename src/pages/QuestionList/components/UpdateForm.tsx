@@ -6,10 +6,10 @@ import {
   ProFormTextArea,
   StepsForm,
 } from '@ant-design/pro-form';
-import { Divider, Form, Input, message, Modal, Radio } from 'antd';
+import { Divider, Form, Input, message, Modal, Radio, Select } from 'antd';
 import type { DropdownProps, newQuestionItem, QuestionListItem } from '../data.d';
 import type { ActionType } from '@ant-design/pro-table';
-import { addQuestion, queryFlows, queryTopics } from '@/pages/QuestionList/service';
+import { editQuestion, queryFlows, queryTopics } from '@/pages/QuestionList/service';
 import { FormattedMessage } from '@@/plugin-locale/localeExports';
 import PlusOutlined from '@ant-design/icons/lib/icons/PlusOutlined';
 import moment from 'moment';
@@ -26,23 +26,20 @@ export type NewFormProps = {
   actionRef: React.MutableRefObject<ActionType | undefined>;
   editModalVisible: boolean;
   handleEditModalVisible: (modalVisible: boolean) => void;
-  values: Partial<QuestionListItem>;
+  values: Partial<QuestionListItem> | undefined;
+  setCurrentRow: (item: QuestionListItem | undefined) => void;
 };
 
-/**
- * 添加节点
- * @param fields
- */
-const handleAdd = async (fields: newQuestionItem) => {
-  const hide = message.loading('Adding');
+const handleEdit = async (fields: newQuestionItem) => {
+  const hide = message.loading('Editing');
   try {
-    await addQuestion({ ...fields });
+    await editQuestion({ ...fields });
     hide();
-    message.success('Add success');
+    message.success('Edit success');
     return true;
   } catch (error) {
     hide();
-    message.error('Add fail, please retry!');
+    message.error('Edit fail, please retry!');
     return false;
   }
 };
@@ -52,14 +49,13 @@ const NewForm: React.FC<NewFormProps> = ({
   handleEditModalVisible,
   actionRef,
   values,
+  setCurrentRow,
 }) => {
-  const [responseType, setResponseType] = useState<string>('text');
-  const [tags, setTags] = useState<string[]>([]);
+  const [responseType, setResponseType] = useState<string>();
   const [newTopic, setNewTopic] = useState<string>('');
   const [topics, setTopics] = useState<DropdownProps[]>([]);
   const [flows, setFlows] = useState<DropdownProps[]>([]);
-  const [selectedQuestion, setSelectedQuestion] = useState({});
-  const [form] = Form.useForm();
+  const [questionBody, setQuestionBody] = useState({});
   const dateFormat = 'YYYY/MM/DD';
   const onDropdownTopicChange = (event) => {
     setNewTopic(event.target.value);
@@ -67,10 +63,7 @@ const NewForm: React.FC<NewFormProps> = ({
 
   useEffect(() => {
     if (values) {
-      console.log('transformValues');
       let listVariations: string[] = [];
-      let listKeywords: string[] = [];
-      let schedule = [];
 
       // alternate questions
       if (values.alternateQuestions) {
@@ -81,32 +74,24 @@ const NewForm: React.FC<NewFormProps> = ({
         });
       }
 
-      // keywords
-      console.log(values);
-      if (values.keyword) {
-        setTags(values.keyword);
-      }
-
-      // schedule
-      if (values.activeAt) {
-        schedule = [moment(values.activeAt, dateFormat), moment(values.expireAt, dateFormat)];
-      }
-
+      const responseSelect = values.answerFlow?.name ? 'flow' : 'text';
+      const flowResponseId = responseSelect === 'flow' ? values.answerFlow.id : null;
       const body = {
-        response: values.answerFlow.name
-          ? values.answerFlow.name
-          : values.answerFlow.flow[0].data.text?.EN,
-        mainQuestion: values.text.EN,
+        id: values.id,
+        [`${responseSelect}Response`]: flowResponseId || values.answerFlow?.flow[0].data.text?.EN,
+        mainQuestion: values.text?.EN,
+        responseSelect: responseSelect,
         topic: values.topic,
         variations: listVariations.join('\n'),
-        responseSelect: values.answerFlow.name ? 'flow' : 'text',
-        tags: listKeywords,
-        questionTime: schedule,
+        tags: values.keyword || [],
+        questionTime: values.activeAt
+          ? [moment(values.activeAt, dateFormat), moment(values.expireAt, dateFormat)]
+          : [],
       };
-      console.log(body);
-      setSelectedQuestion(body);
+      setResponseType(body.responseSelect);
+      setQuestionBody(body);
     }
-  }, [values]);
+  }, [editModalVisible]);
 
   const addNewTopic = () => {
     const topic: DropdownProps = { key: newTopic, value: newTopic, label: newTopic };
@@ -116,31 +101,29 @@ const NewForm: React.FC<NewFormProps> = ({
 
   let responseArea;
   if (responseType === 'text') {
-    form.setFieldsValue({ response: null });
     responseArea = (
       <ProFormTextArea
         width="xl"
         label="Response"
-        name="response"
-        rules={[
-          {
-            required: true,
-            message: (
-              <FormattedMessage
-                id="pages.searchTable.response"
-                defaultMessage="Response is required"
-              />
-            ),
-          },
-        ]}
+        name="textResponse"
+        // rules={[
+        //   {
+        //     required: true,
+        //     message: (
+        //       <FormattedMessage
+        //         id="pages.searchTable.response"
+        //         defaultMessage="Response is required"
+        //       />
+        //     ),
+        //   },
+        // ]}
       />
     );
   } else {
-    form.setFieldsValue({ response: null });
     responseArea = (
       <ProFormSelect
         width="xl"
-        name="response"
+        name="flowResponse"
         label="Response"
         showSearch
         request={async () => {
@@ -148,26 +131,26 @@ const NewForm: React.FC<NewFormProps> = ({
           setFlows(flows);
         }}
         options={flows}
-        rules={[
-          {
-            required: true,
-            message: (
-              <FormattedMessage
-                id="pages.searchTable.response"
-                defaultMessage="Response is required"
-              />
-            ),
-          },
-        ]}
+        // rules={[
+        //   {
+        //     required: true,
+        //     message: (
+        //       <FormattedMessage
+        //         id="pages.searchTable.response"
+        //         defaultMessage="Response is required"
+        //       />
+        //     ),
+        //   },
+        // ]}
       />
     );
   }
   return (
     <StepsForm
       onFinish={async (values) => {
-        const newValues = { ...values, responseType, tags };
-        console.log(tags);
-        const success = await handleAdd((newValues as unknown) as newQuestionItem);
+        const newValues = { ...values, responseType, id: questionBody.id };
+        console.log(newValues);
+        const success = await handleEdit((newValues as unknown) as newQuestionItem);
         if (success) {
           handleEditModalVisible(false);
           if (actionRef.current) {
@@ -183,9 +166,12 @@ const NewForm: React.FC<NewFormProps> = ({
       stepsFormRender={(dom, submitter) => {
         return (
           <Modal
-            title="New Question"
+            title="Edit Question"
             width={800}
-            onCancel={() => handleEditModalVisible(false)}
+            onCancel={() => {
+              setCurrentRow(undefined);
+              handleEditModalVisible(false);
+            }}
             visible={editModalVisible}
             footer={submitter}
             destroyOnClose
@@ -196,10 +182,10 @@ const NewForm: React.FC<NewFormProps> = ({
       }}
     >
       <StepsForm.StepForm
+        initialValues={{ ...questionBody }}
         name="base"
-        title="Editing Question"
+        title="Creating Question"
         onFinish={async () => {
-          // await waitTime(2000);
           return true;
         }}
       >
@@ -209,7 +195,6 @@ const NewForm: React.FC<NewFormProps> = ({
             setTopics(topics);
           }}
           options={topics}
-          // initialValue={...selectedQuestion}
           fieldProps={{
             dropdownRender: (menu) => (
               <div>
@@ -267,7 +252,11 @@ const NewForm: React.FC<NewFormProps> = ({
         {/*<ProFormTextArea width="lg" label="Variations" name="variations" />*/}
         <ProFormTextArea width="xl" label="Variations" name="variations" />
       </StepsForm.StepForm>
-      <StepsForm.StepForm name="checkbox" title="Creating Response" form={form}>
+      <StepsForm.StepForm
+        name="checkbox"
+        title="Creating Response"
+        initialValues={{ ...questionBody }}
+      >
         <div className="ant-row ant-form-item">
           <div className="ant-col ant-form-item-label">
             <label title="Type of Response">Type of Response</label>
@@ -275,7 +264,7 @@ const NewForm: React.FC<NewFormProps> = ({
           <div className="ant-col ant-form-item-control">
             <Radio.Group
               onChange={(event) => setResponseType(event.target.value)}
-              defaultValue="text"
+              defaultValue={questionBody.responseSelect}
               name="responseSelect"
             >
               <Radio.Button value="text">Text</Radio.Button>
@@ -285,14 +274,27 @@ const NewForm: React.FC<NewFormProps> = ({
         </div>
         {responseArea}
       </StepsForm.StepForm>
-      <StepsForm.StepForm name="time" title="Configuration (Optional)">
+      <StepsForm.StepForm
+        name="time"
+        title="Configuration (Optional)"
+        initialValues={{ ...questionBody }}
+      >
         <div className="ant-row ant-form-item">
           <div className="ant-col ant-form-item-label">
             <label htmlFor="time_questionTime" className="" title="Keyword Tags">
               Keyword Tags
             </label>
           </div>
-          <div className="ant-col ant-form-item-control"></div>
+          <div className="ant-col ant-form-item-control">
+            <ProFormSelect
+              name="tags"
+              label="Keywords"
+              fieldProps={{
+                mode: 'tags',
+              }}
+              width="lg"
+            />
+          </div>
         </div>
 
         <ProFormDateRangePicker width="xl" name="questionTime" label="Question Active Time" />

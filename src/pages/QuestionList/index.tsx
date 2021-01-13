@@ -1,6 +1,6 @@
 import { PlusOutlined } from '@ant-design/icons';
 import { Button, message, Drawer, Space, Tag } from 'antd';
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 // @ts-ignore
 import { useIntl, FormattedMessage } from 'umi';
 import { PageContainer, FooterToolbar } from '@ant-design/pro-layout';
@@ -16,6 +16,7 @@ import moment from 'moment';
 import { changeLanguage } from '@/utils/language';
 import UpdateForm from './components/UpdateForm';
 import { readMore } from '@/utils/utils';
+import { FormInstance } from 'antd/lib/form';
 
 /**
  * 更新节点
@@ -59,6 +60,21 @@ const handleRemove = async (selectedRows: QuestionListItem[]) => {
     message.error('Delete fail, please retry!');
     return false;
   }
+};
+
+// reset form fields when modal is form, closed
+const useResetFormOnCloseModal = ({ form, visible }: { form: FormInstance; visible: boolean }) => {
+  const prevVisibleRef = useRef<boolean>();
+  useEffect(() => {
+    prevVisibleRef.current = visible;
+  }, [visible]);
+  const prevVisible = prevVisibleRef.current;
+
+  useEffect(() => {
+    if (!visible && prevVisible) {
+      form.resetFields();
+    }
+  }, [visible]);
 };
 
 changeLanguage('en-US');
@@ -312,7 +328,16 @@ const QuestionList: React.FC = () => {
         editModalVisible={editModalVisible}
         handleEditModalVisible={handleEditModalVisible}
         values={currentRow}
+        setCurrentRow={setCurrentRow}
       />
+      {/*<UpdateForm*/}
+      {/*  actionRef={actionRef}*/}
+      {/*  editModalVisible={editModalVisible}*/}
+      {/*  handleEditModalVisible={handleEditModalVisible}*/}
+      {/*  values={currentRow}*/}
+      {/*  setCurrentRow={setCurrentRow}*/}
+      {/*  resetForm={useResetFormOnCloseModal}*/}
+      {/*/>*/}
 
       <Drawer
         width={600}

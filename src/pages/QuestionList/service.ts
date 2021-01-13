@@ -41,7 +41,7 @@ export async function queryFlows(field: string) {
 
 export async function removeQuestion(params: { key: string[] }) {
   console.log(params);
-  return request('http://localhost:5000/questions', {
+  return request('http://localhost:5000/questions/', {
     method: 'DELETE',
     data: {
       ...params,
@@ -50,8 +50,17 @@ export async function removeQuestion(params: { key: string[] }) {
 }
 
 export async function addQuestion(params: newQuestionItem) {
-  return request('http://localhost:5000/questions', {
+  return request('http://localhost:5000/questions/', {
     method: 'POST',
+    data: {
+      ...params,
+    },
+  });
+}
+
+export async function editQuestion(params: newQuestionItem) {
+  return request('http://localhost:5000/questions', {
+    method: 'PUT',
     data: {
       ...params,
     },

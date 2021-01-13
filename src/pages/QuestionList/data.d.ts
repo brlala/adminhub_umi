@@ -19,6 +19,7 @@ export type QuestionListItem = {
 };
 
 export type newQuestionItem = {
+  id?: string;
   mainQuestion: string;
   questionTime?: string[];
   response: string;
