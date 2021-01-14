@@ -80,4 +80,5 @@ export default {
   'pages.searchTable.titleUpdatedAt': 'Last Updated',
   'pages.searchTable.titleCreatedAt': 'Created At',
   'pages.searchTable.titleSchedule': 'Schedule',
+  'pages.searchTable.titleTags': 'Tags',
 };

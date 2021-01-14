@@ -257,7 +257,7 @@ const NewForm: React.FC<NewFormProps> = ({ createModalVisible, handleModalVisibl
           }}
           width="lg"
           initialValue={[]}
-          options={['keyword1', 'keyword2', 'keyword3'].map((item) => ({
+          options={['SmartProtect', 'SES', 'Rider Incentives'].map((item) => ({
             label: item,
             value: item,
           }))}

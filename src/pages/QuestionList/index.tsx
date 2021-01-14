@@ -395,7 +395,7 @@ const QuestionList: React.FC = () => {
     {
       title: (
         <b>
-          <FormattedMessage id="pages.searchTable.titleSchedule" defaultMessage="Schedule" />
+          <FormattedMessage id="pages.searchTable.titleTags" defaultMessage="Tags" />
         </b>
       ),
       dataIndex: 'keyword',
