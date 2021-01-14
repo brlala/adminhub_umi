@@ -395,13 +395,12 @@ const QuestionList: React.FC = () => {
     {
       title: (
         <b>
-          <FormattedMessage id="pages.searchTable.titleCreatedAt" defaultMessage="Created At" />
+          <FormattedMessage id="pages.searchTable.titleSchedule" defaultMessage="Schedule" />
         </b>
       ),
-      dataIndex: 'createdAt',
-      valueType: 'dateTime',
+      dataIndex: 'keyword',
       render: (dom, entity) => {
-        return moment(entity.createdAt).format('dddd, Do MMMM YYYY');
+        return entity.keyword ? (entity.keyword as string[]).join(', ') : 'None';
       },
     },
     {
@@ -411,7 +410,6 @@ const QuestionList: React.FC = () => {
         </b>
       ),
       dataIndex: 'activeAt',
-      valueType: 'dateTime',
       render: (dom, entity) => {
         if (entity.activeAt) {
           return (
@@ -427,11 +425,22 @@ const QuestionList: React.FC = () => {
     {
       title: (
         <b>
+          <FormattedMessage id="pages.searchTable.titleCreatedAt" defaultMessage="Created At" />
+        </b>
+      ),
+      dataIndex: 'createdAt',
+      render: (dom, entity) => {
+        return moment(entity.createdAt).format('dddd, Do MMMM YYYY');
+      },
+    },
+
+    {
+      title: (
+        <b>
           <FormattedMessage id="pages.searchTable.titleUpdatedAt" defaultMessage="Last Updated" />
         </b>
       ),
       dataIndex: 'updatedAt',
-      valueType: 'dateTime',
       render: (dom, entity) => {
         return moment(entity.updatedAt).format('dddd, Do MMMM YYYY');
       },
