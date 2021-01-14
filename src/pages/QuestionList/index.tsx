@@ -414,7 +414,7 @@ const QuestionList: React.FC = () => {
         if (entity.activeAt) {
           return (
             <>
-              {moment(entity.activeAt).format('dddd, Do MMMM YYYY')} <i>to</i>{' '}
+              {moment(entity.activeAt).format('dddd, Do MMMM YYYY')} -{' '}
               {moment(entity.expireAt).format('dddd, Do MMMM YYYY')}
             </>
           );
