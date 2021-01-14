@@ -173,8 +173,16 @@ const QuestionList: React.FC = () => {
       dataIndex: 'triggeredCount',
       sorter: true,
       hideInForm: true,
+
       renderFormItem: (item, { type, defaultRender, ...rest }, form) => {
-        return <Slider range defaultValue={[0, maxTriggeredCount]} max={maxTriggeredCount} />;
+        return (
+          <Slider
+            style={{ margin: '0px 20px 0px 20px' }}
+            range
+            defaultValue={[0, maxTriggeredCount]}
+            max={maxTriggeredCount}
+          />
+        );
       },
     },
     {
@@ -224,7 +232,7 @@ const QuestionList: React.FC = () => {
       dataIndex: 'createdAt',
       valueType: 'dateTime',
       hideInSearch: true,
-      width: '8%',
+      width: '9%',
       render: (dom, entity) => {
         let date = moment(entity.createdAt).format('dd, DD-MMM-YY');
         return date;
@@ -237,7 +245,7 @@ const QuestionList: React.FC = () => {
       sorter: true,
       dataIndex: 'updatedAt',
       valueType: 'dateRange',
-      width: '8%',
+      width: '9%',
       render: (dom, entity) => {
         let date = moment(entity.updatedAt).format('dd, DD-MMM-YY');
         return date;
