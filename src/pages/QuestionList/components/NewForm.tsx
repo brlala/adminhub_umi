@@ -12,6 +12,7 @@ import type { ActionType } from '@ant-design/pro-table';
 import { addQuestion, queryFlows, queryTopics } from '@/pages/QuestionList/service';
 import { FormattedMessage } from '@@/plugin-locale/localeExports';
 import PlusOutlined from '@ant-design/icons/lib/icons/PlusOutlined';
+import styles from './NewForm.less';
 
 export type FormValueType = {
   target?: string;
@@ -218,7 +219,16 @@ const NewForm: React.FC<NewFormProps> = ({ createModalVisible, handleModalVisibl
         {/*<ProFormTextArea width="sm" label="Variations" name="variations" />*/}
         {/*<ProFormTextArea width="md" label="Variations" name="variations" />*/}
         {/*<ProFormTextArea width="lg" label="Variations" name="variations" />*/}
-        <ProFormTextArea width="xl" label="Variations" name="variations" />
+        {console.log(styles)}
+        <ProFormTextArea
+          width="xl"
+          label="Variations"
+          name="variations"
+          fieldProps={{
+            rows: 10,
+          }}
+          tooltip="Separate each variation with a new line."
+        />
       </StepsForm.StepForm>
       <StepsForm.StepForm name="checkbox" title="Creating Response" form={form}>
         <div className="ant-row ant-form-item">

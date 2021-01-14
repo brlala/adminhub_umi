@@ -26,6 +26,8 @@ export type NewFormProps = {
   actionRef: React.MutableRefObject<ActionType | undefined>;
   editModalVisible: boolean;
   handleEditModalVisible: (modalVisible: boolean) => void;
+  showDetail: boolean;
+  setShowDetail: (modalVisible: boolean) => void;
   values: Partial<QuestionListItem> | undefined;
   setCurrentRow: (item: QuestionListItem | undefined) => void;
 };
@@ -47,6 +49,8 @@ const handleEdit = async (fields: newQuestionItem) => {
 const NewForm: React.FC<NewFormProps> = ({
   editModalVisible,
   handleEditModalVisible,
+  showDetail,
+  setShowDetail,
   actionRef,
   values,
   setCurrentRow,
@@ -149,10 +153,10 @@ const NewForm: React.FC<NewFormProps> = ({
     <StepsForm
       onFinish={async (values) => {
         const newValues = { ...values, responseType, id: questionBody.id };
-        console.log(newValues);
         const success = await handleEdit((newValues as unknown) as newQuestionItem);
         if (success) {
           handleEditModalVisible(false);
+          setShowDetail(false);
           if (actionRef.current) {
             actionRef.current.reload();
           }
@@ -169,7 +173,7 @@ const NewForm: React.FC<NewFormProps> = ({
             title="Edit Question"
             width={800}
             onCancel={() => {
-              setCurrentRow(undefined);
+              if (!showDetail) setCurrentRow(undefined);
               handleEditModalVisible(false);
             }}
             visible={editModalVisible}

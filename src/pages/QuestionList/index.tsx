@@ -1,20 +1,20 @@
 import { PlusOutlined } from '@ant-design/icons';
-import { Button, message, Drawer, Space, Tag } from 'antd';
-import React, { useState, useRef, useEffect } from 'react';
+import { Button, Drawer, message, Slider, Space, Tag } from 'antd';
+import React, { useEffect, useRef, useState } from 'react';
 // @ts-ignore
-import { useIntl, FormattedMessage } from 'umi';
-import { PageContainer, FooterToolbar } from '@ant-design/pro-layout';
-import type { ProColumns, ActionType } from '@ant-design/pro-table';
+import { FormattedMessage, useIntl } from 'umi';
+import { FooterToolbar, PageContainer } from '@ant-design/pro-layout';
+import type { ActionType, ProColumns } from '@ant-design/pro-table';
 import ProTable from '@ant-design/pro-table';
 import type { ProDescriptionsItemProps } from '@ant-design/pro-descriptions';
 import ProDescriptions from '@ant-design/pro-descriptions';
 import type { FormValueType } from './components/UpdateForm';
+import UpdateForm from './components/UpdateForm';
 import type { QuestionListItem } from './data.d';
-import { queryQuestion, updateRule, removeQuestion } from './service';
+import { queryQuestion, removeQuestion, updateRule } from './service';
 import NewForm from '@/pages/QuestionList/components/NewForm';
 import moment from 'moment';
 import { changeLanguage } from '@/utils/language';
-import UpdateForm from './components/UpdateForm';
 import { readMore } from '@/utils/utils';
 import { FormInstance } from 'antd/lib/form';
 
@@ -95,6 +95,7 @@ const QuestionList: React.FC = () => {
   const actionRef = useRef<ActionType>();
   const [currentRow, setCurrentRow] = useState<QuestionListItem>();
   const [selectedRowsState, setSelectedRows] = useState<QuestionListItem[]>([]);
+  const [maxTriggeredCount, setMaxTriggeredCount] = useState<number>(5000);
 
   /**
    * 国际化配置
@@ -112,7 +113,7 @@ const QuestionList: React.FC = () => {
       title: (
         <FormattedMessage
           id="pages.question.mainQuestion.mainQuestionLabel"
-          defaultMessage="Main Question"
+          defaultMessage="Topic"
         />
       ),
       width: '25%',
@@ -141,40 +142,40 @@ const QuestionList: React.FC = () => {
       hideInSearch: true,
       ellipsis: true,
       render: (dom, entity) => {
-        let content;
-        if (entity.answerFlow) {
-          if (!entity.answerFlow.name) {
-            content = (
-              <>
-                <Tag color={'magenta'} key={entity.answerFlow.name}>
-                  Text
-                </Tag>
-                {/*{(entity.answerFlow.flow[0].data.text as any).EN}*/}
-                {readMore((entity.answerFlow.flow[0].data.text as any).EN, 10)}
-              </>
-            );
-          } else {
-            content = (
-              <>
-                <Tag color={'green'} key={entity.answerFlow.name}>
-                  Flow
-                </Tag>
-                {entity.answerFlow.name}
-              </>
-            );
-          }
+        let tagColour;
+        let tagKey;
+        let tagText;
+        if (entity.answerFlow?.name) {
+          // valid flow
+          tagColour = 'green';
+          tagKey = 'Flow';
+          tagText = entity.answerFlow.name;
+        } else {
+          // unnamed text flow
+          tagColour = 'magenta';
+          tagKey = 'Text';
+          tagText = readMore((entity.answerFlow.flow[0].data.text as any).EN, 15);
         }
-        return <Space>{content}</Space>;
+        return (
+          <Space>
+            <Tag color={tagColour} key={entity.answerFlow?.id}>
+              {tagKey}
+            </Tag>
+            {tagText}
+          </Space>
+        );
       },
     },
     {
       title: (
         <FormattedMessage id="pages.searchTable.timesTriggerNo" defaultMessage="Times Triggered" />
       ),
-      dataIndex: 'callNo',
+      dataIndex: 'triggeredCount',
       sorter: true,
       hideInForm: true,
-      hideInSearch: true,
+      renderFormItem: (item, { type, defaultRender, ...rest }, form) => {
+        return <Slider range defaultValue={[0, maxTriggeredCount]} max={maxTriggeredCount} />;
+      },
     },
     {
       title: <FormattedMessage id="pages.searchTable.titleStatus" defaultMessage="状态" />,
@@ -260,6 +261,217 @@ const QuestionList: React.FC = () => {
     },
   ];
 
+  const columnsDrawer: ProColumns<QuestionListItem>[] = [
+    {
+      title: (
+        <b>
+          <FormattedMessage id="pages.question.topic.topicLabel" defaultMessage="Topic" />
+        </b>
+      ),
+      dataIndex: 'topic',
+    },
+    {
+      title: (
+        <b>
+          <FormattedMessage
+            id="pages.question.mainQuestion.mainQuestionLabel"
+            defaultMessage="Main Question"
+          />
+        </b>
+      ),
+      dataIndex: 'questionText',
+      render: (dom, entity) => <>{(entity.text as any).EN}</>,
+    },
+    {
+      title: (
+        <b>
+          <FormattedMessage id="pages.question.response.responseLabel" defaultMessage="Response" />
+        </b>
+      ),
+      dataIndex: 'answerFlow',
+      render: (dom, entity) => {
+        let tagColour;
+        let tagKey;
+        let tagText;
+        if (entity.answerFlow?.name) {
+          // valid flow
+          tagColour = 'green';
+          tagKey = 'Flow';
+          tagText = entity.answerFlow.name;
+        } else {
+          // unnamed text flow
+          tagColour = 'magenta';
+          tagKey = 'Text';
+          tagText = (entity.answerFlow.flow[0].data.text as any).EN;
+        }
+        return (
+          <Space>
+            <Tag color={tagColour} key={entity.answerFlow?.id}>
+              {tagKey}
+            </Tag>
+            {tagText}
+          </Space>
+        );
+      },
+    },
+    {
+      title: (
+        <b>
+          <FormattedMessage
+            id="pages.searchTable.timesTriggerNo"
+            defaultMessage="Times Triggered"
+          />
+        </b>
+      ),
+      dataIndex: 'triggeredCount',
+      sorter: true,
+      hideInForm: true,
+      hideInSearch: true,
+    },
+    {
+      title: (
+        <b>
+          <FormattedMessage id="pages.searchTable.titleStatus" defaultMessage="状态" />
+        </b>
+      ),
+      dataIndex: 'status',
+      hideInForm: true,
+      hideInTable: true,
+      hideInSearch: true,
+      valueEnum: {
+        0: {
+          text: (
+            <FormattedMessage
+              id="pages.searchTable.nameStatus.inactive"
+              defaultMessage="Inactive"
+            />
+          ),
+          status: 'Default',
+        },
+        1: {
+          text: (
+            <FormattedMessage
+              id="pages.searchTable.nameStatus.scheduled"
+              defaultMessage="Scheduled"
+            />
+          ),
+          status: 'Processing',
+        },
+        2: {
+          text: (
+            <FormattedMessage id="pages.searchTable.nameStatus.active" defaultMessage="Active" />
+          ),
+          status: 'Success',
+        },
+        3: {
+          text: (
+            <FormattedMessage id="pages.searchTable.nameStatus.deleted" defaultMessage="deleted" />
+          ),
+          status: 'Error',
+        },
+      },
+    },
+    {
+      title: (
+        <b>
+          <FormattedMessage id="pages.searchTable.variations" defaultMessage="Variations" />
+        </b>
+      ),
+      dataIndex: 'alternateQuestions',
+      render: (dom, entity) => {
+        let listVariations: string[] = [];
+
+        // alternate questions
+        if (entity.alternateQuestions) {
+          entity.alternateQuestions.forEach((varEntry) => {
+            if (varEntry.language === 'EN') {
+              listVariations.push(varEntry.text);
+            }
+          });
+        }
+        return listVariations.join('\n');
+      },
+    },
+    {
+      title: (
+        <b>
+          <FormattedMessage id="pages.searchTable.titleCreatedAt" defaultMessage="Created At" />
+        </b>
+      ),
+      dataIndex: 'createdAt',
+      valueType: 'dateTime',
+      render: (dom, entity) => {
+        return moment(entity.createdAt).format('dddd, Do MMMM YYYY');
+      },
+    },
+    {
+      title: (
+        <b>
+          <FormattedMessage id="pages.searchTable.titleSchedule" defaultMessage="Schedule" />
+        </b>
+      ),
+      dataIndex: 'activeAt',
+      valueType: 'dateTime',
+      render: (dom, entity) => {
+        if (entity.activeAt) {
+          return (
+            <>
+              {moment(entity.activeAt).format('dddd, Do MMMM YYYY')} <i>to</i>{' '}
+              {moment(entity.expireAt).format('dddd, Do MMMM YYYY')}
+            </>
+          );
+        }
+        return <>None</>;
+      },
+    },
+    {
+      title: (
+        <b>
+          <FormattedMessage id="pages.searchTable.titleUpdatedAt" defaultMessage="Last Updated" />
+        </b>
+      ),
+      dataIndex: 'updatedAt',
+      valueType: 'dateTime',
+      render: (dom, entity) => {
+        return moment(entity.updatedAt).format('dddd, Do MMMM YYYY');
+      },
+    },
+    {
+      title: (
+        <b>
+          <FormattedMessage
+            id="pages.searchTable.titleTriggeredAt"
+            defaultMessage="Last Triggered"
+          />
+        </b>
+      ),
+      dataIndex: 'updatedAt',
+      render: (dom, entity) => {
+        return moment(entity.updatedAt).format('dddd, Do MMMM YYYY');
+      },
+    },
+    {
+      title: (
+        <b>
+          <FormattedMessage id="pages.searchTable.variations" defaultMessage="Variations" />
+        </b>
+      ),
+      dataIndex: 'option',
+      valueType: 'option',
+      render: (_, record) => [
+        <a
+          key="config"
+          onClick={() => {
+            handleEditModalVisible(true);
+            setCurrentRow(record);
+          }}
+        >
+          <FormattedMessage id="pages.searchTable.edit" defaultMessage="Edit" />
+        </a>,
+      ],
+    },
+  ];
+
   return (
     <PageContainer>
       <ProTable<QuestionListItem>
@@ -268,10 +480,13 @@ const QuestionList: React.FC = () => {
           id: 'pages.searchTable.title',
           defaultMessage: 'Status',
         })}
+        size={'small'}
         actionRef={actionRef}
         rowKey="id"
         search={{
-          labelWidth: 120,
+          defaultCollapsed: true,
+          labelWidth: 'auto',
+          // layout: 'vertical',
         }}
         toolBarRender={() => [
           <Button
@@ -327,19 +542,13 @@ const QuestionList: React.FC = () => {
         actionRef={actionRef}
         editModalVisible={editModalVisible}
         handleEditModalVisible={handleEditModalVisible}
+        showDetail={showDetail}
+        setShowDetail={setShowDetail}
         values={currentRow}
         setCurrentRow={setCurrentRow}
       />
-      {/*<UpdateForm*/}
-      {/*  actionRef={actionRef}*/}
-      {/*  editModalVisible={editModalVisible}*/}
-      {/*  handleEditModalVisible={handleEditModalVisible}*/}
-      {/*  values={currentRow}*/}
-      {/*  setCurrentRow={setCurrentRow}*/}
-      {/*  resetForm={useResetFormOnCloseModal}*/}
-      {/*/>*/}
-
       <Drawer
+        style={{ whiteSpace: 'pre-line' }}
         width={600}
         visible={showDetail}
         onClose={() => {
@@ -351,14 +560,22 @@ const QuestionList: React.FC = () => {
         {currentRow?.id && (
           <ProDescriptions<QuestionListItem>
             column={1}
-            title={currentRow?.id}
+            title={
+              <b
+                style={{
+                  fontSize: 20,
+                }}
+              >
+                Question Details
+              </b>
+            }
             request={async () => ({
               data: currentRow || {},
             })}
             params={{
               id: currentRow?.id,
             }}
-            columns={columns as ProDescriptionsItemProps<QuestionListItem>[]}
+            columns={columnsDrawer as ProDescriptionsItemProps<QuestionListItem>[]}
           />
         )}
       </Drawer>

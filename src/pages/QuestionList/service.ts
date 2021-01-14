@@ -20,7 +20,7 @@ export async function queryQuestion(params?: QuestionListParams) {
   params = { ...searchParam };
 
   // return request('/api/rule', {
-  return request('http://localhost:5000/questions/', {
+  return request('http://localhost:5000/questions', {
     params,
   });
 }
