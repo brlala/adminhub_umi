@@ -234,8 +234,7 @@ const QuestionList: React.FC = () => {
       hideInSearch: true,
       width: '9%',
       render: (dom, entity) => {
-        let date = moment(entity.createdAt).format('dd, DD-MMM-YY');
-        return date;
+        return moment(entity.createdAt).format('dd, DD-MMM-YY');
       },
     },
     {
@@ -247,8 +246,7 @@ const QuestionList: React.FC = () => {
       valueType: 'dateRange',
       width: '9%',
       render: (dom, entity) => {
-        let date = moment(entity.updatedAt).format('dd, DD-MMM-YY');
-        return date;
+        return moment(entity.updatedAt).format('dd, DD-MMM-YY');
       },
     },
     {
@@ -497,7 +495,6 @@ const QuestionList: React.FC = () => {
           id: 'pages.searchTable.title',
           defaultMessage: 'Status',
         })}
-        size={'small'}
         actionRef={actionRef}
         rowKey="id"
         search={{
