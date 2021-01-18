@@ -107,7 +107,7 @@ const QuestionList: React.FC = () => {
       title: <FormattedMessage id="pages.question.topic.topicLabel" defaultMessage="Topic" />,
       dataIndex: 'topic',
       valueType: 'textarea',
-      width: '10%',
+      // width: '10%',
     },
     {
       title: (
@@ -116,7 +116,7 @@ const QuestionList: React.FC = () => {
           defaultMessage="Topic"
         />
       ),
-      width: '25%',
+      // width: '25%',
       dataIndex: 'questionText',
       valueType: 'textarea',
       render: (dom, entity) => {
@@ -155,6 +155,7 @@ const QuestionList: React.FC = () => {
           tagColour = 'magenta';
           tagKey = 'Text';
           tagText = readMore((entity.answerFlow.flow[0].data.text as any).EN, 15);
+          // tagText = (entity.answerFlow.flow[0].data.text as any).EN;
         }
         return (
           <Space>
@@ -172,8 +173,8 @@ const QuestionList: React.FC = () => {
       ),
       dataIndex: 'triggeredCount',
       sorter: true,
+      align: 'right',
       hideInForm: true,
-
       renderFormItem: (item, { type, defaultRender, ...rest }, form) => {
         return (
           <Slider
@@ -232,9 +233,9 @@ const QuestionList: React.FC = () => {
       dataIndex: 'createdAt',
       valueType: 'dateTime',
       hideInSearch: true,
-      width: '9%',
+      // width: '8%',
       render: (dom, entity) => {
-        return moment(entity.createdAt).format('dd, DD-MMM-YY');
+        return moment(entity.createdAt).format('yyyy-MM-DD');
       },
     },
     {
@@ -244,9 +245,9 @@ const QuestionList: React.FC = () => {
       sorter: true,
       dataIndex: 'updatedAt',
       valueType: 'dateRange',
-      width: '9%',
+      // width: '8%',
       render: (dom, entity) => {
-        return moment(entity.updatedAt).format('dd, DD-MMM-YY');
+        return moment(entity.updatedAt).format('yyyy-MM-DD');
       },
     },
     {
@@ -420,8 +421,8 @@ const QuestionList: React.FC = () => {
         if (entity.activeAt) {
           return (
             <>
-              {moment(entity.activeAt).format('dddd, Do MMMM YYYY')} -{' '}
-              {moment(entity.expireAt).format('dddd, Do MMMM YYYY')}
+              {moment(entity.activeAt).format('yyyy-MM-DD')} ~{' '}
+              {moment(entity.expireAt).format('yyyy-MM-DD')}
             </>
           );
         }
@@ -436,7 +437,7 @@ const QuestionList: React.FC = () => {
       ),
       dataIndex: 'createdAt',
       render: (dom, entity) => {
-        return moment(entity.createdAt).format('dddd, Do MMMM YYYY');
+        return moment(entity.createdAt).format('yyyy-MM-DD');
       },
     },
 
@@ -448,7 +449,7 @@ const QuestionList: React.FC = () => {
       ),
       dataIndex: 'updatedAt',
       render: (dom, entity) => {
-        return moment(entity.updatedAt).format('dddd, Do MMMM YYYY');
+        return moment(entity.updatedAt).format('yyyy-MM-DD');
       },
     },
     {
@@ -462,7 +463,7 @@ const QuestionList: React.FC = () => {
       ),
       dataIndex: 'updatedAt',
       render: (dom, entity) => {
-        return moment(entity.updatedAt).format('dddd, Do MMMM YYYY');
+        return moment(entity.updatedAt).format('yyyy-MM-DD');
       },
     },
     {
