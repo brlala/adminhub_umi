@@ -37,6 +37,7 @@ export default defineConfig({
   theme: {
     'primary-color': defaultSettings.primaryColor,
   },
+  fastRefresh: {},
   esbuild: {},
   title: false,
   ignoreMomentLocale: true,

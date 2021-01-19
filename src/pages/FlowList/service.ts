@@ -1,7 +1,7 @@
 import { request } from 'umi';
-import type { QuestionListParams, newQuestionItem, DropdownProps } from './data.d';
+import type { FlowListParams, newQuestionItem, DropdownProps } from './data.d';
 
-export async function queryQuestions(params?: QuestionListParams) {
+export async function queryFlows(params?: FlowListParams) {
   let { sorter, filter, ...searchParam } = params;
   let sortQuery: string = '';
   if (Object.keys(sorter).length !== 0) {
@@ -12,7 +12,6 @@ export async function queryQuestions(params?: QuestionListParams) {
       } else {
         temp.push(`-${key}`);
       }
-
       sortQuery = temp.join();
     }
     searchParam = { ...searchParam, sortBy: sortQuery };
@@ -20,7 +19,7 @@ export async function queryQuestions(params?: QuestionListParams) {
   params = { ...searchParam };
 
   // return request('/api/rule', {
-  return request('http://localhost:5000/questions', {
+  return request('http://localhost:5000/flows', {
     params,
   });
 }
@@ -29,13 +28,6 @@ export async function queryTopics() {
   const topics: string[] = await request('http://localhost:5000/questions/topics');
   let results: DropdownProps[] = [];
   topics.forEach((topic) => results.push({ label: topic, value: topic, key: topic }));
-  return results;
-}
-
-export async function queryFlowsFilter(field: string) {
-  const flows: any = await request(`http://localhost:5000/flows/fields?field=${field}`);
-  let results: DropdownProps[] = [];
-  flows.forEach((flow: any) => results.push({ label: flow.name, value: flow.id, key: flow.id }));
   return results;
 }
 

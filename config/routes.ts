@@ -37,10 +37,22 @@
     ],
   },
   {
-    name: 'list.table-list',
+    name: 'list.question-list',
     icon: 'table',
-    path: '/list',
+    path: '/questions',
     component: './QuestionList',
+  },
+  {
+    name: 'list.flow-list',
+    icon: 'ApartmentOutlined',
+    path: '/flows',
+    component: './FlowList',
+  },
+  {
+    name: 'New Flow',
+    icon: 'ApartmentOutlined',
+    path: '/flows/new',
+    component: './FlowList/Update',
   },
   {
     path: '/',

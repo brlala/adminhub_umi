@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   ProFormText,
   ProFormDateRangePicker,
@@ -6,10 +6,10 @@ import {
   ProFormTextArea,
   StepsForm,
 } from '@ant-design/pro-form';
-import { Divider, Form, Input, message, Modal, Radio, Select } from 'antd';
+import { Divider, Input, message, Modal, Radio } from 'antd';
 import type { DropdownProps, newQuestionItem, QuestionListItem } from '../data.d';
 import type { ActionType } from '@ant-design/pro-table';
-import { editQuestion, queryFlows, queryTopics } from '@/pages/QuestionList/service';
+import { editQuestion, queryFlowsFilter, queryTopics } from '@/pages/QuestionList/service';
 import { FormattedMessage } from '@@/plugin-locale/localeExports';
 import PlusOutlined from '@ant-design/icons/lib/icons/PlusOutlined';
 import moment from 'moment';
@@ -131,7 +131,7 @@ const NewForm: React.FC<NewFormProps> = ({
         label="Response"
         showSearch
         request={async () => {
-          const flows = await queryFlows('name,params');
+          const flows = await queryFlowsFilter('name,params');
           setFlows(flows);
         }}
         options={flows}

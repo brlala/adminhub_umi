@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useState } from 'react';
 import {
   ProFormText,
   ProFormDateRangePicker,
@@ -9,7 +9,7 @@ import {
 import { Divider, Form, Input, message, Modal, Radio } from 'antd';
 import type { DropdownProps, newQuestionItem, QuestionListItem } from '../data.d';
 import type { ActionType } from '@ant-design/pro-table';
-import { addQuestion, queryFlows, queryTopics } from '@/pages/QuestionList/service';
+import { addQuestion, queryFlowsFilter, queryTopics } from '@/pages/QuestionList/service';
 import { FormattedMessage } from '@@/plugin-locale/localeExports';
 import PlusOutlined from '@ant-design/icons/lib/icons/PlusOutlined';
 import styles from './NewForm.less';
@@ -99,7 +99,7 @@ const NewForm: React.FC<NewFormProps> = ({ createModalVisible, handleModalVisibl
         // }}
         // options={topics}
         request={async () => {
-          const flows = await queryFlows('name,params');
+          const flows = await queryFlowsFilter('name,params');
           setFlows(flows);
         }}
         options={flows}

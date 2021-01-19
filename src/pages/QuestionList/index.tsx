@@ -11,7 +11,7 @@ import ProDescriptions from '@ant-design/pro-descriptions';
 import type { FormValueType } from './components/UpdateForm';
 import UpdateForm from './components/UpdateForm';
 import type { QuestionListItem } from './data.d';
-import { queryQuestion, removeQuestion, updateRule } from './service';
+import { queryQuestions, removeQuestion, updateRule } from './service';
 import NewForm from '@/pages/QuestionList/components/NewForm';
 import moment from 'moment';
 import { changeLanguage } from '@/utils/language';
@@ -107,7 +107,7 @@ const QuestionList: React.FC = () => {
       title: <FormattedMessage id="pages.question.topic.topicLabel" defaultMessage="Topic" />,
       dataIndex: 'topic',
       valueType: 'textarea',
-      // width: '10%',
+      width: '15%',
     },
     {
       title: (
@@ -116,7 +116,7 @@ const QuestionList: React.FC = () => {
           defaultMessage="Topic"
         />
       ),
-      // width: '25%',
+      width: '20%',
       dataIndex: 'questionText',
       valueType: 'textarea',
       render: (dom, entity) => {
@@ -175,6 +175,7 @@ const QuestionList: React.FC = () => {
       sorter: true,
       align: 'right',
       hideInForm: true,
+      valueType: 'digit',
       renderFormItem: (item, { type, defaultRender, ...rest }, form) => {
         return (
           <Slider
@@ -233,9 +234,10 @@ const QuestionList: React.FC = () => {
       dataIndex: 'createdAt',
       valueType: 'dateTime',
       hideInSearch: true,
+      hideInTable: true,
       // width: '8%',
       render: (dom, entity) => {
-        return moment(entity.createdAt).format('yyyy-MM-DD');
+        return moment(entity.createdAt).format('yyyy-MM-DD HH:mm:ss');
       },
     },
     {
@@ -247,7 +249,7 @@ const QuestionList: React.FC = () => {
       valueType: 'dateRange',
       // width: '8%',
       render: (dom, entity) => {
-        return moment(entity.updatedAt).format('yyyy-MM-DD');
+        return moment(entity.updatedAt).format('yyyy-MM-DD HH:mm:ss');
       },
     },
     {
@@ -421,8 +423,8 @@ const QuestionList: React.FC = () => {
         if (entity.activeAt) {
           return (
             <>
-              {moment(entity.activeAt).format('yyyy-MM-DD')} ~{' '}
-              {moment(entity.expireAt).format('yyyy-MM-DD')}
+              {moment(entity.activeAt).format('yyyy-MM-DD HH:mm:ss')} ~{' '}
+              {moment(entity.expireAt).format('yyyy-MM-DD HH:mm:ss')}
             </>
           );
         }
@@ -437,7 +439,7 @@ const QuestionList: React.FC = () => {
       ),
       dataIndex: 'createdAt',
       render: (dom, entity) => {
-        return moment(entity.createdAt).format('yyyy-MM-DD');
+        return moment(entity.createdAt).format('yyyy-MM-DD HH:mm:ss');
       },
     },
 
@@ -449,7 +451,7 @@ const QuestionList: React.FC = () => {
       ),
       dataIndex: 'updatedAt',
       render: (dom, entity) => {
-        return moment(entity.updatedAt).format('yyyy-MM-DD');
+        return moment(entity.updatedAt).format('yyyy-MM-DD HH:mm:ss');
       },
     },
     {
@@ -463,7 +465,7 @@ const QuestionList: React.FC = () => {
       ),
       dataIndex: 'updatedAt',
       render: (dom, entity) => {
-        return moment(entity.updatedAt).format('yyyy-MM-DD');
+        return moment(entity.updatedAt).format('yyyy-MM-DD HH:mm:ss');
       },
     },
     {
@@ -515,7 +517,7 @@ const QuestionList: React.FC = () => {
           </Button>,
         ]}
         request={async (params, sorter, filter) => {
-          return queryQuestion({ sorter, filter, ...params });
+          return queryQuestions({ sorter, filter, ...params });
         }}
         columns={columns}
         rowSelection={{

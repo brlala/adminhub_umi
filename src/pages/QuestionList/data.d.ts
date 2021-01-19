@@ -57,6 +57,6 @@ export type QuestionListParams = {
   key?: number;
   pageSize?: number;
   currentPage?: number;
-  filter?: Record<string, any[]>;
-  sorter?: Record<string, any>;
+  filter: Record<string, any[]> | {};
+  sorter: Record<string, any> | {};
 };
