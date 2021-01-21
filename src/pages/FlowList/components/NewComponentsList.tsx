@@ -1,5 +1,6 @@
-import { Tree } from 'antd';
-import { useState } from 'react';
+import { message, Tree } from 'antd';
+import React, { useState } from 'react';
+import { DraggableListItems } from '@/pages/FlowList/data';
 
 const x = 3;
 const y = 2;
@@ -29,12 +30,18 @@ const generateData = (_level, _preKey, _tns) => {
 };
 generateData(z);
 
-const NewComponentsList = () => {
-  const [generatedData, setGeneratedData] = useState(gData);
-  const [expandedKeys, setExpandedKeys] = useState(['0-0', '0-0-0', '0-0-0-0']);
+export type NewComponentsListProps = {
+  setComponentsList: (items: DraggableListItems[]) => void;
+  componentList: DraggableListItems[];
+};
 
+const NewComponentsList: React.FC<NewComponentsListProps> = ({
+  componentList,
+  setComponentsList,
+}) => {
+  // console.log(componentList);
   const onDragEnter = (info) => {
-    console.log(info);
+    // console.log(info);
     // expandedKeys 需要受控时设置
     // this.setState({
     //   expandedKeys: info.expandedKeys,
@@ -42,6 +49,11 @@ const NewComponentsList = () => {
   };
 
   const onDrop = (info) => {
+    // blocked dropping from parent node into children node
+    // if (!info.dropToGap) {
+    //   message.error('Not allowed!');
+    //   return;
+    // }
     console.log(info);
     const dropKey = info.node.key;
     const dragKey = info.dragNode.key;
@@ -58,11 +70,11 @@ const NewComponentsList = () => {
         }
       }
     };
-    const data = [...gData];
+    const data = [...componentList];
 
     // Find dragObject
-    let dragObj;
-    loop(data, dragKey, (item, index, arr) => {
+    let dragObj: DraggableListItems;
+    loop(data, dragKey, (item, index: number, arr: DraggableListItems[]) => {
       arr.splice(index, 1);
       dragObj = item;
     });
@@ -87,9 +99,9 @@ const NewComponentsList = () => {
         // item to the tail of the children
       });
     } else {
-      let ar;
-      let i;
-      loop(data, dropKey, (item, index, arr) => {
+      let ar: DraggableListItems[];
+      let i: number;
+      loop(data, dropKey, (item, index: number, arr: DraggableListItems[]) => {
         ar = arr;
         i = index;
       });
@@ -100,18 +112,17 @@ const NewComponentsList = () => {
       }
     }
 
-    setGeneratedData(data);
+    setComponentsList(data);
   };
 
   return (
     <Tree
       className="draggable-tree"
-      defaultExpandedKeys={expandedKeys}
       draggable
       blockNode
       onDragEnter={onDragEnter}
       onDrop={onDrop}
-      treeData={generatedData}
+      treeData={componentList}
     />
   );
 };

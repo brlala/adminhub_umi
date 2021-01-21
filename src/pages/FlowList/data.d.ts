@@ -44,3 +44,10 @@ export type FlowListParams = {
   filter: Record<string, any[]> | {};
   sorter: Record<string, any> | {};
 };
+
+export type DraggableListItems = {
+  title: string;
+  key: string;
+  children?: DraggableListItems[];
+  id: string;
+};
