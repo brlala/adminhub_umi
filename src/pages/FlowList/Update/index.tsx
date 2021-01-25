@@ -3,7 +3,7 @@ import ProCard from '@ant-design/pro-card';
 // @ts-ignore
 import { FormattedMessage, useIntl } from 'umi';
 import { changeLanguage } from '@/utils/language';
-import { Divider, Form, Menu, Row, Space } from 'antd';
+import { Button, Divider, Form, Menu, Popover, Row, Space } from 'antd';
 import styles from './index.less';
 import NewComponentsList from '../components/NewComponentsList';
 import FlowComponentsList from '@/pages/FlowList/components/FlowComponentsList';
@@ -13,14 +13,25 @@ import {
   TextComponent,
   FlowComponent,
   ButtonTemplatesComponent,
+  VideoAttachmentComponent,
 } from '@/components/FlowItems';
 import { FlowList } from '@/pages/FlowList/data';
+import { FooterToolbar } from '@ant-design/pro-layout';
+import { CloseCircleOutlined } from '@ant-design/icons';
 
 changeLanguage('en-US');
+
+type InternalNamePath = (string | number)[];
+
+interface ErrorField {
+  name: InternalNamePath;
+  errors: string[];
+}
 
 const NewFlow: React.FC = () => {
   const [componentList, setNewComponentsList] = useState([]);
   const [componentsContentList, setComponentsContentList] = useState([]);
+  const [error, setError] = useState<ErrorField[]>([]);
 
   const onFinish = (values) => {
     console.log('Received values of form: ', values);
@@ -37,7 +48,7 @@ const NewFlow: React.FC = () => {
         renderedComponent = <ImageAttachmentComponent componentData={componentData} />;
         break;
       case 'videoAttachments':
-        renderedComponent = <div>Not implemented yet</div>;
+        renderedComponent = <VideoAttachmentComponent componentData={componentData} />;
         break;
       case 'fileAttachments':
         renderedComponent = <div>Not implemented yet</div>;
@@ -56,6 +67,52 @@ const NewFlow: React.FC = () => {
     }
     return renderedComponent;
   };
+
+  const getErrorInfo = (errors: ErrorField[]) => {
+    const errorCount = errors.filter((item) => item.errors.length > 0).length;
+    if (!errors || errorCount === 0) {
+      return null;
+    }
+    const scrollToField = (fieldKey: string) => {
+      const labelNode = document.querySelector(`label[for="${fieldKey}"]`);
+      if (labelNode) {
+        labelNode.scrollIntoView(true);
+      }
+    };
+    const errorList = errors.map((err) => {
+      if (!err || err.errors.length === 0) {
+        return null;
+      }
+      const key = err.name[0] as string;
+      return (
+        <li key={key} className={styles.errorListItem} onClick={() => scrollToField(key)}>
+          <CloseCircleOutlined className={styles.errorIcon} />
+          <div className={styles.errorMessage}>{err.errors[0]}</div>
+          {/*<div className={styles.errorField}>{fieldLabels[key]}</div>*/}
+        </li>
+      );
+    });
+    return (
+      <span className={styles.errorIcon}>
+        <Popover
+          title="表单校验信息"
+          content={errorList}
+          overlayClassName={styles.errorPopover}
+          trigger="click"
+          getPopupContainer={(trigger: HTMLElement) => {
+            if (trigger && trigger.parentNode) {
+              return trigger.parentNode as HTMLElement;
+            }
+            return trigger;
+          }}
+        >
+          <CloseCircleOutlined />
+        </Popover>
+        {errorCount}
+      </span>
+    );
+  };
+
   console.log(componentsContentList);
   let newComponentsImplementation = [];
   return (
@@ -84,23 +141,22 @@ const NewFlow: React.FC = () => {
           />
         </ProCard>
         <ProCard title="Flow Content">
-          {componentList.map((flowNode) => {
-            return (
-              <Form
-                name="complex-form"
-                onFinish={onFinish}
-                labelCol={{ span: 2 }}
-                wrapperCol={{ span: 16 }}
-              >
-                {renderComponent(flowNode)}
-                <Divider />
-              </Form>
-            );
-          })}
+          <Form name="complex-form" onFinish={onFinish}>
+            {componentList.map((flowNode) => renderComponent(flowNode))}
+            <FooterToolbar>
+              {getErrorInfo(error)}
+              {/*<Button type="primary" onClick={() => form?.submit()} loading={submitting}>*/}
+              <Button key="3">重置</Button>
+              <Button type="primary" onClick={() => form?.submit()} loading={false}>
+                提交
+              </Button>
+            </FooterToolbar>
+          </Form>
           {componentList.length === 0 && (
             <div style={{ height: 360 }}>Add a flow to see the contents here</div>
           )}
         </ProCard>
+        <ProCard title="Placeholder"></ProCard>
       </ProCard>
     </div>
   );

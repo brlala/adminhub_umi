@@ -6,76 +6,35 @@ import {
   ProFormUploadButton,
   ProFormUploadDragger,
 } from '@ant-design/pro-form';
-import { Button, Col, Divider, Form, Input, Tooltip, Select, Row, Progress } from 'antd';
+import {
+  Button,
+  Col,
+  Divider,
+  Form,
+  Input,
+  Tooltip,
+  Select,
+  Row,
+  message,
+  Progress,
+  Space,
+} from 'antd';
 const { Option } = Select;
 import { queryFlowsFilter } from '@/pages/QuestionList/service';
 import { FormattedMessage } from '@@/plugin-locale/localeExports';
 import { Upload, Modal } from 'antd';
-import { PlusOutlined } from '@ant-design/icons';
+const { TextArea } = Input;
+import { MinusCircleOutlined, PlusOutlined, UploadOutlined } from '@ant-design/icons';
 import axios from 'axios';
 
 export const TextComponent: React.FC = ({ componentData }) => {
-  const onFinish = (values) => {
-    console.log('Received values of form: ', values);
-  };
-
   return (
     <>
-      <Form.Item label="Username">
-        <Form.Item
-          name="username"
-          noStyle
-          rules={[{ required: true, message: 'Username is required' }]}
-        >
-          <Input style={{ width: 160 }} placeholder="Please input" />
-        </Form.Item>
-        <Tooltip title="Useful information">
-          <a href="#API" style={{ margin: '0 8px' }}>
-            Need Help?
-          </a>
-        </Tooltip>
-      </Form.Item>
-      <Form.Item label="Address">
-        <Input.Group compact>
-          <Form.Item
-            name={['address', 'province']}
-            noStyle
-            rules={[{ required: true, message: 'Province is required' }]}
-          >
-            <Select placeholder="Select province">
-              <Option value="Zhejiang">Zhejiang</Option>
-              <Option value="Jiangsu">Jiangsu</Option>
-            </Select>
-          </Form.Item>
-          <Form.Item
-            name={['address', 'street']}
-            noStyle
-            rules={[{ required: true, message: 'Street is required' }]}
-          >
-            <Input style={{ width: '50%' }} placeholder="Input street" />
-          </Form.Item>
-        </Input.Group>
-      </Form.Item>
-      <Form.Item label="BirthDate" style={{ marginBottom: 0 }}>
-        <Form.Item
-          name="year"
-          rules={[{ required: true }]}
-          style={{ display: 'inline-block', width: 'calc(50% - 8px)' }}
-        >
-          <Input placeholder="Input birth year" />
-        </Form.Item>
-        <Form.Item
-          name="month"
-          rules={[{ required: true }]}
-          style={{ display: 'inline-block', width: 'calc(50% - 8px)', margin: '0 8px' }}
-        >
-          <Input placeholder="Input birth month" />
-        </Form.Item>
-      </Form.Item>
-      <Form.Item label=" " colon={false}>
-        <Button type="primary" htmlType="submit">
-          Submit
-        </Button>
+      <Divider style={{ marginTop: -6 }} orientation="left">
+        Text
+      </Divider>
+      <Form.Item name="text" rules={[{ required: true, message: 'Field is required' }]}>
+        <TextArea rows={4} placeholder="Please input" />
       </Form.Item>
     </>
   );
@@ -144,6 +103,9 @@ export const ImageAttachmentComponent: React.FC = ({ data }) => {
     setFileList(fileList);
   };
 
+  const beforeUpload = () => {
+    console.log('beforeupload');
+  };
   const uploadButton = (
     <div>
       <PlusOutlined />
@@ -152,12 +114,16 @@ export const ImageAttachmentComponent: React.FC = ({ data }) => {
   );
   return (
     <>
-      {' '}
-      <Form.Item label="Address">
-        <Form.Item noStyle rules={[{ required: true, message: 'Province is required' }]}>
+      <Divider style={{ marginTop: -6 }} orientation="left">
+        Image
+      </Divider>
+      <Form.Item>
+        <Form.Item noStyle rules={[{ required: true, message: 'Image is required' }]}>
           <Upload
             customRequest={uploadImage}
+            beforeUpload={beforeUpload}
             onChange={handleChange}
+            accept="image/*"
             listType="picture-card"
             fileList={fileList}
             onPreview={handlePreview}
@@ -182,12 +148,12 @@ export const ImageAttachmentComponent: React.FC = ({ data }) => {
             footer={null}
             onCancel={handleCancel}
           >
-            {/*<img alt="image-preview" style={{ width: '100%' }} src={previewImage} />*/}
+            <img alt="image-preview" style={{ width: '100%' }} src={previewImage} />
             {/*<video controls autoPlay style={{ width: '100%' }} src={previewVideo} />*/}
-            <object
-              style={{ width: '100%', height: '1000px' }}
-              data="http://www.africau.edu/images/default/sample.pdf"
-            />
+            {/*<object*/}
+            {/*  style={{ width: '100%', height: '1000px' }}*/}
+            {/*  data="http://www.africau.edu/images/default/sample.pdf"*/}
+            {/*/>*/}
           </Modal>
         </Form.Item>
         {progress > 0 ? <Progress percent={progress} /> : null}
@@ -196,43 +162,221 @@ export const ImageAttachmentComponent: React.FC = ({ data }) => {
   );
 };
 
-export const GenericTemplatesComponent: React.FC = () => {
+export const ButtonTemplatesComponent: React.FC = ({ componentData }) => {
+  const onFinish = (values) => {
+    console.log('Received values of form: ', values);
+  };
+  const prefixSelector = (
+    <>
+      <Form.Item name="prefix" noStyle>
+        <Select style={{ width: 140 }}>
+          <Option value="flow">Flow</Option>
+          <Option value="url">URL</Option>
+        </Select>
+      </Form.Item>
+    </>
+  );
+
   return (
     <>
-      <ProFormSelect
-        width="xl"
-        prop
-        name="flowResponse"
-        label="Response"
-        showSearch
-        // request={async () => {
-        //   const topics = await queryTopics();
-        //   setTopics(topics);
-        // }}
-        // options={topics}
-        request={async () => {
-          return await queryFlowsFilter('name,params');
-        }}
-        rules={[
-          {
-            required: true,
-            message: (
-              <FormattedMessage
-                id="pages.searchTable.response"
-                defaultMessage="Response is required"
-              />
-            ),
-          },
-        ]}
-      />
+      <Form.Item>
+        <Divider style={{ marginTop: -6 }} orientation="left">
+          Button Templates
+        </Divider>
+        <Form.Item name="text" rules={[{ required: true, message: 'Field is required' }]}>
+          <TextArea rows={4} placeholder="Please input" />
+          <Form.List name="users">
+            {(fields, { add, remove }) => (
+              <>
+                {fields.map((field) => (
+                  <>
+                    <Form.Item
+                      name="phone"
+                      rules={[{ required: true, message: 'Please input your phone number!' }]}
+                    >
+                      <Input addonBefore={prefixSelector} style={{ width: '100%' }} />
+                    </Form.Item>
+                    <MinusCircleOutlined
+                      onClick={() => {
+                        remove(field.name);
+                      }}
+                    />
+                  </>
+                ))}
+                <Form.Item>
+                  <Button type="dashed" onClick={() => add()} block icon={<PlusOutlined />}>
+                    Add field
+                  </Button>
+                </Form.Item>
+              </>
+            )}
+          </Form.List>
+          {/*<Button type="dashed" block>*/}
+          {/*  Dashed*/}
+          {/*</Button>*/}
+        </Form.Item>
+      </Form.Item>
+      {/*<Form.Item label="Username">*/}
+      {/*  <Form.Item*/}
+      {/*    name="username"*/}
+      {/*    noStyle*/}
+      {/*    rules={[{ required: true, message: 'Username is required' }]}*/}
+      {/*  >*/}
+      {/*    <Input style={{ width: 160 }} placeholder="Please input" />*/}
+      {/*  </Form.Item>*/}
+      {/*  <Tooltip title="Useful information">*/}
+      {/*    <a href="#API" style={{ margin: '0 8px' }}>*/}
+      {/*      Need Help?*/}
+      {/*    </a>*/}
+      {/*  </Tooltip>*/}
+      {/*</Form.Item>*/}
+      {/*<Form.Item label="Address">*/}
+      {/*  <Input.Group compact>*/}
+      {/*    <Form.Item*/}
+      {/*      name={['address', 'province']}*/}
+      {/*      noStyle*/}
+      {/*      rules={[{ required: true, message: 'Province is required' }]}*/}
+      {/*    >*/}
+      {/*      <Select placeholder="Select province">*/}
+      {/*        <Option value="Zhejiang">Zhejiang</Option>*/}
+      {/*        <Option value="Jiangsu">Jiangsu</Option>*/}
+      {/*      </Select>*/}
+      {/*    </Form.Item>*/}
+      {/*    <Form.Item*/}
+      {/*      name={['address', 'street']}*/}
+      {/*      noStyle*/}
+      {/*      rules={[{ required: true, message: 'Street is required' }]}*/}
+      {/*    >*/}
+      {/*      <Input style={{ width: '50%' }} placeholder="Input street" />*/}
+      {/*    </Form.Item>*/}
+      {/*  </Input.Group>*/}
+      {/*</Form.Item>*/}
+      {/*<Form.Item label="BirthDate" style={{ marginBottom: 0 }}>*/}
+      {/*  <Form.Item*/}
+      {/*    name="year"*/}
+      {/*    rules={[{ required: true }]}*/}
+      {/*    style={{ display: 'inline-block', width: 'calc(50% - 8px)' }}*/}
+      {/*  >*/}
+      {/*    <Input placeholder="Input birth year" />*/}
+      {/*  </Form.Item>*/}
+      {/*  <Form.Item*/}
+      {/*    name="month"*/}
+      {/*    rules={[{ required: true }]}*/}
+      {/*    style={{ display: 'inline-block', width: 'calc(50% - 8px)', margin: '0 8px' }}*/}
+      {/*  >*/}
+      {/*    <Input placeholder="Input birth month" />*/}
+      {/*  </Form.Item>*/}
+      {/*</Form.Item>*/}
+      {/*<Form.Item label=" " colon={false}>*/}
+      {/*  <Button type="primary" htmlType="submit">*/}
+      {/*    Submit*/}
+      {/*  </Button>*/}
+      {/*</Form.Item>*/}
     </>
   );
 };
 
-export const ButtonTemplatesComponent: React.FC = () => {
+import { Icon, Spin } from 'antd';
+
+export const VideoAttachmentComponent: React.FC = () => {
+  const props = {
+    action: '//jsonplaceholder.typicode.com/posts/',
+    listType: 'picture',
+    previewFile(file) {
+      console.log('Your upload file:', file);
+      // Your process logic. Here we just mock to the same file
+      return fetch('https://next.json-generator.com/api/json/get/4ytyBoLK8', {
+        method: 'POST',
+        body: file,
+      })
+        .then((res) => res.json())
+        .then(
+          ({ thumbnail }) =>
+            'https://cdn0.iconfinder.com/data/icons/network-and-communication-1-6/66/41-512.png',
+        );
+    },
+  };
+
   return (
     <>
-      Flow Button Templates Here <div />
+      <Form.Item>
+        <Divider style={{ marginTop: -6 }} orientation="left">
+          Video
+        </Divider>
+        <Upload {...props}>
+          <Button icon={<UploadOutlined />}>Upload</Button>
+        </Upload>
+      </Form.Item>
+    </>
+  );
+};
+
+import { Card, Avatar } from 'antd';
+import { EditOutlined, EllipsisOutlined, SettingOutlined } from '@ant-design/icons';
+import { LoadingOutlined } from '@ant-design/icons';
+import ProCard from '@ant-design/pro-card';
+const { Meta } = Card;
+export const GenericTemplatesComponent: React.FC = () => {
+  const [imageUrl, setImageUrl] = useState(null);
+  const [loading, setLoading] = useState(false);
+
+  const uploadButton = (
+    <div>
+      {loading ? <LoadingOutlined /> : <PlusOutlined />}
+      <div style={{ marginTop: 8 }}>Upload</div>
+    </div>
+  );
+  const handleChange = (info) => {
+    if (info.file.status === 'uploading') {
+      setLoading(true);
+      return;
+    }
+    if (info.file.status === 'done') {
+      // Get this url from response in real world.
+      getBase64(info.file.originFileObj, (imageUrl) => {
+        setLoading(false);
+        setImageUrl(imageUrl);
+      });
+    }
+  };
+  return (
+    <>
+      <Form.Item>
+        <Divider style={{ marginTop: -6 }} orientation="left">
+          Generic Templates
+        </Divider>
+        <Card
+          size="small"
+          title={
+            <>
+              <Upload
+                name="avatar"
+                listType="picture-card"
+                className="avatar-upsloader"
+                showUploadList={false}
+                action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
+                onChange={handleChange}
+              >
+                {imageUrl ? (
+                  <img src={'imageUrl'} alt="avatar" style={{ width: '100%' }} />
+                ) : (
+                  uploadButton
+                )}
+              </Upload>
+              <Input placeholder="Title" />
+              <Input placeholder="Subtitle" />
+            </>
+          }
+          style={{ width: 300 }}
+        >
+          <Input placeholder="Subtitle" />
+          <Button block>Default</Button>
+          <Button block>Default</Button>
+          <Button type="dashed" block>
+            Dashed
+          </Button>
+        </Card>
+      </Form.Item>
     </>
   );
 };
@@ -240,6 +384,20 @@ export const ButtonTemplatesComponent: React.FC = () => {
 export const FlowComponent: React.FC = () => {
   return (
     <>
+      <Divider style={{ marginTop: -6 }} orientation="left">
+        Flow
+      </Divider>
+      Flow Component Here <div />
+    </>
+  );
+};
+
+export const FileAttachmentComponent: React.FC = () => {
+  return (
+    <>
+      <Divider style={{ marginTop: -6 }} orientation="left">
+        Flow
+      </Divider>
       Flow Component Here <div />
     </>
   );

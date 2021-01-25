@@ -1,6 +1,7 @@
-import { message, Tree } from 'antd';
+import { Col, message, Row, Tree } from 'antd';
 import React, { useState } from 'react';
 import { DraggableListItems } from '@/pages/FlowList/data';
+import { DeleteTwoTone, LoadingOutlined, PlusOutlined } from '@ant-design/icons';
 
 const x = 3;
 const y = 2;
@@ -46,6 +47,10 @@ const NewComponentsList: React.FC<NewComponentsListProps> = ({
     // this.setState({
     //   expandedKeys: info.expandedKeys,
     // });
+  };
+  const onClickRemove = (key: string) => {
+    const newArr = componentList.filter((obj) => obj.key !== key);
+    setComponentsList(newArr);
   };
 
   const onDrop = (info) => {
@@ -123,6 +128,18 @@ const NewComponentsList: React.FC<NewComponentsListProps> = ({
       onDragEnter={onDragEnter}
       onDrop={onDrop}
       treeData={componentList}
+      titleRender={(nodeData) => {
+        console.log(nodeData);
+        const content = (
+          <Row>
+            <Col span={22}>{nodeData.key}</Col>
+            <Col span={2}>
+              <DeleteTwoTone twoToneColor="#eb2f96" onClick={() => onClickRemove(nodeData.key)} />
+            </Col>
+          </Row>
+        );
+        return content;
+      }}
     />
   );
 };
