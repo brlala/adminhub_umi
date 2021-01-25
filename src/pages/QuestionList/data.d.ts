@@ -2,7 +2,7 @@ import { FlowDb } from '../../../models/flows';
 
 export type QuestionListItem = {
   id: string;
-  activeAt?: boolean;
+  activeAt?: string | undefined;
   alternateQuestions: Object[];
   answers: Object[];
   createdAt: string;

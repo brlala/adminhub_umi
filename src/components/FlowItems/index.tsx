@@ -6,12 +6,13 @@ import {
   ProFormUploadButton,
   ProFormUploadDragger,
 } from '@ant-design/pro-form';
-import { Button, Col, Divider, Form, Input, Tooltip, Select, Row } from 'antd';
+import { Button, Col, Divider, Form, Input, Tooltip, Select, Row, Progress } from 'antd';
 const { Option } = Select;
 import { queryFlowsFilter } from '@/pages/QuestionList/service';
 import { FormattedMessage } from '@@/plugin-locale/localeExports';
 import { Upload, Modal } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
+import axios from 'axios';
 
 export const TextComponent: React.FC = ({ componentData }) => {
   const onFinish = (values) => {
@@ -89,48 +90,43 @@ function getBase64(file) {
   });
 }
 
-export const AttachmentComponent: React.FC = ({ data }) => {
+export const ImageAttachmentComponent: React.FC = ({ data }) => {
   const [previewVisible, setPreviewVisible] = useState(false);
-  const [previewImage, setPreviewImage] = useState(false);
+  const [previewImage, setPreviewImage] = useState(null);
+  const [previewVideo, setPreviewVideo] = useState(
+    'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
+  );
   const [previewTitle, setPreviewTitle] = useState(false);
-  const [fileList, setFileList] = useState([
-    {
-      uid: '-1',
-      name: 'image.png',
-      status: 'done',
-      url: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png',
-    },
-    {
-      uid: '-2',
-      name: 'image.png',
-      status: 'done',
-      url: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png',
-    },
-    {
-      uid: '-3',
-      name: 'image.png',
-      status: 'done',
-      url: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png',
-    },
-    {
-      uid: '-4',
-      name: 'image.png',
-      status: 'done',
-      url: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png',
-    },
-    {
-      uid: '-xxx',
-      percent: 50,
-      name: 'image.png',
-      status: 'uploading',
-      url: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png',
-    },
-    {
-      uid: '-5',
-      name: 'image.png',
-      status: 'error',
-    },
-  ]);
+  const [progress, setProgress] = useState(0);
+  const [fileList, setFileList] = useState([]);
+
+  const uploadImage = async (options) => {
+    const { onSuccess, onError, file, onProgress } = options;
+
+    const formData = new FormData();
+    const config = {
+      headers: { 'content-type': 'multipart/form-data' },
+      onUploadProgress: (event) => {
+        const percent = Math.floor((event.loaded / event.total) * 100);
+        setProgress(percent);
+        if (percent === 100) {
+          setTimeout(() => setProgress(0), 1000);
+        }
+        onProgress({ percent: (event.loaded / event.total) * 100 });
+      },
+    };
+    formData.append('file', file);
+    try {
+      const res = await axios.post('http://localhost:5000/upload', formData, config);
+
+      onSuccess('Ok');
+      console.log('server res: ', res);
+    } catch (err) {
+      console.log('Eroor: ', err);
+      const error = new Error('Some error');
+      onError({ err });
+    }
+  };
 
   const handleCancel = () => setPreviewVisible(false);
 
@@ -143,7 +139,10 @@ export const AttachmentComponent: React.FC = ({ data }) => {
     setPreviewVisible(true);
     setPreviewTitle(file.name || file.url.substring(file.url.lastIndexOf('/') + 1));
   };
-  const handleChange = ({ fileList }) => setFileList(fileList);
+  const handleChange = ({ fileList }) => {
+    console.log(fileList);
+    setFileList(fileList);
+  };
 
   const uploadButton = (
     <div>
@@ -157,11 +156,23 @@ export const AttachmentComponent: React.FC = ({ data }) => {
       <Form.Item label="Address">
         <Form.Item noStyle rules={[{ required: true, message: 'Province is required' }]}>
           <Upload
-            action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
+            customRequest={uploadImage}
+            onChange={handleChange}
             listType="picture-card"
             fileList={fileList}
             onPreview={handlePreview}
-            onChange={handleChange}
+            // previewFile={(file) => {
+            //   return new Promise((resolve) => {
+            //     const reader = new FileReader();
+            //     reader.readAsDataURL(file);
+            //     reader.onload = function (e) {
+            //       const dataUrl = e.target.result;
+            //       resolve(
+            //         'https://ss1.bdstatic.com/70cFuXSh_Q1YnxGkpoWK1HF6hhy/it/u=3498227956,2363956367&fm=26&gp=0.jpg',
+            //       );
+            //     };
+            //   });
+            // }}
           >
             {fileList.length >= 8 ? null : uploadButton}
           </Upload>
@@ -171,9 +182,15 @@ export const AttachmentComponent: React.FC = ({ data }) => {
             footer={null}
             onCancel={handleCancel}
           >
-            <img alt="example" style={{ width: '100%' }} src={previewImage} />
+            {/*<img alt="image-preview" style={{ width: '100%' }} src={previewImage} />*/}
+            {/*<video controls autoPlay style={{ width: '100%' }} src={previewVideo} />*/}
+            <object
+              style={{ width: '100%', height: '1000px' }}
+              data="http://www.africau.edu/images/default/sample.pdf"
+            />
           </Modal>
         </Form.Item>
+        {progress > 0 ? <Progress percent={progress} /> : null}
       </Form.Item>
     </>
   );

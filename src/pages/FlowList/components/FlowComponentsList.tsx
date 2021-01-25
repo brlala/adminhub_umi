@@ -1,62 +1,58 @@
 import { Button, Col, Row, Space } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import React from 'react';
-import { DraggableListItems } from '../data';
+import type { DraggableListItems, FlowList } from '../data';
 import { nanoid } from 'nanoid';
-import {
-  AttachmentComponent,
-  ButtonTemplatesComponent,
-  FlowComponent,
-  GenericTemplatesComponent,
-  TextComponent,
-} from '@/components/FlowItems';
 
 export type UpdateComponentsListProps = {
   setNewComponentsList: (p: (prevState: DraggableListItems[]) => DraggableListItems[]) => void;
-  componentList: DraggableListItems[];
-  setComponentsComponentsList: () => void;
 };
 
-const FlowComponentsList: React.FC<UpdateComponentsListProps> = ({
-  setNewComponentsList,
-  componentList,
-  setComponentsComponentsList,
-}) => {
-  const componentsList = [
-    { name: 'Text', key: 'text' },
-    { name: 'Attachments', key: 'attachments' },
-    { name: 'Generic Templates', key: 'genericTemplates' },
-    { name: 'Button Templates', key: 'buttonTemplates' },
-    { name: 'Flow', key: 'flow' },
+const FlowComponentsList: React.FC<UpdateComponentsListProps> = ({ setNewComponentsList }) => {
+  const componentsList: FlowList[] = [
+    { name: 'Text', type: 'text' },
+    { name: 'Image', type: 'imageAttachments' },
+    { name: 'Video', type: 'videoAttachments' },
+    { name: 'File', type: 'fileAttachments' },
+    { name: 'Generic Templates', type: 'genericTemplates' },
+    { name: 'Button Templates', type: 'buttonTemplates' },
+    { name: 'Flow', type: 'flow' },
   ];
 
-  const addComponent = (item) => {
-    const { name, key } = item;
-    console.log(name);
-    const uniqueId = `${key}-${nanoid(4)}`;
+  const addComponent = (item: FlowList) => {
+    const { name, type } = item;
+    const uniqueId = `${type}-${nanoid(4)}`;
     let componentData;
-    switch (key) {
+    switch (type) {
       case 'text':
-        componentData = { type: key, name: uniqueId, data: { qrs: [], textField: null } };
+        componentData = { type, name: uniqueId, data: { buttons: [], textField: null } };
         break;
-      case 'attachments':
-        componentData = { type: key, name: uniqueId, data: { qrs: [], attachments: [] } };
+      case 'imageAttachments':
+        componentData = { type, name: uniqueId, data: { attachments: [] } };
+        break;
+      case 'videoAttachments':
+        componentData = { type, name: uniqueId, data: { attachments: [] } };
+        break;
+      case 'fileAttachments':
+        componentData = { type, name: uniqueId, data: { attachments: [] } };
         break;
       case 'genericTemplates':
-        componentData = { type: key, name: uniqueId, data: { qrs: [], templates: null } };
+        componentData = { type, name: uniqueId, data: { qrs: [], templates: null } };
         break;
       case 'buttonTemplates':
-        componentData = { type: key, name: uniqueId, data: { textField: [], buttons: [] } };
+        componentData = { type, name: uniqueId, data: { textField: [], buttons: [] } };
         break;
       case 'flow':
-        componentData = { type: key, name: uniqueId, data: { flowId: null, params: [] } };
+        componentData = { type, name: uniqueId, data: { flowId: null, params: [] } };
         break;
+      default:
+        componentData = { type, name: uniqueId, data: {} };
     }
     const entry = {
       title: name,
       key: uniqueId,
       id: uniqueId,
-      componentData: componentData,
+      componentData,
     };
 
     setNewComponentsList((prevState) => [...prevState, entry]);
@@ -64,7 +60,7 @@ const FlowComponentsList: React.FC<UpdateComponentsListProps> = ({
 
   return (
     <Space direction="vertical" size={4}>
-      {componentsList.map((item, index) => {
+      {componentsList.map((item) => {
         return (
           <>
             <Row gutter={32}>
@@ -76,8 +72,8 @@ const FlowComponentsList: React.FC<UpdateComponentsListProps> = ({
                   size="small"
                   type="primary"
                   ghost
-                  key={item.key}
-                  value={item.key}
+                  key={item.type}
+                  value={item.type}
                   onClick={() => addComponent(item)}
                 >
                   <PlusOutlined /> Add

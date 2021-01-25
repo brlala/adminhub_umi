@@ -80,11 +80,12 @@ const NewForm: React.FC<NewFormProps> = ({
 
       const responseSelect = values.answerFlow?.name ? 'flow' : 'text';
       const flowResponseId = responseSelect === 'flow' ? values.answerFlow.id : null;
+
       const body = {
         id: values.id,
         [`${responseSelect}Response`]: flowResponseId || values.answerFlow?.flow[0].data.text?.EN,
         mainQuestion: values.text?.EN,
-        responseSelect: responseSelect,
+        responseSelect,
         topic: values.topic,
         variations: listVariations.join('\n'),
         tags: values.keyword || [],
@@ -130,9 +131,10 @@ const NewForm: React.FC<NewFormProps> = ({
         name="flowResponse"
         label="Response"
         showSearch
+        // @ts-ignore
         request={async () => {
-          const flows = await queryFlowsFilter('name,params');
-          setFlows(flows);
+          const flowsRequest = await queryFlowsFilter('name,params');
+          setFlows(flowsRequest);
         }}
         options={flows}
         // rules={[
@@ -151,8 +153,8 @@ const NewForm: React.FC<NewFormProps> = ({
   }
   return (
     <StepsForm
-      onFinish={async (values) => {
-        const newValues = { ...values, responseType, id: questionBody.id };
+      onFinish={async (valueStore) => {
+        const newValues = { ...valueStore, responseType, id: questionBody.id };
         const success = await handleEdit((newValues as unknown) as newQuestionItem);
         if (success) {
           handleEditModalVisible(false);
@@ -194,9 +196,10 @@ const NewForm: React.FC<NewFormProps> = ({
         }}
       >
         <ProFormSelect
+          // @ts-ignore
           request={async () => {
-            const topics = await queryTopics();
-            setTopics(topics);
+            const t = await queryTopics();
+            setTopics(t);
           }}
           options={topics}
           fieldProps={{

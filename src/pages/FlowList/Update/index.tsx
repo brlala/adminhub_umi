@@ -9,31 +9,38 @@ import NewComponentsList from '../components/NewComponentsList';
 import FlowComponentsList from '@/pages/FlowList/components/FlowComponentsList';
 import {
   GenericTemplatesComponent,
-  AttachmentComponent,
+  ImageAttachmentComponent,
   TextComponent,
   FlowComponent,
   ButtonTemplatesComponent,
 } from '@/components/FlowItems';
+import { FlowList } from '@/pages/FlowList/data';
 
 changeLanguage('en-US');
 
 const NewFlow: React.FC = () => {
   const [componentList, setNewComponentsList] = useState([]);
-  const [componentsContentList, setComponentsComponentsList] = useState([]);
+  const [componentsContentList, setComponentsContentList] = useState([]);
 
   const onFinish = (values) => {
     console.log('Received values of form: ', values);
   };
 
-  const renderComponent = (component) => {
+  const renderComponent = (component: { componentData: FlowList }) => {
     const { componentData } = component;
     let renderedComponent;
     switch (componentData.type) {
       case 'text':
         renderedComponent = <TextComponent componentData={componentData} />;
         break;
-      case 'attachments':
-        renderedComponent = <AttachmentComponent componentData={componentData} />;
+      case 'imageAttachments':
+        renderedComponent = <ImageAttachmentComponent componentData={componentData} />;
+        break;
+      case 'videoAttachments':
+        renderedComponent = <div>Not implemented yet</div>;
+        break;
+      case 'fileAttachments':
+        renderedComponent = <div>Not implemented yet</div>;
         break;
       case 'genericTemplates':
         renderedComponent = <GenericTemplatesComponent componentData={componentData} />;
@@ -44,6 +51,8 @@ const NewFlow: React.FC = () => {
       case 'flow':
         renderedComponent = <FlowComponent componentData={componentData} />;
         break;
+      default:
+        renderedComponent = <div>Cannot render {componentData.type}</div>;
     }
     return renderedComponent;
   };
@@ -66,7 +75,7 @@ const NewFlow: React.FC = () => {
           <FlowComponentsList
             componentList={componentList}
             setNewComponentsList={setNewComponentsList}
-            setComponentsComponentsList={setComponentsComponentsList}
+            setComponentsComponentsList={setComponentsContentList}
           />
           <Divider orientation="center">Current</Divider>
           <NewComponentsList
@@ -81,7 +90,7 @@ const NewFlow: React.FC = () => {
                 name="complex-form"
                 onFinish={onFinish}
                 labelCol={{ span: 2 }}
-                wrapperCol={{ span: 12 }}
+                wrapperCol={{ span: 16 }}
               >
                 {renderComponent(flowNode)}
                 <Divider />

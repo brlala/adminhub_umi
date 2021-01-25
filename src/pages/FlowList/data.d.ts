@@ -45,6 +45,18 @@ export type FlowListParams = {
   sorter: Record<string, any> | {};
 };
 
+export type FlowList = {
+  name: string;
+  type:
+    | 'text'
+    | 'imageAttachments'
+    | 'videoAttachments'
+    | 'fileAttachments'
+    | 'genericTemplates'
+    | 'buttonTemplates'
+    | 'flow';
+};
+
 export type DraggableListItems = {
   title: string;
   key: string;
