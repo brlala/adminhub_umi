@@ -48,6 +48,7 @@ export default {
   'pages.searchTable.ruleName': 'Rule name is required',
   'pages.searchTable.topic': 'Topic is required',
   'pages.searchTable.response': 'Response is required',
+  'pages.flowTable.url': 'URL is required',
   'pages.searchTable.mainQuestion': 'Main Question is required',
   'pages.searchTable.titleCallNo': 'Number of Service Calls',
   'pages.searchTable.titleStatus': 'Status',

@@ -25,10 +25,16 @@ const FlowComponentsList: React.FC<UpdateComponentsListProps> = ({ setNewCompone
     let componentData;
     switch (type) {
       case 'text':
-        componentData = { type, name: uniqueId, data: { buttons: [], textField: null } };
+        componentData = { type, name: uniqueId, data: { textField: null } };
         break;
       case 'imageAttachments':
-        componentData = { type, name: uniqueId, data: { attachments: [] } };
+        componentData = {
+          type,
+          name: uniqueId,
+          data: {
+            attachments: [],
+          },
+        };
         break;
       case 'videoAttachments':
         componentData = { type, name: uniqueId, data: { attachments: [] } };
@@ -37,10 +43,10 @@ const FlowComponentsList: React.FC<UpdateComponentsListProps> = ({ setNewCompone
         componentData = { type, name: uniqueId, data: { attachments: [] } };
         break;
       case 'genericTemplates':
-        componentData = { type, name: uniqueId, data: { qrs: [], templates: null } };
+        componentData = { type, name: uniqueId, data: { templates: [] } };
         break;
       case 'buttonTemplates':
-        componentData = { type, name: uniqueId, data: { textField: [], buttons: [] } };
+        componentData = { type, name: uniqueId, data: { textField: null, buttons: [] } };
         break;
       case 'flow':
         componentData = { type, name: uniqueId, data: { flowId: null, params: [] } };

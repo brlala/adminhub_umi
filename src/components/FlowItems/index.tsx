@@ -1,10 +1,14 @@
 import React, { useState } from 'react';
 import { nanoid } from 'nanoid';
-import {
+import ProForm, {
+  ModalForm,
+  ProFormDateRangePicker,
   ProFormSelect,
+  ProFormText,
   ProFormTextArea,
   ProFormUploadButton,
   ProFormUploadDragger,
+  StepsForm,
 } from '@ant-design/pro-form';
 import {
   Button,
@@ -18,6 +22,8 @@ import {
   message,
   Progress,
   Space,
+  Popconfirm,
+  Radio,
 } from 'antd';
 const { Option } = Select;
 import { queryFlowsFilter } from '@/pages/QuestionList/service';
@@ -26,15 +32,67 @@ import { Upload, Modal } from 'antd';
 const { TextArea } = Input;
 import { MinusCircleOutlined, PlusOutlined, UploadOutlined } from '@ant-design/icons';
 import axios from 'axios';
+import styles from './index.less';
 
-export const TextComponent: React.FC = ({ componentData }) => {
+export type TextComponentData = {
+  type: string;
+  name: string;
+  data: { textField: string };
+};
+export type Attachments = {
+  name: string;
+  url?: string;
+  uid: string;
+  response?: { url: string };
+};
+export type Buttons = {
+  type: string;
+  response: string;
+};
+export type Templates = {
+  imageUrl: string;
+  title: string;
+  subtitle: string;
+  buttons: Buttons[];
+};
+export type AttachmentsComponentData = {
+  type: string;
+  name: string;
+  data: { attachments: Attachments[] };
+};
+
+export type GenericTemplatesComponentData = {
+  type: string;
+  name: string;
+  data: Templates[];
+};
+export type ButtonTemplatesComponentData = {
+  type: string;
+  name: string;
+  data: { textField: string; buttons: Buttons[] };
+};
+
+export type FlowComponentData = {
+  type: string;
+  name: string;
+  data: { flowId: string; params: string[] };
+};
+export type TextComponentDataProps = {
+  componentData: TextComponentData;
+};
+
+export type AttachmentsComponentDataProps = {
+  componentData: AttachmentsComponentData;
+};
+
+export const TextComponent: React.FC<TextComponentDataProps> = ({ componentData }) => {
   return (
     <>
       <Divider style={{ marginTop: -6 }} orientation="left">
         Text
       </Divider>
       <Form.Item name="text" rules={[{ required: true, message: 'Field is required' }]}>
-        <TextArea rows={4} placeholder="Please input" />
+        <TextArea rows={4} placeholder="Please input" defaultValue={componentData.data.textField} />
       </Form.Item>
     </>
   );
@@ -49,7 +107,9 @@ function getBase64(file) {
   });
 }
 
-export const ImageAttachmentComponent: React.FC = ({ data }) => {
+export const ImageAttachmentComponent: React.FC<AttachmentsComponentDataProps> = ({
+  componentData,
+}) => {
   const [previewVisible, setPreviewVisible] = useState(false);
   const [previewImage, setPreviewImage] = useState(null);
   const [previewVideo, setPreviewVideo] = useState(
@@ -57,7 +117,8 @@ export const ImageAttachmentComponent: React.FC = ({ data }) => {
   );
   const [previewTitle, setPreviewTitle] = useState(false);
   const [progress, setProgress] = useState(0);
-  const [fileList, setFileList] = useState([]);
+  const [fileList, setFileList] = useState(componentData.data.attachments); // old items is in "url", new items is in "response" key
+  const [url, setUrl] = useState(null);
 
   const uploadImage = async (options) => {
     const { onSuccess, onError, file, onProgress } = options;
@@ -77,11 +138,10 @@ export const ImageAttachmentComponent: React.FC = ({ data }) => {
     formData.append('file', file);
     try {
       const res = await axios.post('http://localhost:5000/upload', formData, config);
-
-      onSuccess('Ok');
+      onSuccess({ url: res.data.url });
       console.log('server res: ', res);
     } catch (err) {
-      console.log('Eroor: ', err);
+      console.log('Error: ', err);
       const error = new Error('Some error');
       onError({ err });
     }
@@ -99,13 +159,9 @@ export const ImageAttachmentComponent: React.FC = ({ data }) => {
     setPreviewTitle(file.name || file.url.substring(file.url.lastIndexOf('/') + 1));
   };
   const handleChange = ({ fileList }) => {
-    console.log(fileList);
     setFileList(fileList);
   };
 
-  const beforeUpload = () => {
-    console.log('beforeupload');
-  };
   const uploadButton = (
     <div>
       <PlusOutlined />
@@ -121,7 +177,6 @@ export const ImageAttachmentComponent: React.FC = ({ data }) => {
         <Form.Item noStyle rules={[{ required: true, message: 'Image is required' }]}>
           <Upload
             customRequest={uploadImage}
-            beforeUpload={beforeUpload}
             onChange={handleChange}
             accept="image/*"
             listType="picture-card"
@@ -163,19 +218,65 @@ export const ImageAttachmentComponent: React.FC = ({ data }) => {
 };
 
 export const ButtonTemplatesComponent: React.FC = ({ componentData }) => {
+  const [buttonIndex, setButtonIndex] = useState(0);
+  const [responseType, setResponseType] = useState<string>('flow');
   const onFinish = (values) => {
     console.log('Received values of form: ', values);
   };
-  const prefixSelector = (
-    <>
-      <Form.Item name="prefix" noStyle>
-        <Select style={{ width: 140 }}>
-          <Option value="flow">Flow</Option>
-          <Option value="url">URL</Option>
-        </Select>
-      </Form.Item>
-    </>
-  );
+
+  const waitTime = (time: number = 100) => {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        resolve(true);
+      }, time);
+    });
+  };
+
+  let responseArea;
+  if (responseType === 'url') {
+    responseArea = (
+      <ProFormText
+        width="xl"
+        label="URL"
+        name="urlResponse"
+        rules={[
+          {
+            required: true,
+            message: <FormattedMessage id="pages.flowTable.url" defaultMessage="URL is required" />,
+          },
+        ]}
+      />
+    );
+  } else {
+    responseArea = (
+      <ProFormSelect
+        width="xl"
+        prop
+        name="flowResponse"
+        label="Response"
+        showSearch
+        // request={async () => {
+        //   const topics = await queryTopics();
+        //   setTopics(topics);
+        // }}
+        // options={topics}
+        request={async () => {
+          return await queryFlowsFilter('name,params');
+        }}
+        rules={[
+          {
+            required: true,
+            message: (
+              <FormattedMessage
+                id="pages.searchTable.response"
+                defaultMessage="Response is required"
+              />
+            ),
+          },
+        ]}
+      />
+    );
+  }
 
   return (
     <>
@@ -183,34 +284,59 @@ export const ButtonTemplatesComponent: React.FC = ({ componentData }) => {
         <Divider style={{ marginTop: -6 }} orientation="left">
           Button Templates
         </Divider>
-        <Form.Item name="text" rules={[{ required: true, message: 'Field is required' }]}>
+        <Form.Item
+          // name={`${componentData.name}-text`}
+          rules={[{ required: true, message: 'Field is required' }]}
+        >
           <TextArea rows={4} placeholder="Please input" />
-          <Form.List name="users">
-            {(fields, { add, remove }) => (
-              <>
-                {fields.map((field) => (
-                  <>
-                    <Form.Item
-                      name="phone"
-                      rules={[{ required: true, message: 'Please input your phone number!' }]}
-                    >
-                      <Input addonBefore={prefixSelector} style={{ width: '100%' }} />
-                    </Form.Item>
-                    <MinusCircleOutlined
-                      onClick={() => {
-                        remove(field.name);
-                      }}
-                    />
-                  </>
-                ))}
-                <Form.Item>
-                  <Button type="dashed" onClick={() => add()} block icon={<PlusOutlined />}>
-                    Add field
-                  </Button>
-                </Form.Item>
-              </>
-            )}
-          </Form.List>
+          <Form.Item>
+            <ModalForm<{
+              name: string;
+              company: string;
+            }>
+              title="Add Button"
+              trigger={
+                <Button type="dashed">
+                  <PlusOutlined />
+                  Add Button
+                </Button>
+              }
+              modalProps={{
+                onCancel: () => console.log('run'),
+              }}
+              onFinish={async (values) => {
+                await waitTime(2000);
+                console.log(values.name);
+                message.success('提交成功');
+                return true;
+              }}
+            >
+              <ProForm.Group>
+                <ProFormText
+                  width="sm"
+                  name="textas"
+                  label="Display Button Text"
+                  placeholder="Please enter"
+                />
+              </ProForm.Group>
+              <div className="ant-row ant-form-item">
+                <div className="ant-col ant-form-item-label">
+                  <label title="Type of Button">Type of Response</label>
+                </div>
+                <div className="ant-col ant-form-item-control">
+                  <Radio.Group
+                    onChange={(event) => setResponseType(event.target.value)}
+                    defaultValue="text"
+                    name="responseSelect"
+                  >
+                    <Radio.Button value="url">URL</Radio.Button>
+                    <Radio.Button value="flow">Flow</Radio.Button>
+                  </Radio.Group>
+                </div>
+              </div>
+              <ProForm.Group>{responseArea}</ProForm.Group>
+            </ModalForm>
+          </Form.Item>
           {/*<Button type="dashed" block>*/}
           {/*  Dashed*/}
           {/*</Button>*/}
@@ -315,6 +441,8 @@ import { Card, Avatar } from 'antd';
 import { EditOutlined, EllipsisOutlined, SettingOutlined } from '@ant-design/icons';
 import { LoadingOutlined } from '@ant-design/icons';
 import ProCard from '@ant-design/pro-card';
+import { AutoCompleteProps } from 'antd/es/auto-complete';
+import immer, { produce } from 'immer';
 const { Meta } = Card;
 export const GenericTemplatesComponent: React.FC = () => {
   const [imageUrl, setImageUrl] = useState(null);
@@ -387,7 +515,31 @@ export const FlowComponent: React.FC = () => {
       <Divider style={{ marginTop: -6 }} orientation="left">
         Flow
       </Divider>
-      Flow Component Here <div />
+      <ProFormSelect
+        width="xl"
+        prop
+        name="flowResponse"
+        showSearch
+        // request={async () => {
+        //   const topics = await queryTopics();
+        //   setTopics(topics);
+        // }}
+        // options={topics}
+        request={async () => {
+          return await queryFlowsFilter('name,params');
+        }}
+        rules={[
+          {
+            required: true,
+            message: (
+              <FormattedMessage
+                id="pages.searchTable.response"
+                defaultMessage="Response is required"
+              />
+            ),
+          },
+        ]}
+      />
     </>
   );
 };
