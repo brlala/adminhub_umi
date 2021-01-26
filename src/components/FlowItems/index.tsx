@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { nanoid } from 'nanoid';
 import ProForm, {
   ModalForm,
@@ -112,13 +112,9 @@ export const ImageAttachmentComponent: React.FC<AttachmentsComponentDataProps> =
 }) => {
   const [previewVisible, setPreviewVisible] = useState(false);
   const [previewImage, setPreviewImage] = useState(null);
-  const [previewVideo, setPreviewVideo] = useState(
-    'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
-  );
   const [previewTitle, setPreviewTitle] = useState(false);
   const [progress, setProgress] = useState(0);
   const [fileList, setFileList] = useState(componentData.data.attachments); // old items is in "url", new items is in "response" key
-  const [url, setUrl] = useState(null);
 
   const uploadImage = async (options) => {
     const { onSuccess, onError, file, onProgress } = options;
@@ -204,7 +200,6 @@ export const ImageAttachmentComponent: React.FC<AttachmentsComponentDataProps> =
             onCancel={handleCancel}
           >
             <img alt="image-preview" style={{ width: '100%' }} src={previewImage} />
-            {/*<video controls autoPlay style={{ width: '100%' }} src={previewVideo} />*/}
             {/*<object*/}
             {/*  style={{ width: '100%', height: '1000px' }}*/}
             {/*  data="http://www.africau.edu/images/default/sample.pdf"*/}
@@ -404,23 +399,47 @@ export const ButtonTemplatesComponent: React.FC = ({ componentData }) => {
 
 import { Icon, Spin } from 'antd';
 
-export const VideoAttachmentComponent: React.FC = () => {
-  const props = {
-    action: '//jsonplaceholder.typicode.com/posts/',
-    listType: 'picture',
-    previewFile(file) {
-      console.log('Your upload file:', file);
-      // Your process logic. Here we just mock to the same file
-      return fetch('https://next.json-generator.com/api/json/get/4ytyBoLK8', {
-        method: 'POST',
-        body: file,
-      })
-        .then((res) => res.json())
-        .then(
-          ({ thumbnail }) =>
-            'https://cdn0.iconfinder.com/data/icons/network-and-communication-1-6/66/41-512.png',
-        );
-    },
+export const VideoAttachmentComponent: React.FC<AttachmentsComponentDataProps> = ({
+  componentData,
+}) => {
+  const [progress, setProgress] = useState(0);
+  const [url, setUrl] = useState(null);
+  const [fileList, setFileList] = useState(componentData.data.attachments);
+
+  useEffect(() => {
+    if (componentData.data.attachments.length > 0) {
+      setUrl(componentData.data.attachments[0].url);
+    }
+  }, [componentData]);
+  const uploadVideo = async (options) => {
+    const { onSuccess, onError, file, onProgress } = options;
+
+    const formData = new FormData();
+    const config = {
+      headers: { 'content-type': 'multipart/form-data' },
+      onUploadProgress: (event) => {
+        const percent = Math.floor((event.loaded / event.total) * 100);
+        setProgress(percent);
+        if (percent === 100) {
+          setTimeout(() => setProgress(0), 1000);
+        }
+        onProgress({ percent: (event.loaded / event.total) * 100 });
+      },
+    };
+    formData.append('file', file);
+    try {
+      const res = await axios.post('http://localhost:5000/upload', formData, config);
+      onSuccess({ url: res.data.url });
+      setUrl(res.data.url);
+      console.log('server res: ', res);
+    } catch (err) {
+      console.log('Error: ', err);
+      const error = new Error('Some error');
+      onError({ err });
+    }
+  };
+  const handleChange = ({ fileList }) => {
+    setFileList(fileList);
   };
 
   return (
@@ -429,9 +448,20 @@ export const VideoAttachmentComponent: React.FC = () => {
         <Divider style={{ marginTop: -6 }} orientation="left">
           Video
         </Divider>
-        <Upload {...props}>
-          <Button icon={<UploadOutlined />}>Upload</Button>
+        {url && <video controls style={{ width: '100%' }} src={url} />}
+        <Upload
+          customRequest={uploadVideo}
+          accept="video/mp4"
+          onChange={handleChange}
+          fileList={fileList}
+          onRemove={() => setUrl(null)}
+          action="http://localhost:5000/upload"
+          listType="picture"
+          maxCount={1}
+        >
+          <Button icon={<UploadOutlined />}>Upload (Max: 1)</Button>
         </Upload>
+        {/*{progress > 0 ? <Progress percent={progress} /> : null}*/}
       </Form.Item>
     </>
   );
@@ -443,6 +473,8 @@ import { LoadingOutlined } from '@ant-design/icons';
 import ProCard from '@ant-design/pro-card';
 import { AutoCompleteProps } from 'antd/es/auto-complete';
 import immer, { produce } from 'immer';
+import { plugin } from '@@/core/plugin';
+import { ApplyPluginsType } from 'umi';
 const { Meta } = Card;
 export const GenericTemplatesComponent: React.FC = () => {
   const [imageUrl, setImageUrl] = useState(null);

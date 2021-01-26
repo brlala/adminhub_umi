@@ -28,13 +28,7 @@ const FlowComponentsList: React.FC<UpdateComponentsListProps> = ({ setNewCompone
         componentData = { type, name: uniqueId, data: { textField: null } };
         break;
       case 'imageAttachments':
-        componentData = {
-          type,
-          name: uniqueId,
-          data: {
-            attachments: [],
-          },
-        };
+        componentData = { type, name: uniqueId, data: { attachments: [] } };
         break;
       case 'videoAttachments':
         componentData = { type, name: uniqueId, data: { attachments: [] } };
