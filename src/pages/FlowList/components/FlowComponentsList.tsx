@@ -34,7 +34,20 @@ const FlowComponentsList: React.FC<UpdateComponentsListProps> = ({ setNewCompone
         componentData = { type, name: uniqueId, data: { attachments: [] } };
         break;
       case 'fileAttachments':
-        componentData = { type, name: uniqueId, data: { attachments: [] } };
+        componentData = {
+          type,
+          name: uniqueId,
+          data: {
+            attachments: [
+              {
+                name: 'test.pdf',
+                url:
+                  'https://pandai-admin-portal.s3-ap-southeast-1.amazonaws.com/portal/flows/If%20You%20Suspect%20That%20You%20Are%20Infected%20With%20Covid-19%20%28210124TEH%29%20%281%29.pdf',
+                uid: 1,
+              },
+            ],
+          },
+        };
         break;
       case 'genericTemplates':
         componentData = { type, name: uniqueId, data: { templates: [] } };

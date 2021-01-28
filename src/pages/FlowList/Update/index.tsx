@@ -14,6 +14,7 @@ import {
   FlowComponent,
   ButtonTemplatesComponent,
   VideoAttachmentComponent,
+  FileAttachmentComponent,
 } from '@/components/FlowItems';
 import { FlowList } from '@/pages/FlowList/data';
 import { FooterToolbar } from '@ant-design/pro-layout';
@@ -37,30 +38,38 @@ const NewFlow: React.FC = () => {
     console.log('Received values of form: ', values);
   };
 
-  const renderComponent = (component: { componentData: FlowList }) => {
+  const renderComponent = (component: { componentData: FlowList }, index: Number) => {
     const { componentData } = component;
     let renderedComponent;
     switch (componentData.type) {
       case 'text':
-        renderedComponent = <TextComponent componentData={componentData} />;
+        renderedComponent = <TextComponent index={index} componentData={componentData} />;
         break;
       case 'imageAttachments':
-        renderedComponent = <ImageAttachmentComponent componentData={componentData} />;
+        renderedComponent = (
+          <ImageAttachmentComponent index={index} componentData={componentData} />
+        );
         break;
       case 'videoAttachments':
-        renderedComponent = <VideoAttachmentComponent componentData={componentData} />;
+        renderedComponent = (
+          <VideoAttachmentComponent index={index} componentData={componentData} />
+        );
         break;
       case 'fileAttachments':
-        renderedComponent = <div>Not implemented yet</div>;
+        renderedComponent = <FileAttachmentComponent index={index} componentData={componentData} />;
         break;
       case 'genericTemplates':
-        renderedComponent = <GenericTemplatesComponent componentData={componentData} />;
+        renderedComponent = (
+          <GenericTemplatesComponent index={index} componentData={componentData} />
+        );
         break;
       case 'buttonTemplates':
-        renderedComponent = <ButtonTemplatesComponent componentData={componentData} />;
+        renderedComponent = (
+          <ButtonTemplatesComponent index={index} componentData={componentData} />
+        );
         break;
       case 'flow':
-        renderedComponent = <FlowComponent componentData={componentData} />;
+        renderedComponent = <FlowComponent index={index} componentData={componentData} />;
         break;
       default:
         renderedComponent = <div>Cannot render {componentData.type}</div>;
@@ -134,15 +143,15 @@ const NewFlow: React.FC = () => {
             setNewComponentsList={setNewComponentsList}
             setComponentsComponentsList={setComponentsContentList}
           />
-          <Divider orientation="center">Current</Divider>
+          <Divider orientation="center">Current Flow</Divider>
           <NewComponentsList
             componentList={componentList}
             setComponentsList={setNewComponentsList}
           />
         </ProCard>
-        <ProCard title="Flow Content">
+        <ProCard title="Flow Content" colSpan={{ xs: 20, sm: 20, md: 20, lg: 20, xl: 16 }}>
           <Form name="complex-form" onFinish={onFinish}>
-            {componentList.map((flowNode) => renderComponent(flowNode))}
+            {componentList.map((flowNode, index) => renderComponent(flowNode, index + 1))}
             <FooterToolbar>
               {getErrorInfo(error)}
               {/*<Button type="primary" onClick={() => form?.submit()} loading={submitting}>*/}
@@ -156,7 +165,7 @@ const NewFlow: React.FC = () => {
             <div style={{ height: 360 }}>Add a flow to see the contents here</div>
           )}
         </ProCard>
-        <ProCard title="Placeholder"></ProCard>
+        <ProCard title="Placeholder" colSpan={{ xs: 4, sm: 4, md: 10, lg: 10, xl: 8 }}></ProCard>
       </ProCard>
     </div>
   );
