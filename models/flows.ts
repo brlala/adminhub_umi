@@ -15,7 +15,7 @@ export type FlowDb = {
 
 export type FlowItem = {
   data: FlowItemData;
-  type: 'button_template' | string;
+  type: string;
 };
 
 export type FlowItemData = {

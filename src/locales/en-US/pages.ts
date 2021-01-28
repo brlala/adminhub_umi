@@ -84,4 +84,14 @@ export default {
   'pages.searchTable.titleCreatedAt': 'Created At',
   'pages.searchTable.titleSchedule': 'Schedule',
   'pages.searchTable.titleTags': 'Tags',
+  'pages.broadcast.status.completed': 'Completed',
+  'pages.broadcast.status.sending': 'Sending',
+  'pages.broadcast.status.scheduled': 'Scheduled',
+  'pages.broadcast.status.failed': 'Failed',
+  'pages.broadcast.view.viewLabel': 'Details',
+  'pages.broadcast.view': 'View',
+  'pages.broadcast.reach.reachLabel': 'Reach',
+  'pages.broadcast.author.authorLabel': 'Author',
+  'pages.broadcast.sendAt.sendAtLabel': 'Broadcast Time',
+  'pages.broadcast.flow.flowLabel': 'Flow'
 };
