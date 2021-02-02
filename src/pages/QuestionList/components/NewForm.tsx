@@ -219,7 +219,6 @@ const NewForm: React.FC<NewFormProps> = ({ createModalVisible, handleModalVisibl
         {/*<ProFormTextArea width="sm" label="Variations" name="variations" />*/}
         {/*<ProFormTextArea width="md" label="Variations" name="variations" />*/}
         {/*<ProFormTextArea width="lg" label="Variations" name="variations" />*/}
-        {console.log(styles)}
         <ProFormTextArea
           width="xl"
           label="Variations"

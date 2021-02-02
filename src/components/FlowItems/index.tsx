@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { nanoid } from 'nanoid';
 import ProForm, {
   ModalForm,
+  ProFormDatePicker,
   ProFormDateRangePicker,
   ProFormSelect,
   ProFormText,
@@ -467,6 +468,7 @@ export const VideoAttachmentComponent: React.FC<AttachmentsComponentDataProps> =
   );
 };
 
+<<<<<<< HEAD
 import { Card, Avatar } from 'antd';
 import { EditOutlined, EllipsisOutlined, SettingOutlined } from '@ant-design/icons';
 import { LoadingOutlined } from '@ant-design/icons';
@@ -480,6 +482,166 @@ const { Meta } = Card;
 export const GenericTemplatesComponent: React.FC = () => {
   const [imageUrl, setImageUrl] = useState(null);
   const [loading, setLoading] = useState(false);
+=======
+import ImgCrop from 'antd-img-crop';
+import { Tabs } from 'antd';
+import { StickyContainer, Sticky } from 'react-sticky';
+import ProCard from '@ant-design/pro-card';
+import { EditableProTable, ProColumns } from '@ant-design/pro-table';
+import FormItemLabel from 'antd/es/form/FormItemLabel';
+
+const initialPanes = [{ title: '1', content: 'Content of Tab 1', key: '1' }];
+const { TabPane } = Tabs;
+
+export const GenericTemplatesComponent = (componentData, index) => {
+  const [tabIndex, setTabIndex] = useState(2);
+  const [activeKey, setActiveKey] = useState(initialPanes[0].key);
+  const [panes, setPanes] = useState(initialPanes);
+
+  const onChange = (activeKey) => {
+    setActiveKey(activeKey);
+  };
+
+  const onEdit = (targetKey, action) => {
+    if (action === 'add') {
+      add();
+    } else {
+      remove(targetKey);
+    }
+  };
+
+  const add = () => {
+    console.log(tabIndex);
+    const activeKey = `newTab${tabIndex}`;
+    const newPanes = [...panes];
+    newPanes.push({
+      title: `${tabIndex}`,
+      content: <TemplateComponent componentData={componentData} />,
+      key: activeKey,
+    });
+    setPanes(newPanes);
+    setTabIndex(tabIndex + 1);
+    setActiveKey(activeKey);
+  };
+
+  const remove = (targetKey) => {
+    let newActiveKey = activeKey;
+    let lastIndex;
+    panes.forEach((pane, i) => {
+      if (pane.key === targetKey) {
+        lastIndex = i - 1;
+      }
+    });
+    const newPanes = panes.filter((pane) => pane.key !== targetKey);
+    if (newPanes.length && newActiveKey === targetKey) {
+      if (lastIndex && lastIndex >= 0) {
+        newActiveKey = newPanes[lastIndex].key;
+      } else {
+        newActiveKey = newPanes[0].key;
+      }
+    }
+    setPanes(newPanes);
+    setActiveKey(newActiveKey);
+  };
+
+  return (
+    <>
+      <Divider style={{ marginTop: -6 }} orientation="left">
+        Step : Generic Template
+      </Divider>
+      <Tabs
+        type="editable-card"
+        onChange={onChange}
+        activeKey={activeKey}
+        onEdit={onEdit}
+        hideAdd={!(panes.length < 10)}
+      >
+        {panes.map((pane) => (
+          <TabPane tab={pane.title} key={pane.key} closable={pane.closable}>
+            {pane.content}
+          </TabPane>
+        ))}
+      </Tabs>
+    </>
+  );
+};
+
+export const TemplateComponent: React.FC<GenericTemplateComponentDataProps> = ({
+  componentData,
+}) => {
+  const [imageUrl, setImageUrl] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [previewVisible, setPreviewVisible] = useState(false);
+  const [previewImage, setPreviewImage] = useState(null);
+  const [previewTitle, setPreviewTitle] = useState(false);
+  // const [fileList, setFileList] = useState(componentData.data.attachments);
+  const [fileList, setFileList] = useState([]);
+  const [buttonType, setButtonType] = useState(['flow', 'flow', 'flow']);
+
+  // useEffect(() => {
+  //   if (componentData.data.attachments.length > 0) {
+  //     setUrl(componentData.data.attachments[0].url);
+  //   }
+  // }, [componentData]);
+  const [progress, setProgress] = useState(0);
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const uploadImage = async (options) => {
+    const { onSuccess, onError, file, onProgress } = options;
+
+    const formData = new FormData();
+    const config = {
+      headers: { 'content-type': 'multipart/form-data' },
+      onUploadProgress: (event) => {
+        const percent = Math.floor((event.loaded / event.total) * 100);
+        setProgress(percent);
+        if (percent === 100) {
+          setTimeout(() => setProgress(0), 1000);
+        }
+        onProgress({ percent: (event.loaded / event.total) * 100 });
+      },
+    };
+    formData.append('file', file);
+    try {
+      const res = await axios.post('http://localhost:5000/upload', formData, config);
+      onSuccess({ url: res.data.url });
+      console.log('server res: ', res);
+    } catch (err) {
+      console.log('Error: ', err);
+      const error = new Error('Some error');
+      onError({ err });
+    }
+  };
+
+  const showModal = () => {
+    setIsModalVisible(true);
+  };
+
+  const handleOkModal = () => {
+    setIsModalVisible(false);
+  };
+
+  const handleCancelModal = () => {
+    setIsModalVisible(false);
+  };
+  const handleCancel = () => setPreviewVisible(false);
+
+  const handlePreview = async (file) => {
+    if (!file.url && !file.preview) {
+      file.preview = await getBase64(file.originFileObj);
+    }
+
+    setPreviewImage(file.url || file.preview);
+    setPreviewVisible(true);
+    setPreviewTitle(file.name || file.url.substring(file.url.lastIndexOf('/') + 1));
+  };
+  const handleChange = ({ fileList: newFileList }) => {
+    if (newFileList && newFileList[newFileList.length - 1]?.response?.url) {
+      newFileList[newFileList.length - 1].url = newFileList[newFileList.length - 1].response?.url;
+      newFileList[newFileList.length - 1].thumbUrl = null;
+    }
+    setFileList(newFileList);
+  };
+>>>>>>> master
 
   const uploadButton = (
     <div>
@@ -487,6 +649,7 @@ export const GenericTemplatesComponent: React.FC = () => {
       <div style={{ marginTop: 8 }}>Upload</div>
     </div>
   );
+<<<<<<< HEAD
   const handleChange = (info) => {
     if (info.file.status === 'uploading') {
       setLoading(true);
@@ -502,6 +665,46 @@ export const GenericTemplatesComponent: React.FC = () => {
   };
   return (
     <>
+=======
+
+  const getButtonField = (index: Number) => {
+    console.log(index);
+    if (buttonType[index] === 'url') {
+      return <ProFormText width="md" name={`url${index}`} label="Content" />;
+    }
+    return (
+      <ProFormSelect
+        width="md"
+        prop
+        name={`flow${index}`}
+        label="Content"
+        showSearch
+        // request={async () => {
+        //   const topics = await queryTopics();
+        //   setTopics(topics);
+        // }}
+        // options={topics}
+        request={async () => {
+          return await queryFlowsFilter('name,params');
+        }}
+        rules={[
+          {
+            required: true,
+            message: (
+              <FormattedMessage
+                id="pages.searchTable.response"
+                defaultMessage="Response is required"
+              />
+            ),
+          },
+        ]}
+      />
+    );
+  };
+
+  return (
+    <div>
+>>>>>>> master
       <Form.Item>
         <Divider style={{ marginTop: -6 }} orientation="left">
           Generic Templates
@@ -531,11 +734,93 @@ export const GenericTemplatesComponent: React.FC = () => {
           style={{ width: 300 }}
         >
           <Input placeholder="Subtitle" />
+<<<<<<< HEAD
           <Button block>Default</Button>
           <Button block>Default</Button>
           <Button type="dashed" block>
             Dashed
+=======
+          <Button onClick={showModal} type="dashed" block>
+            <PlusOutlined /> Add Button
+>>>>>>> master
           </Button>
+          <Modal
+            title="New Button"
+            visible={isModalVisible}
+            onOk={handleOkModal}
+            onCancel={handleCancelModal}
+            destroyOnClose={true}
+            width={900}
+          >
+            <ProForm<{
+              name: string;
+              company: string;
+            }>
+              onFinish={async (values) => {
+                console.log(values);
+                message.success('提交成功');
+              }}
+              initialValues={{
+                name: '蚂蚁设计有限公司',
+                useMode: 'chapter',
+              }}
+            >
+              <ProFormText width="sm" name="title" label="Title" tooltip="最长为 24 位" />
+              <ProFormTextArea
+                name="subtitle"
+                label="Subtitle"
+                fieldProps={{ maxLength: '80', showCount: true }}
+              />
+              <ProForm.Item
+                name="dataSource"
+                // initialValue={defaultData}
+                trigger="onValuesChange"
+              >
+                <ProForm.Group>
+                  Button 1:
+                  <ProFormText name="text1" label="Display Text" />
+                  <ProFormSelect
+                    initialValue={buttonType[0]}
+                    label="Type"
+                    options={[
+                      {
+                        value: 'url',
+                        label: 'URL',
+                      },
+                      {
+                        value: 'flow',
+                        label: 'Flow',
+                      },
+                    ]}
+                    width="xs"
+                    name="type1"
+                  />
+                  {getButtonField(0)}
+                </ProForm.Group>
+                {/*<ProForm.Group>*/}
+                {/*  Button 2:*/}
+                {/*  <ProFormText name="text2" label="Display Text" />*/}
+                {/*  <ProFormText width="sm" name="type2" label="type" />*/}
+                {/*  <ProFormText width="sm" name="type" label="type" />*/}
+                {/*</ProForm.Group>*/}
+                {/*<ProForm.Group>*/}
+                {/*  Button 3:*/}
+                {/*  <ProFormText name="text3" label="Display Text" />*/}
+                {/*  <ProFormText width="sm" name="type3" label="type" />*/}
+                {/*  <ProFormText width="sm" name="type" label="type" />*/}
+                {/*</ProForm.Group>*/}
+                {/*<Form.Item>*/}
+
+                {/*{getButtonField(1)}*/}
+                {/*{getButtonField(2)}*/}
+                {/*  Button 1:*/}
+                {/*  <Input placeholder="Basic usage" />*/}
+                {/*  <Input placeholder="Basic usage" />*/}
+                {/*  <Input placeholder="Basic usage" />*/}
+                {/*</Form.Item>*/}
+              </ProForm.Item>
+            </ProForm>
+          </Modal>
         </Card>
       </Form.Item>
     </>
