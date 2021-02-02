@@ -129,7 +129,6 @@ const NewComponentsList: React.FC<NewComponentsListProps> = ({
       onDrop={onDrop}
       treeData={componentList}
       titleRender={(nodeData) => {
-        console.log(nodeData);
         const content = (
           <Row>
             <Col span={22}>{nodeData.key}</Col>
