@@ -59,7 +59,7 @@ const NewBroadcast: FC = () => {
     
     switch (component) {
       case 'text':
-        renderedComponent = <TextComponent componentKey={index} componentData={componentData} onChange={setComponentsList} />;
+        renderedComponent = <TextComponent componentKey={index} componentData={componentData} onChange={setComponentsList}/>;
         break;
       case 'imageAttachments':
         renderedComponent = <ImageAttachmentComponent key={index}  componentData={componentData} />;
