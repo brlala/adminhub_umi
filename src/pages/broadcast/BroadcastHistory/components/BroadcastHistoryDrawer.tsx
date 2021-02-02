@@ -6,8 +6,8 @@ import ProDescriptions, { ProDescriptionsItemProps } from '@ant-design/pro-descr
 import { FormattedMessage } from 'umi';
 import { ProColumns } from '@ant-design/pro-table';
 import { FlowItem } from 'models/flows';
-import { ButtonTemplateDisplayComponent, GenericTemplateDisplayComponent, ImageDisplayComponent, QuickReplyDisplayComponent, TextDisplayComponent } from '@/components/FlowItems';
 import moment from 'moment';
+import { ButtonTemplateDisplayComponent, GenericTemplateDisplayComponent, ImageDisplayComponent, QuickReplyDisplayComponent, TextDisplayComponent } from '../../BroadcastTemplateList/components/FlowItems';
 
 interface OperationDrawerProps {
   visible: boolean;

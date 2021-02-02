@@ -6,8 +6,8 @@ import { Params, BroadcastTemplateListItem, BroadcastFlowList } from './data.d';
 import { queryBroadcastTemplate } from './service';
 import styles from './style.less';
 import ProCard from '@ant-design/pro-card';
-import { TextComponent, ImageAttachmentComponent, VideoAttachmentComponent, GenericTemplatesComponent, ButtonTemplatesComponent, FlowComponent} from '@/components/FlowItems';
 import { PageContainer } from '@ant-design/pro-layout';
+import { TextComponent, ImageAttachmentComponent, VideoAttachmentComponent, GenericTemplatesComponent, ButtonTemplatesComponent, FlowComponent } from '../FlowItems';
 
 const FormItem = Form.Item;
 const { Paragraph } = Typography;
@@ -32,11 +32,11 @@ const NewBroadcast: FC = () => {
       case 'text':
         componentData = { type: component, data: { text: '' } };
         break;
-      case 'imageAttachments':
-        componentData = { type: component, data: { attachments: [] } };
+      case 'image':
+        componentData = { type: component, data: { url: '' } };
         break;
       case 'videoAttachments':
-        componentData = { type: component,  data: { attachments: [] } };
+        componentData = { type: component, data: { attachments: [] } };
         break;
       case 'fileAttachments':
         componentData = { type: component, data: { attachments: [] } };
@@ -59,10 +59,10 @@ const NewBroadcast: FC = () => {
     
     switch (component) {
       case 'text':
-        renderedComponent = <TextComponent componentKey={index} componentData={componentData} onChange={setComponentsList}/>;
+        renderedComponent = <TextComponent componentKey={index} componentData={componentData} onChange={setComponentsList} />;
         break;
-      case 'imageAttachments':
-        renderedComponent = <ImageAttachmentComponent key={index}  componentData={componentData} />;
+      case 'image':
+        renderedComponent = <ImageAttachmentComponent componentKey={index}  componentData={componentData} onChange={setComponentsList} />;
         break;
       case 'videoAttachments':
         renderedComponent = <VideoAttachmentComponent key={index}  componentData={componentData} />;
@@ -89,7 +89,7 @@ const NewBroadcast: FC = () => {
   const list = data?.flow || [];
 
   const onFinish = (values: any) => {
-    console.log('Success:', values);
+    console.log('Success:', values,componentList );
   };
 
   return (
@@ -102,7 +102,7 @@ const NewBroadcast: FC = () => {
               <Row>
                 <Col span={12} key={1}>
                   <FormItem 
-                    name="flow">
+                    name="flow" >
                     <ProCard title="Component">
                       {list.map((flowNode, index) => renderComponent(flowNode, index))}
                     </ProCard>
