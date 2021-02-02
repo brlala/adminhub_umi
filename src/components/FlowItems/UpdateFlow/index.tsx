@@ -32,7 +32,13 @@ import { queryFlowsFilter } from '@/pages/QuestionList/service';
 import { FormattedMessage } from '@@/plugin-locale/localeExports';
 import { Upload, Modal } from 'antd';
 const { TextArea } = Input;
-import { DeleteOutlined, InboxOutlined, MinusCircleOutlined, PlusOutlined, UploadOutlined } from '@ant-design/icons';
+import {
+  DeleteOutlined,
+  InboxOutlined,
+  MinusCircleOutlined,
+  PlusOutlined,
+  UploadOutlined,
+} from '@ant-design/icons';
 import axios from 'axios';
 import styles from './index.less';
 
@@ -83,14 +89,18 @@ export type FlowComponentData = {
 //   componentData: TextComponentData;
 // };
 
-export type AttachmentsComponentDataProps = {
-  componentData: AttachmentsComponentData;
+export type TextComponentDataProps = {
+  componentData: TextComponentData;
+  index: Number;
+};
+export type GenericTemplateComponentDataProps = {
+  componentData: GenericTemplatesComponentData[];
+  index: Number;
 };
 
-export type TextComponentDataProps = {
-  componentKey: number;
-  componentData: TextComponentData;
-  onChange: (prevState: any) => void;
+export type AttachmentsComponentDataProps = {
+  componentData: AttachmentsComponentData;
+  index: Number;
 };
 
 export const TextComponent: React.FC<TextComponentDataProps> = ({
@@ -166,12 +176,12 @@ export const TextComponent: React.FC<TextComponentDataProps> = ({
 //           <Divider style={{ marginTop: -6 }} orientation="left">
 //             Image
 //           </Divider>
-//           {previewImage? 
+//           {previewImage?
 //             <Space>
 //               <ImageDisplayComponent componentKey={componentKey} componentData={{url: previewImage}}/>
 //               <Button onClick={handleRemove}><DeleteOutlined/></Button>
 //             </Space>
-//             : 
+//             :
 //             <Dragger {...props}>
 //               <p className="ant-upload-drag-icon">
 //                 <InboxOutlined />
@@ -180,7 +190,7 @@ export const TextComponent: React.FC<TextComponentDataProps> = ({
 //               <p className="ant-upload-hint">Support for a single upload.</p>
 //             </Dragger>
 //             }
-          
+
 //       </>
 //   );
 // };
@@ -909,13 +919,23 @@ export const FlowComponent: React.FC = () => {
   );
 };
 
-export const FileAttachmentComponent: React.FC = () => {
+export const FileAttachmentComponent: React.FC<AttachmentsComponentDataProps> = ({
+  componentData,
+}) => {
+  const [fileList, setFileList] = useState(componentData.data.attachments);
+  const handleChange = ({ fileList: newFileList }) => {
+    setFileList(newFileList);
+  };
   return (
     <>
-      <Divider style={{ marginTop: -6 }} orientation="left">
-        Flow
-      </Divider>
-      Flow Component Here <div />
+      <Form.Item>
+        <Divider style={{ marginTop: -6 }} orientation="left">
+          File
+        </Divider>
+        <Upload onChange={handleChange} action={'http://localhost:5000/upload'} fileList={fileList}>
+          <Button icon={<UploadOutlined />}>Upload</Button>
+        </Upload>
+      </Form.Item>
     </>
   );
 };
