@@ -422,15 +422,6 @@ export const VideoAttachmentComponent: React.FC<AttachmentsComponentDataProps> =
     </>
   );
 };
-<<<<<<< HEAD
-=======
-import ImgCrop from 'antd-img-crop';
-import { Tabs } from 'antd';
-import { StickyContainer, Sticky } from 'react-sticky';
-import ProCard from '@ant-design/pro-card';
-import { EditableProTable, ProColumns } from '@ant-design/pro-table';
-import FormItemLabel from 'antd/es/form/FormItemLabel';
->>>>>>> master
 
 const initialPanes = [{ title: '1', content: 'Content of Tab 1', key: '1' }];
 const { TabPane } = Tabs;
