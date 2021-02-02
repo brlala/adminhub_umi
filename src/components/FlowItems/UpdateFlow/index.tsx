@@ -22,7 +22,6 @@ import { queryFlowsFilter } from '@/pages/QuestionList/service';
 import { FormattedMessage } from '@@/plugin-locale/localeExports';
 import { Upload, Modal } from 'antd';
 const { TextArea } = Input;
-<<<<<<< HEAD
 import { DeleteOutlined, InboxOutlined, PlusOutlined, UploadOutlined } from '@ant-design/icons';
 import axios from 'axios';
 import { ImageDisplayComponent } from '../ReadFlow';
@@ -35,77 +34,6 @@ export type TextComponentDataProps = {
     data: { text: StringObject };
   };
   onChange: (prevState: any) => void;
-=======
-import {
-  DeleteOutlined,
-  InboxOutlined,
-  MinusCircleOutlined,
-  PlusOutlined,
-  UploadOutlined,
-} from '@ant-design/icons';
-import axios from 'axios';
-import './index.less';
-
-export type TextComponentData = {
-  type: string;
-  name: string;
-  data: { textField: string };
-};
-export type Attachments = {
-  name: string;
-  url?: string;
-  uid: string;
-  response?: { url: string };
-};
-export type Buttons = {
-  type: string;
-  response: string;
-};
-export type Templates = {
-  imageUrl: string;
-  title: string;
-  subtitle: string;
-  buttons: Buttons[];
-};
-export type AttachmentsComponentData = {
-  type: string;
-  name: string;
-  data: { attachments: Attachments[] };
-};
-
-export type GenericTemplatesComponentData = {
-  type: string;
-  name: string;
-  data: Templates[];
-};
-export type ButtonTemplatesComponentData = {
-  type: string;
-  name: string;
-  data: { textField: string; buttons: Buttons[] };
-};
-
-export type FlowComponentData = {
-  type: string;
-  name: string;
-  data: { flowId: string; params: string[] };
-};
-// export type TextComponentDataProps = {
-//   componentData: TextComponentData;
-// };
-
-export type TextComponentDataProps = {
-  componentData: TextComponentData;
-  index: Number;
-};
-export type GenericTemplateComponentDataProps = {
-  componentData: GenericTemplatesComponentData[];
-  index: Number;
-};
-
-export type AttachmentsComponentDataProps = {
-  componentData: AttachmentsComponentData;
-  index: Number;
->>>>>>> master
 };
 
 export const TextComponent: React.FC<TextComponentDataProps> = (props) => {
@@ -139,113 +67,11 @@ export const TextComponent: React.FC<TextComponentDataProps> = (props) => {
   );
 };
 
-<<<<<<< HEAD
 export type ImageComponentDataProps = {
   componentKey: number;
   componentData?: {
     type: string;
     data: { url: string };
-=======
-// export const ImageAttachmentComponent: React.FC<AttachmentsComponentDataProps> = ({ componentKey, componentData, onChange }) => {
-//   const [previewImage, setPreviewImage] = useState(componentData.data.url);
-//   const props = {
-//     name: 'file',
-//     multiple: false,
-//     action: 'http://localhost:5000/flows/upload',
-//     onChange(info) {
-//       const { status } = info.file;
-//       if (status !== 'uploading') {
-//         console.log(info.file, info.fileList);
-//       }
-//       if (status === 'done') {
-//         setPreviewImage(info.file.response.url)
-
-//         console.log(info.file.response.url)
-//         onChange((prevState: any) => [...prevState].map((item, index) => {
-//           if(index === componentKey) {
-//             return { ...item, data: {url: previewImage}}
-//           }
-//           else return item;
-//         }))
-//         message.success(`${info.file.name} file uploaded successfully.`);
-//       } else if (status === 'error') {
-//         message.error(`${info.file.name} file upload failed.`);
-//       }
-//     },
-//   };
-
-//   const handleRemove = () => {
-//     setPreviewImage(null)
-//   }
-
-//   return (
-//         <>
-//           <Divider style={{ marginTop: -6 }} orientation="left">
-//             Image
-//           </Divider>
-//           {previewImage?
-//             <Space>
-//               <ImageDisplayComponent componentKey={componentKey} componentData={{url: previewImage}}/>
-//               <Button onClick={handleRemove}><DeleteOutlined/></Button>
-//             </Space>
-//             :
-//             <Dragger {...props}>
-//               <p className="ant-upload-drag-icon">
-//                 <InboxOutlined />
-//               </p>
-//               <p className="ant-upload-text">Click or drag file to this area to upload</p>
-//               <p className="ant-upload-hint">Support for a single upload.</p>
-//             </Dragger>
-//             }
-
-//       </>
-//   );
-// };
-
-function getBase64(file) {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.onload = () => resolve(reader.result);
-    reader.onerror = (error) => reject(error);
-  });
-}
-
-export const ImageAttachmentComponent: React.FC<AttachmentsComponentDataProps> = ({
-  componentData,
-}) => {
-  const [previewVisible, setPreviewVisible] = useState(false);
-  const [previewImage, setPreviewImage] = useState(null);
-  const [previewTitle, setPreviewTitle] = useState(false);
-  const [progress, setProgress] = useState(0);
-  const [fileList, setFileList] = useState(componentData.data.attachments); // old items is in "url", new items is in "response" key
-
-  const uploadImage = async (options) => {
-    const { onSuccess, onError, file, onProgress } = options;
-
-    const formData = new FormData();
-    const config = {
-      headers: { 'content-type': 'multipart/form-data' },
-      onUploadProgress: (event) => {
-        const percent = Math.floor((event.loaded / event.total) * 100);
-        setProgress(percent);
-        if (percent === 100) {
-          setTimeout(() => setProgress(0), 1000);
-        }
-        onProgress({ percent: (event.loaded / event.total) * 100 });
-      },
-    };
-    formData.append('file', file);
-    try {
-      const res = await axios.post('http://localhost:5000/upload', formData, config);
-      onSuccess({ url: res.data.url });
-      console.log('server res: ', res);
-    } catch (err) {
-      console.log('Error: ', err);
-      const error = new Error('Some error');
-      onError({ err });
-    }
->>>>>>> master
   };
   onChange: (prevState: any) => void;
 };

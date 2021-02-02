@@ -14,11 +14,8 @@ import {
   FlowComponent,
   ButtonTemplatesComponent,
   VideoAttachmentComponent,
-<<<<<<< HEAD
   ImageComponent,
-=======
   FileAttachmentComponent,
->>>>>>> master
 } from '@/components/FlowItems/UpdateFlow';
 import { FlowList } from '@/pages/FlowList/data';
 import { FooterToolbar } from '@ant-design/pro-layout';
