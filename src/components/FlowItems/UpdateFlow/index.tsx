@@ -40,7 +40,7 @@ import {
   UploadOutlined,
 } from '@ant-design/icons';
 import axios from 'axios';
-import styles from './index.less';
+import './index.less';
 
 export type TextComponentData = {
   type: string;
@@ -563,15 +563,12 @@ export const VideoAttachmentComponent: React.FC<AttachmentsComponentDataProps> =
     </>
   );
 };
-
 import ImgCrop from 'antd-img-crop';
 import { Tabs } from 'antd';
 import { StickyContainer, Sticky } from 'react-sticky';
 import ProCard from '@ant-design/pro-card';
 import { EditableProTable, ProColumns } from '@ant-design/pro-table';
 import FormItemLabel from 'antd/es/form/FormItemLabel';
-import Dragger from 'antd/lib/upload/Dragger';
-import { ImageDisplayComponent } from '../ReadFlow';
 
 const initialPanes = [{ title: '1', content: 'Content of Tab 1', key: '1' }];
 const { TabPane } = Tabs;
@@ -727,7 +724,7 @@ export const TemplateComponent: React.FC<GenericTemplateComponentDataProps> = ({
 
   const uploadButton = (
     <div>
-      {loading ? <LoadingOutlined /> : <PlusOutlined />}
+      <PlusOutlined />
       <div style={{ marginTop: 8 }}>Upload</div>
     </div>
   );
@@ -770,27 +767,37 @@ export const TemplateComponent: React.FC<GenericTemplateComponentDataProps> = ({
   return (
     <div>
       <Form.Item>
-        <Divider style={{ marginTop: -6 }} orientation="left">
-          Generic Templates
-        </Divider>
         <Card
           size="small"
           title={
             <>
-              <Upload
-                name="avatar"
-                listType="picture-card"
-                className="avatar-upsloader"
-                showUploadList={false}
-                action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
-                onChange={handleChange}
+              <div className="GenericTemplate">
+                <ImgCrop rotate aspect={1.91}>
+                  <Upload
+                    customRequest={uploadImage}
+                    onChange={handleChange}
+                    accept=".jpg,.jpeg"
+                    listType="picture-card"
+                    fileList={fileList}
+                    onPreview={handlePreview}
+                  >
+                    {/*Choose File*/}
+                    {fileList.length >= 1 ? null : uploadButton}
+                  </Upload>
+                </ImgCrop>
+              </div>
+              <Modal
+                visible={previewVisible}
+                title={previewTitle}
+                footer={null}
+                onCancel={handleCancel}
               >
-                {imageUrl ? (
-                  <img src={'imageUrl'} alt="avatar" style={{ width: '100%' }} />
-                ) : (
-                  uploadButton
-                )}
-              </Upload>
+                <img alt="image-preview" style={{ width: '100%' }} src={previewImage} />
+                {/*<object*/}
+                {/*  style={{ width: '100%', height: '1000px' }}*/}
+                {/*  data="http://www.africau.edu/images/default/sample.pdf"*/}
+                {/*/>*/}
+              </Modal>
               <Input placeholder="Title" />
               <Input placeholder="Subtitle" />
             </>
