@@ -7,7 +7,7 @@ import { queryBroadcastTemplate } from './service';
 import styles from './style.less';
 import ProCard from '@ant-design/pro-card';
 import { PageContainer } from '@ant-design/pro-layout';
-import { TextComponent, ImageAttachmentComponent, VideoAttachmentComponent, GenericTemplatesComponent, ButtonTemplatesComponent, FlowComponent } from '../FlowItems';
+import { ImageAttachmentComponent, TextComponent, VideoAttachmentComponent, GenericTemplatesComponent, ButtonTemplatesComponent, FlowComponent } from '@/components/FlowItems/UpdateFlow';
 
 const FormItem = Form.Item;
 const { Paragraph } = Typography;

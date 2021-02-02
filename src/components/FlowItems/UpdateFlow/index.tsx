@@ -32,7 +32,7 @@ import { queryFlowsFilter } from '@/pages/QuestionList/service';
 import { FormattedMessage } from '@@/plugin-locale/localeExports';
 import { Upload, Modal } from 'antd';
 const { TextArea } = Input;
-import { MinusCircleOutlined, PlusOutlined, UploadOutlined } from '@ant-design/icons';
+import { DeleteOutlined, InboxOutlined, MinusCircleOutlined, PlusOutlined, UploadOutlined } from '@ant-design/icons';
 import axios from 'axios';
 import styles from './index.less';
 
@@ -128,6 +128,62 @@ export const TextComponent: React.FC<TextComponentDataProps> = ({
     </>
   );
 };
+
+// export const ImageAttachmentComponent: React.FC<AttachmentsComponentDataProps> = ({ componentKey, componentData, onChange }) => {
+//   const [previewImage, setPreviewImage] = useState(componentData.data.url);
+//   const props = {
+//     name: 'file',
+//     multiple: false,
+//     action: 'http://localhost:5000/flows/upload',
+//     onChange(info) {
+//       const { status } = info.file;
+//       if (status !== 'uploading') {
+//         console.log(info.file, info.fileList);
+//       }
+//       if (status === 'done') {
+//         setPreviewImage(info.file.response.url)
+
+//         console.log(info.file.response.url)
+//         onChange((prevState: any) => [...prevState].map((item, index) => {
+//           if(index === componentKey) {
+//             return { ...item, data: {url: previewImage}}
+//           }
+//           else return item;
+//         }))
+//         message.success(`${info.file.name} file uploaded successfully.`);
+//       } else if (status === 'error') {
+//         message.error(`${info.file.name} file upload failed.`);
+//       }
+//     },
+//   };
+
+//   const handleRemove = () => {
+//     setPreviewImage(null)
+//   }
+
+//   return (
+//         <>
+//           <Divider style={{ marginTop: -6 }} orientation="left">
+//             Image
+//           </Divider>
+//           {previewImage? 
+//             <Space>
+//               <ImageDisplayComponent componentKey={componentKey} componentData={{url: previewImage}}/>
+//               <Button onClick={handleRemove}><DeleteOutlined/></Button>
+//             </Space>
+//             : 
+//             <Dragger {...props}>
+//               <p className="ant-upload-drag-icon">
+//                 <InboxOutlined />
+//               </p>
+//               <p className="ant-upload-text">Click or drag file to this area to upload</p>
+//               <p className="ant-upload-hint">Support for a single upload.</p>
+//             </Dragger>
+//             }
+          
+//       </>
+//   );
+// };
 
 function getBase64(file) {
   return new Promise((resolve, reject) => {
@@ -504,6 +560,8 @@ import { StickyContainer, Sticky } from 'react-sticky';
 import ProCard from '@ant-design/pro-card';
 import { EditableProTable, ProColumns } from '@ant-design/pro-table';
 import FormItemLabel from 'antd/es/form/FormItemLabel';
+import Dragger from 'antd/lib/upload/Dragger';
+import { ImageDisplayComponent } from '../ReadFlow';
 
 const initialPanes = [{ title: '1', content: 'Content of Tab 1', key: '1' }];
 const { TabPane } = Tabs;
