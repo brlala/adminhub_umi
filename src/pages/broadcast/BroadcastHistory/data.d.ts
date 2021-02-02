@@ -2,8 +2,8 @@ import { FlowComponentData } from "@/components/FlowItems";
 import { FlowItem } from "models/flows";
 
 export interface Member {
-  avatar: string;
-  name: string;
+  avatar?: string;
+  username: string;
   id: string;
 }
 
@@ -32,7 +32,7 @@ export interface BroadcastHistoryListItem {
   sent: number;
   total: number;
   sendAt: string;
-  createdBy: string;
+  createdBy: Member;
 }
 
 export interface BroadcastHistoryItem {
@@ -44,5 +44,5 @@ export interface BroadcastHistoryItem {
   total: number;
   sendAt: string;
   createdAt: string;
-  createdBy: string;
+  createdBy: Member;
 }

@@ -1,18 +1,17 @@
-import { Card, Button, Form, List, Typography, message, Drawer, Tag } from 'antd';
+import { Card, Form, Typography, Tag } from 'antd';
 import React, { FC, useState } from 'react';
-import { Link, useIntl, useRequest, FormattedMessage } from 'umi';
+import { useIntl, useRequest, FormattedMessage } from 'umi';
 
 import type { ProColumns, ActionType } from '@ant-design/pro-table';
 import StandardFormRow from './components/StandardFormRow';
 import TagSelect from './components/TagSelect';
-import { BroadcastHistoryListItem, BroadcastHistoryItem } from './data.d';
-import TemplateModal from './components/TemplateModal';
+import { BroadcastHistoryItem, BroadcastHistoryListItem } from './data.d';
 import styles from './style.less';
 import ProTable from '@ant-design/pro-table';
 import moment from 'moment';
 import { queryBroadcastHistory, queryBroadcastHistoryList } from './service';
-import ProDescriptions from '@ant-design/pro-descriptions';
 import BroadcastHistoryDrawer from './components/BroadcastHistoryDrawer';
+import { PageContainer } from '@ant-design/pro-layout';
 
 const FormItem = Form.Item;
 const { Paragraph } = Typography;
@@ -27,7 +26,7 @@ const BroadcastHistory: FC = () => {
   const list = data? data : [];
 
   const [visible, setVisible] = useState<boolean>(false);
-  const [current, setCurrent] = useState<Partial<BroadcastHistoryListItem> | undefined>(undefined);
+  const [current, setCurrent] = useState<BroadcastHistoryItem | undefined>(undefined);
   
   const onClose = () => {
     setVisible(false);
@@ -51,7 +50,10 @@ const BroadcastHistory: FC = () => {
     {
       title: <FormattedMessage id="pages.broadcast.author.authorLabel" defaultMessage="Author" />,
       hideInSearch: true,
-      dataIndex: 'createdBy'
+      dataIndex: 'createdBy',
+      render: (_, object) => {
+        return object.createdBy.username;
+      },
     },
     {
       title: <FormattedMessage id="pages.broadcast.sendAt.sendAtLabel" defaultMessage="Broadcast Time" />,
@@ -134,58 +136,61 @@ const BroadcastHistory: FC = () => {
   console.log( columns )
   console.log( list )
 
-  return <div className={styles.coverCardList}>
-      <Card bordered={false}>
-        <Form
-          layout="inline"
-          initialValues={{
-          }}
-          onValuesChange={(_, values) => {
-            run(values);
-          }}
-        >
-          <StandardFormRow title="Tags" block style={{ paddingBottom: 11 }}>
-            <FormItem name="tags">
-              <TagSelect>
-                <TagSelect.Option value="Pandai">Pandai</TagSelect.Option>
-                <TagSelect.Option value="BBL">BBL</TagSelect.Option>
-                <TagSelect.Option value="RMs">RMs</TagSelect.Option>
-              </TagSelect>
-            </FormItem>
-          </StandardFormRow>
-          <StandardFormRow title="Status" block style={{ paddingBottom: 11 }}>
-            <FormItem name="status">
-              <TagSelect>
-                <TagSelect.Option value="completed">Completed</TagSelect.Option>
-                <TagSelect.Option value="sending">Sending</TagSelect.Option>
-                <TagSelect.Option value="scheduled">Scheduled</TagSelect.Option>
-                <TagSelect.Option value="failed">Failed</TagSelect.Option>
-              </TagSelect>
-            </FormItem>
-          </StandardFormRow>
-        </Form>
-      </Card>
+  return (
+    <PageContainer> 
+      <div className={styles.coverCardList}>
+        <Card bordered={false}>
+          <Form
+            layout="inline"
+            initialValues={{
+            }}
+            onValuesChange={(_, values) => {
+              run(values);
+            }}
+          >
+            <StandardFormRow title="Tags" block style={{ paddingBottom: 11 }}>
+              <FormItem name="tags">
+                <TagSelect>
+                  <TagSelect.Option value="Pandai">Pandai</TagSelect.Option>
+                  <TagSelect.Option value="BBL">BBL</TagSelect.Option>
+                  <TagSelect.Option value="RMs">RMs</TagSelect.Option>
+                </TagSelect>
+              </FormItem>
+            </StandardFormRow>
+            <StandardFormRow title="Status" block style={{ paddingBottom: 11 }}>
+              <FormItem name="status">
+                <TagSelect>
+                  <TagSelect.Option value="completed">Completed</TagSelect.Option>
+                  <TagSelect.Option value="sending">Sending</TagSelect.Option>
+                  <TagSelect.Option value="scheduled">Scheduled</TagSelect.Option>
+                  <TagSelect.Option value="failed">Failed</TagSelect.Option>
+                </TagSelect>
+              </FormItem>
+            </StandardFormRow>
+          </Form>
+        </Card>
 
-      <ProTable<BroadcastHistoryListItem>
-        headerTitle={intl.formatMessage({
-          id: 'pages.searchTable.title',
-          defaultMessage: '查询表格',
-        })}
-        rowKey="id"
-        search={{
-          labelWidth: 120,
-        }}
-        loading={loading}
-        dataSource={list}
-        columns={columns}
-      />
-      
-      <BroadcastHistoryDrawer 
-        visible={visible}
-        current={current}
-        onClose={onClose}
-      />
-    </div>
+        <ProTable<BroadcastHistoryListItem>
+          headerTitle={intl.formatMessage({
+            id: 'pages.searchTable.title',
+            defaultMessage: '查询表格',
+          })}
+          rowKey="id"
+          search={{
+            labelWidth: 120,
+          }}
+          loading={loading}
+          dataSource={list}
+          columns={columns}
+        />
+        
+        <BroadcastHistoryDrawer 
+          visible={visible}
+          current={current}
+          onClose={onClose}
+        />
+      </div>
+    </PageContainer>)
 };
 
 export default BroadcastHistory;

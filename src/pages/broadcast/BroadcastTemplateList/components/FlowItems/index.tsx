@@ -24,13 +24,15 @@ import {
   Space,
   Popconfirm,
   Radio,
+  Carousel,
+  Tabs,
 } from 'antd';
 const { Option } = Select;
 import { queryFlowsFilter } from '@/pages/QuestionList/service';
 import { FormattedMessage } from '@@/plugin-locale/localeExports';
 import { Upload, Modal } from 'antd';
 const { TextArea } = Input;
-import { MinusCircleOutlined, PlusOutlined, UploadOutlined } from '@ant-design/icons';
+import { ColumnWidthOutlined, LeftCircleOutlined, LeftOutlined, MinusCircleOutlined, PlusOutlined, RightCircleOutlined, RightOutlined, UploadOutlined } from '@ant-design/icons';
 import axios from 'axios';
 import styles from './index.less';
 
@@ -78,21 +80,35 @@ export type FlowComponentData = {
   data: { flowId: string; params: string[] };
 };
 export type TextComponentDataProps = {
+  componentKey: number;
   componentData: TextComponentData;
+  onChange: (prevState: any) => void;
 };
 
 export type AttachmentsComponentDataProps = {
   componentData: AttachmentsComponentData;
 };
 
-export const TextComponent: React.FC<TextComponentDataProps> = ({ componentData }) => {
+export const TextComponent: React.FC<TextComponentDataProps> = ({ componentKey, componentData, onChange }) => {
+  console.log(componentData, componentKey)
   return (
     <>
       <Divider style={{ marginTop: -6 }} orientation="left">
         Text
       </Divider>
-      <Form.Item name="text" rules={[{ required: true, message: 'Field is required' }]}>
-        <TextArea rows={4} placeholder="Please input" defaultValue={componentData.data.textField} />
+      <Form.Item id={componentKey.toString()} name={componentKey} rules={[{ required: true, message: 'Field is required' }]}>
+        <TextArea rows={4} placeholder="Please input" defaultValue={componentData.data.textField} 
+        
+          onChange={(e) => {
+            console.log('HERE', e.target.value)
+            onChange((prevState: any) => [...prevState].map((item, index) => {
+              if(index === componentKey) {
+                return { ...item, data: {text: {EN: e.target.value }}}
+              }
+              else return item;
+            }))
+          }}
+          />
       </Form.Item>
     </>
   );
@@ -591,28 +607,157 @@ export const FileAttachmentComponent: React.FC = () => {
 import { FlowItemData } from 'models/flows';
 import { Image } from 'antd';
 
-interface DisplayCompoenntProps {
+interface DisplayComponentProps {
   componentKey: number
   componentData: FlowItemData
 }
 
-export const TextDisplayComponent: React.FC<DisplayCompoenntProps> = (props) =>  {
+export const QuickReplyDisplayComponent: React.FC<DisplayComponentProps> = (props) => {
   const { componentKey, componentData } = props;
-  console.log('Here',  componentKey, componentData)
-  return (componentData?.text &&
-      <ProCard key={componentKey} style={{ borderRadius: 20, background: "#F6F6F6" }} size="small">
-        <div>{componentData.text.TH}</div>
-      </ProCard>
-  );
+  console.log(componentData)
+  return (
+    <Space>
+      {componentData && componentData.quick_replies?.map((element, index) => (
+        <Button key={componentKey + "qr" + index} type="default" style={{ borderRadius: 20 }} >{element.text.EN}</Button>
+        ))} </Space>
+    )
 };
 
-export const ImageDisplayComponent: React.FC<DisplayCompoenntProps> = (props) =>  {
+export const TextDisplayComponent: React.FC<DisplayComponentProps> = (props) =>  {
   const { componentKey, componentData } = props;
-  console.log('Here',  componentKey, componentData)
-  return (componentData?.url &&
-    <Image
-      width={300}
-      src={componentData.url}
-    />
-  );
+  if (componentData) {
+    return (
+      <ProCard key={componentKey} style={{ borderRadius: 20, background: "#F6F6F6" }} size="small">
+        <div>{componentData.text?.EN}</div>
+      </ProCard>
+    )}
+  return (
+    <ProCard key={componentKey} style={{ borderRadius: 20, background: "#F6F6F6" }} size="small"> Placeholder Text </ProCard>
+  )
+};
+
+export const ImageDisplayComponent: React.FC<DisplayComponentProps> = (props) =>  {
+  const { componentKey, componentData } = props;
+  if (componentData) {
+    return (
+      <Image
+        width={300} 
+        key={componentKey}
+        src={componentData.url}
+      />
+    )}
+  return (
+    <Image width={300} key={componentKey} src="https://placekitten.com/300/150" />
+  )
+};
+
+export const GenericTemplateDisplayComponent: React.FC<DisplayComponentProps> = (props) =>  {
+  const { componentKey, componentData } = props;
+  console.log('Here', componentData)
+
+  const CarouselButtonGroup = (total: number, current: number) => {
+
+    const items = []
+    for (let x = 0; x < total; x++){
+      items.push(<Button type={current===x?"primary":"default"} shape="circle">{x + 1}</Button>)
+    }
+    return (
+      <Space style={{width: '100%', justifyContent: 'center', margin: '10px'}}>{items} </Space>
+      )
+  }
+  
+  const CarouselNextArrow = (carouselProps) => {
+    const { className, style, onClick } = carouselProps
+    return (
+      <div
+        className={className}
+        style={{
+          ...style,
+          color: 'black',
+          fontSize: '15px',
+          lineHeight: '1.5715'
+        }}
+        onClick={onClick}
+      >
+      </div>
+    )
+  }
+  
+  const CarouselPrevArrow = (carouselProps) => {
+    const { className, style, onClick } = carouselProps
+    return (
+      <div
+        className={className}
+        style={{
+          ...style,
+          color: 'black',
+          fontSize: '15px',
+          lineHeight: '1.5715'
+        }}
+        onClick={onClick}
+      >
+      </div>
+    )
+  }
+
+  const contentStyle = {
+    height: '600px',
+    color: '#fff',
+    lineHeight: '600px',
+    textAlign: 'center',
+    background: '#364d79'
+  }
+
+  return (
+    <Carousel key={componentKey} className={styles.carousel} arrows {...{nextArrow: <CarouselNextArrow />, prevArrow: <CarouselPrevArrow />}}>
+      {componentData && componentData.elements?.map((element, index) => (
+          <div style={contentStyle}>
+              {/* {CarouselButtonGroup(componentData.elements.length, index)} */}
+              <Card key={index} style={{ borderRadius: 10, background: "#F6F6F6" }} size="small"
+              cover={<img src={element?element.image_url:''} />}>
+                <Meta title={element.title.EN} description={element.subtitle.EN} />
+                {element.buttons?.map((button, buttonIdex) => (
+                  <ProCard key={buttonIdex} style={{ borderRadius: 10, marginTop: 10, textAlign: 'center',}} size="small"> 
+                    {button.title.EN}
+                  </ProCard>))
+                }
+              </Card>
+              </div>
+            ))}
+    </Carousel>
+  )
+};
+
+export const ButtonTemplateDisplayComponent: React.FC<DisplayComponentProps> = (props) =>  {
+  const { componentKey, componentData } = props;
+  if (componentData) {
+    return (
+      <ProCard key={componentKey} style={{ borderRadius: 10, background: "#F6F6F6", width: 270 }} size="small">
+          {componentData.title?.EN}
+          {componentData.buttons?.map((button, buttonIdex) => (
+            <Card key={buttonIdex} style={{ borderRadius: 10, marginTop: 10, textAlign: 'center'}} size="small"> 
+              {button.title?.EN}
+            </Card>))
+          }
+      </ProCard>
+    )}
+  return (
+    <ProCard key={componentKey} style={{ borderRadius: 20, background: "#F6F6F6" }} size="small"> Placeholder Text </ProCard>
+  )
+};
+
+export const FlowDisplayComponent: React.FC<DisplayComponentProps> = (props) =>  {
+  const { componentKey, componentData } = props;
+  if (componentData) {
+    return (
+      <ProCard key={componentKey} style={{ borderRadius: 10, background: "#F6F6F6", width: 270 }} size="small">
+        <Meta title='GO TO' />
+        <Card key={'Button' + componentKey} style={{ borderRadius: 10, marginTop: 10, textAlign: 'center'}} size="small"> 
+              {componentData.flow?.name}
+            </Card>
+      </ProCard>
+    )}
+  return (
+    <ProCard key={componentKey} style={{ borderRadius: 20, background: "#F6F6F6" }} size="small"> Placeholder Text </ProCard>
+  )
 };

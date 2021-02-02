@@ -27,6 +27,7 @@ export default {
   'menu.form.new-flow': 'New Flow',
   'menu.list.broadcast': 'Broadcasts',
   'menu.list.broadcast.broadcast-list': 'Broadcast Template',
+  'menu.list.broadcast.broadcast-new': 'New Broadcast',
   'menu.list.broadcast.broadcast-history': 'Broadcast History',
   'menu.list.basic-list': 'Basic List',
   'menu.list.card-list': 'Card List',

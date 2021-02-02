@@ -21,6 +21,9 @@ export async function addBroadcastTemplate(
   return request('http://localhost:5000/broadcasts/templates', {
     method: 'post',
     data: data,
+  })
+  .catch(err => {
+    throw err.data?.detail || "You Have encounterded an Error"
   });
 }
 

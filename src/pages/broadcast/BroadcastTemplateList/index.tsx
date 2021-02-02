@@ -1,20 +1,17 @@
-import { Card, Button, Form, List, Typography, message, Space } from 'antd';
+import { Card, Button, Form, List, message, Space } from 'antd';
 import { PlusOutlined, DeleteOutlined } from '@ant-design/icons';
 import React, { FC, useState } from 'react';
 import { Link, useRequest } from 'umi';
 
 import StandardFormRow from './components/StandardFormRow';
 import TagSelect from './components/TagSelect';
-import { BroadcastTemplateListItem, componentsList } from './data.d';
+import { BroadcastTemplateListItem } from './data.d';
 import { queryBroadcastTemplateList, addBroadcastTemplate, updateBroadcastTemplate, deleteBroadcastTemplate } from './service';
 import TemplateModal from './components/TemplateModal';
 import styles from './style.less';
-import { Route } from "react-router";
-import NewBroadcast from './components/NewBroadcast/index'
-import { TextComponent, ImageAttachmentComponent, VideoAttachmentComponent, GenericTemplatesComponent, ButtonTemplatesComponent, FlowComponent} from '@/components/FlowItems';
+import { PageContainer } from '@ant-design/pro-layout';
 
 const FormItem = Form.Item;
-const { Paragraph } = Typography;
 
 
 const BroadcastTemplateList: FC = () => {
@@ -25,16 +22,11 @@ const BroadcastTemplateList: FC = () => {
 
   const list = data? data : [];
 
-  const [view, setView] = useState<string>('template');
   const [visible, setVisible] = useState<boolean>(false);
   const [current, setCurrent] = useState<Partial<BroadcastTemplateListItem> | undefined>(undefined);
   
   const { run: postRun } = useRequest(
     (method, data) => {
-      // if (method === 'remove') {
-      //   return removeFakeList(params);
-      // }
-      console.log(data)
       if (method === 'delete') {
         return deleteBroadcastTemplate(data);
       }
@@ -45,15 +37,11 @@ const BroadcastTemplateList: FC = () => {
     }, {
       manual: true,
       onSuccess: (result) => {
-        console.log('result', result)
         setVisible(false);
         message.success('Success');
-        run({});
+        run({}).catch();
       },
-      onError: (result) => {
-        setVisible(true);
-        message.error('Fail');
-      },
+      throwOnError: true
     }
   );
 
@@ -61,11 +49,14 @@ const BroadcastTemplateList: FC = () => {
     setVisible(false);
   };
 
-  const handleSubmit = (values: BroadcastTemplateListItem) => {
+  const handleSubmit = async (values: BroadcastTemplateListItem) => {
     const id = current?.id || '';
     const method = id ? 'update' : 'add';
-    console.log('method', method, id, current)
-    postRun(method, { id, ...values });
+    postRun(method, values)
+    .catch((response) => {
+      setVisible(true);
+      message.error(response);
+    });
   };
 
 
@@ -76,7 +67,7 @@ const BroadcastTemplateList: FC = () => {
   };
 
   const showModal = () => {
-    console.log(current)
+    console.log('Current', current)
     setVisible(true);
   };
 
@@ -104,8 +95,6 @@ const BroadcastTemplateList: FC = () => {
     return <Button size="small" key={index}> {renderedComponent}</Button>;
   };
 
-  
-  console.log( list )
   const cardList = list && (
     <List<BroadcastTemplateListItem>
       rowKey="id"
@@ -138,8 +127,7 @@ const BroadcastTemplateList: FC = () => {
   );
 
   return (
-    view === 'template'?
-    (<div className={styles.coverCardList}>
+    <PageContainer>  <div className={styles.coverCardList}>
       <Card bordered={false}>
         <Form
           layout="inline"
@@ -179,13 +167,7 @@ const BroadcastTemplateList: FC = () => {
         onCancel={handleCancel}
         onSubmit={handleSubmit}
       />
-    </div>): 
-    
-    (
-    <Route path="/broadcasts/broadcast-templates/:templateId">
-      <NewBroadcast />
-    </Route>
-    )
+    </div></PageContainer>
   );
 };
 
