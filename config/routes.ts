@@ -91,7 +91,7 @@
         icon: 'NotificationOutlined',
         path: '/broadcasts/history',
         component: './broadcast/BroadcastHistory',
-      }
+      },
     ],
   },
   {
