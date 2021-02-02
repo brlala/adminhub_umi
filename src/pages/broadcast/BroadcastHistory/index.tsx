@@ -1,4 +1,4 @@
-import { Card, Form, Typography, Tag } from 'antd';
+import { Card, Form, Typography, Tag, Tooltip, Progress } from 'antd';
 import React, { FC, useState } from 'react';
 import { useIntl, useRequest, FormattedMessage } from 'umi';
 
@@ -16,36 +16,35 @@ import { PageContainer } from '@ant-design/pro-layout';
 const FormItem = Form.Item;
 const { Paragraph } = Typography;
 
-
 const BroadcastHistory: FC = () => {
-
   const { data, loading, run } = useRequest((values: any) => {
     return queryBroadcastHistoryList(values);
   });
 
-  const list = data? data : [];
+  const list = data ? data : [];
 
   const [visible, setVisible] = useState<boolean>(false);
   const [current, setCurrent] = useState<BroadcastHistoryItem | undefined>(undefined);
-  
+
   const onClose = () => {
     setVisible(false);
   };
 
   const { run: postRun } = useRequest(
     (id: string) => {
-      console.log(id)
+      console.log(id);
       return queryBroadcastHistory(id);
-    }, {
+    },
+    {
       manual: true,
       onSuccess: (result) => {
         setCurrent(result);
-      }
-    }
+      },
+    },
   );
-  
+
   const intl = useIntl();
-  
+
   const columns: ProColumns<BroadcastHistoryListItem>[] = [
     {
       title: <FormattedMessage id="pages.broadcast.author.authorLabel" defaultMessage="Author" />,
@@ -56,7 +55,9 @@ const BroadcastHistory: FC = () => {
       },
     },
     {
-      title: <FormattedMessage id="pages.broadcast.sendAt.sendAtLabel" defaultMessage="Broadcast Time" />,
+      title: (
+        <FormattedMessage id="pages.broadcast.sendAt.sendAtLabel" defaultMessage="Broadcast Time" />
+      ),
       dataIndex: 'sendAt',
       valueType: 'dateTimeRange',
       sorter: (a, b) => a.total - b.total,
@@ -69,28 +70,24 @@ const BroadcastHistory: FC = () => {
       dataIndex: 'status',
       hideInSearch: true,
       valueEnum: {
-        'Completed': {
+        Completed: {
           text: (
             <FormattedMessage id="pages.broadcast.status.completed" defaultMessage="Completed" />
           ),
           status: 'Success',
         },
-        'Sending': {
-          text: (
-            <FormattedMessage id="pages.broadcast.status.sending" defaultMessage="Sending" />
-          ),
+        Sending: {
+          text: <FormattedMessage id="pages.broadcast.status.sending" defaultMessage="Sending" />,
           status: 'Processing',
         },
-        'Scheduled': {
+        Scheduled: {
           text: (
             <FormattedMessage id="pages.broadcast.status.scheduled" defaultMessage="Scheduled" />
           ),
           status: 'Warning',
         },
-        'Failed': {
-          text: (
-            <FormattedMessage id="pages.broadcast.status.failed" defaultMessage="Failed" />
-          ),
+        Failed: {
+          text: <FormattedMessage id="pages.broadcast.status.failed" defaultMessage="Failed" />,
           status: 'Error',
         },
       },
@@ -100,6 +97,18 @@ const BroadcastHistory: FC = () => {
       dataIndex: 'total',
       hideInSearch: true,
       sorter: (a, b) => a.total - b.total,
+      render: (_, object) => (
+        <>
+          <Tooltip
+            title={object.processed + ' sent / ' + (object.total - object.processed) + ' to do'}
+          >
+            <Progress
+              percent={(object.processed * 100) / object.total}
+              success={{ percent: (object.sent * 100) / object.total }}
+            />
+          </Tooltip>
+        </>
+      ),
     },
     {
       title: <FormattedMessage id="pages.searchTable.titleTags" defaultMessage="Tags" />,
@@ -107,7 +116,7 @@ const BroadcastHistory: FC = () => {
       hideInSearch: true,
       render: (_, object) => (
         <>
-          {object.tags.map(tag => {
+          {object.tags.map((tag) => {
             let color = tag.length > 5 ? 'geekblue' : 'green';
             if (tag === 'loser') {
               color = 'volcano';
@@ -126,24 +135,29 @@ const BroadcastHistory: FC = () => {
       hideInSearch: true,
       valueType: 'option',
       render: (_, record) => [
-        <a key="viewButton" onClick={() => {setVisible(true); postRun(record.id)}}>
+        <a
+          key="viewButton"
+          onClick={() => {
+            setVisible(true);
+            postRun(record.id);
+          }}
+        >
           <FormattedMessage id="pages.broadcast.view" defaultMessage="View" />
         </a>,
       ],
     },
   ];
 
-  console.log( columns )
-  console.log( list )
+  console.log(columns);
+  console.log(list);
 
   return (
-    <PageContainer> 
+    <PageContainer>
       <div className={styles.coverCardList}>
         <Card bordered={false}>
           <Form
             layout="inline"
-            initialValues={{
-            }}
+            initialValues={{}}
             onValuesChange={(_, values) => {
               run(values);
             }}
@@ -183,23 +197,11 @@ const BroadcastHistory: FC = () => {
           dataSource={list}
           columns={columns}
         />
-        
-        <BroadcastHistoryDrawer 
-          visible={visible}
-          current={current}
-          onClose={onClose}
-        />
+
+        <BroadcastHistoryDrawer visible={visible} current={current} onClose={onClose} />
       </div>
-    </PageContainer>)
+    </PageContainer>
+  );
 };
 
 export default BroadcastHistory;
-
-
-
-
-
-
-
-
-

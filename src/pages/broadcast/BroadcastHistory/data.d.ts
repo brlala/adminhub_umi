@@ -1,5 +1,5 @@
-import { FlowComponentData } from "@/components/FlowItems";
-import { FlowItem } from "models/flows";
+import { FlowComponentData } from '@/components/FlowItems/UpdateFlow';
+import { FlowItem } from 'models/flows';
 
 export interface Member {
   avatar?: string;
@@ -11,12 +11,10 @@ export interface Params {
   type?: string[];
 }
 
-
 export interface BroadcastTemplateComponent {
   name: string;
   key: string;
 }
-
 
 export interface NewBroadcastTemplate {
   id?: string;
@@ -30,6 +28,7 @@ export interface BroadcastHistoryListItem {
   status: string;
   tags: string[];
   sent: number;
+  processed: number;
   total: number;
   sendAt: string;
   createdBy: Member;
@@ -37,7 +36,7 @@ export interface BroadcastHistoryListItem {
 
 export interface BroadcastHistoryItem {
   id: string;
-  flow: FlowItem[]
+  flow: FlowItem[];
   status: string;
   tags: string[];
   sent: number;

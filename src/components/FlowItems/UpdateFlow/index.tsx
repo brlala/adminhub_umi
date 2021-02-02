@@ -25,6 +25,7 @@ import {
   Space,
   Popconfirm,
   Radio,
+  Card,
 } from 'antd';
 const { Option } = Select;
 import { queryFlowsFilter } from '@/pages/QuestionList/service';
@@ -78,22 +79,51 @@ export type FlowComponentData = {
   name: string;
   data: { flowId: string; params: string[] };
 };
-export type TextComponentDataProps = {
-  componentData: TextComponentData;
-};
+// export type TextComponentDataProps = {
+//   componentData: TextComponentData;
+// };
 
 export type AttachmentsComponentDataProps = {
   componentData: AttachmentsComponentData;
 };
 
-export const TextComponent: React.FC<TextComponentDataProps> = ({ componentData }) => {
+export type TextComponentDataProps = {
+  componentKey: number;
+  componentData: TextComponentData;
+  onChange: (prevState: any) => void;
+};
+
+export const TextComponent: React.FC<TextComponentDataProps> = ({
+  componentKey,
+  componentData,
+  onChange,
+}) => {
+  console.log(componentData, componentKey);
   return (
     <>
       <Divider style={{ marginTop: -6 }} orientation="left">
         Text
       </Divider>
-      <Form.Item name="text" rules={[{ required: true, message: 'Field is required' }]}>
-        <TextArea rows={4} placeholder="Please input" defaultValue={componentData.data.textField} />
+      <Form.Item
+        id={componentKey.toString()}
+        name={componentKey}
+        rules={[{ required: true, message: 'Field is required' }]}
+      >
+        <TextArea
+          rows={4}
+          placeholder="Please input"
+          defaultValue={componentData.data.textField}
+          onChange={(e) => {
+            console.log('HERE', e.target.value);
+            onChange((prevState: any) =>
+              [...prevState].map((item, index) => {
+                if (index === componentKey) {
+                  return { ...item, data: { text: { EN: e.target.value } } };
+                } else return item;
+              }),
+            );
+          }}
+        />
       </Form.Item>
     </>
   );
@@ -468,21 +498,6 @@ export const VideoAttachmentComponent: React.FC<AttachmentsComponentDataProps> =
   );
 };
 
-<<<<<<< HEAD
-import { Card, Avatar } from 'antd';
-import { EditOutlined, EllipsisOutlined, SettingOutlined } from '@ant-design/icons';
-import { LoadingOutlined } from '@ant-design/icons';
-import ProCard from '@ant-design/pro-card';
-import { AutoCompleteProps } from 'antd/es/auto-complete';
-import immer, { produce } from 'immer';
-import { plugin } from '@@/core/plugin';
-import { ApplyPluginsType } from 'umi';
-
-const { Meta } = Card;
-export const GenericTemplatesComponent: React.FC = () => {
-  const [imageUrl, setImageUrl] = useState(null);
-  const [loading, setLoading] = useState(false);
-=======
 import ImgCrop from 'antd-img-crop';
 import { Tabs } from 'antd';
 import { StickyContainer, Sticky } from 'react-sticky';
@@ -641,7 +656,6 @@ export const TemplateComponent: React.FC<GenericTemplateComponentDataProps> = ({
     }
     setFileList(newFileList);
   };
->>>>>>> master
 
   const uploadButton = (
     <div>
@@ -649,23 +663,6 @@ export const TemplateComponent: React.FC<GenericTemplateComponentDataProps> = ({
       <div style={{ marginTop: 8 }}>Upload</div>
     </div>
   );
-<<<<<<< HEAD
-  const handleChange = (info) => {
-    if (info.file.status === 'uploading') {
-      setLoading(true);
-      return;
-    }
-    if (info.file.status === 'done') {
-      // Get this url from response in real world.
-      getBase64(info.file.originFileObj, (imageUrl) => {
-        setLoading(false);
-        setImageUrl(imageUrl);
-      });
-    }
-  };
-  return (
-    <>
-=======
 
   const getButtonField = (index: Number) => {
     console.log(index);
@@ -704,7 +701,6 @@ export const TemplateComponent: React.FC<GenericTemplateComponentDataProps> = ({
 
   return (
     <div>
->>>>>>> master
       <Form.Item>
         <Divider style={{ marginTop: -6 }} orientation="left">
           Generic Templates
@@ -734,15 +730,8 @@ export const TemplateComponent: React.FC<GenericTemplateComponentDataProps> = ({
           style={{ width: 300 }}
         >
           <Input placeholder="Subtitle" />
-<<<<<<< HEAD
-          <Button block>Default</Button>
-          <Button block>Default</Button>
-          <Button type="dashed" block>
-            Dashed
-=======
           <Button onClick={showModal} type="dashed" block>
             <PlusOutlined /> Add Button
->>>>>>> master
           </Button>
           <Modal
             title="New Button"
@@ -823,7 +812,7 @@ export const TemplateComponent: React.FC<GenericTemplateComponentDataProps> = ({
           </Modal>
         </Card>
       </Form.Item>
-    </>
+    </div>
   );
 };
 
@@ -870,34 +859,5 @@ export const FileAttachmentComponent: React.FC = () => {
       </Divider>
       Flow Component Here <div />
     </>
-  );
-};
-
-import { FlowItemData } from 'models/flows';
-import { Image } from 'antd';
-
-interface DisplayCompoenntProps {
-  componentKey: number
-  componentData: FlowItemData
-}
-
-export const TextDisplayComponent: React.FC<DisplayCompoenntProps> = (props) =>  {
-  const { componentKey, componentData } = props;
-  console.log('Here',  componentKey, componentData)
-  return (componentData?.text &&
-      <ProCard key={componentKey} style={{ borderRadius: 20, background: "#F6F6F6" }} size="small">
-        <div>{componentData.text.TH}</div>
-      </ProCard>
-  );
-};
-
-export const ImageDisplayComponent: React.FC<DisplayCompoenntProps> = (props) =>  {
-  const { componentKey, componentData } = props;
-  console.log('Here',  componentKey, componentData)
-  return (componentData?.url &&
-    <Image
-      width={300}
-      src={componentData.url}
-    />
   );
 };

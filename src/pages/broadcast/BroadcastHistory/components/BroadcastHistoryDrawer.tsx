@@ -1,5 +1,5 @@
 import React, { FC } from 'react';
-import { Space,  Drawer, Tag } from 'antd';
+import { Space, Drawer, Tag } from 'antd';
 
 import { BroadcastHistoryItem } from '../data';
 import ProDescriptions, { ProDescriptionsItemProps } from '@ant-design/pro-descriptions';
@@ -7,7 +7,13 @@ import { FormattedMessage } from 'umi';
 import { ProColumns } from '@ant-design/pro-table';
 import { FlowItem } from 'models/flows';
 import moment from 'moment';
-import { ButtonTemplateDisplayComponent, GenericTemplateDisplayComponent, ImageDisplayComponent, QuickReplyDisplayComponent, TextDisplayComponent } from '../../BroadcastTemplateList/components/FlowItems';
+import {
+  TextDisplayComponent,
+  ButtonTemplateDisplayComponent,
+  GenericTemplateDisplayComponent,
+  ImageDisplayComponent,
+  QuickReplyDisplayComponent,
+} from '@/components/FlowItems/ReadFlow';
 
 interface OperationDrawerProps {
   visible: boolean;
@@ -22,23 +28,34 @@ const BroadcastHistoryDrawer: FC<OperationDrawerProps> = (props) => {
     let renderedComponent;
     switch (component.type) {
       case 'message':
-        renderedComponent = <TextDisplayComponent componentKey={index} componentData={component.data} />;
+        renderedComponent = (
+          <TextDisplayComponent componentKey={index} componentData={component.data} />
+        );
         break;
       case 'image':
-        renderedComponent = <ImageDisplayComponent componentKey={index} componentData={component.data} />;
+        renderedComponent = (
+          <ImageDisplayComponent componentKey={index} componentData={component.data} />
+        );
         break;
-    case 'generic_template':
-        renderedComponent = <GenericTemplateDisplayComponent componentKey={index} componentData={component.data} />;
+      case 'generic_template':
+        renderedComponent = (
+          <GenericTemplateDisplayComponent componentKey={index} componentData={component.data} />
+        );
         break;
-    case 'button_template':
-        renderedComponent = <ButtonTemplateDisplayComponent componentKey={index} componentData={component.data} />;
+      case 'button_template':
+        renderedComponent = (
+          <ButtonTemplateDisplayComponent componentKey={index} componentData={component.data} />
+        );
         break;
       default:
-        renderedComponent = <div key={index} >Cannot render {component}</div>;
+        renderedComponent = <div key={index}>Cannot render {component}</div>;
     }
-    
+
     if (component.data.quick_replies) {
-        return [renderedComponent, <QuickReplyDisplayComponent componentKey={index} componentData={component.data} />]
+      return [
+        renderedComponent,
+        <QuickReplyDisplayComponent componentKey={index} componentData={component.data} />,
+      ];
     }
     return renderedComponent;
   };
@@ -50,43 +67,41 @@ const BroadcastHistoryDrawer: FC<OperationDrawerProps> = (props) => {
       dataIndex: 'createdBy',
       render: (_, object) => {
         return object.createdBy.username;
-      }
+      },
     },
     {
-      title: <FormattedMessage id="pages.broadcast.sendAt.sendAtLabel" defaultMessage="Broadcast Time" />,
+      title: (
+        <FormattedMessage id="pages.broadcast.sendAt.sendAtLabel" defaultMessage="Broadcast Time" />
+      ),
       dataIndex: 'sendAt',
       valueType: 'dateTimeRange',
       render: (_, object) => {
         return moment(object.sendAt).format('yyyy-MM-DD HH:mm');
-      }
+      },
     },
     {
       title: <FormattedMessage id="pages.searchTable.titleStatus" defaultMessage="Status" />,
       dataIndex: 'status',
       hideInSearch: true,
       valueEnum: {
-        'Completed': {
+        Completed: {
           text: (
             <FormattedMessage id="pages.broadcast.status.completed" defaultMessage="Completed" />
           ),
           status: 'Success',
         },
-        'Sending': {
-          text: (
-            <FormattedMessage id="pages.broadcast.status.sending" defaultMessage="Sending" />
-          ),
+        Sending: {
+          text: <FormattedMessage id="pages.broadcast.status.sending" defaultMessage="Sending" />,
           status: 'Processing',
         },
-        'Scheduled': {
+        Scheduled: {
           text: (
             <FormattedMessage id="pages.broadcast.status.scheduled" defaultMessage="Scheduled" />
           ),
           status: 'Warning',
         },
-        'Failed': {
-          text: (
-            <FormattedMessage id="pages.broadcast.status.failed" defaultMessage="Failed" />
-          ),
+        Failed: {
+          text: <FormattedMessage id="pages.broadcast.status.failed" defaultMessage="Failed" />,
           status: 'Error',
         },
       },
@@ -103,9 +118,9 @@ const BroadcastHistoryDrawer: FC<OperationDrawerProps> = (props) => {
       hideInSearch: true,
       render: (_, object) => (
         <>
-          {object.tags.map(tag => {
+          {object.tags.map((tag) => {
             return (
-              <Tag color='geekblue' key={tag}>
+              <Tag color="geekblue" key={tag}>
                 {tag.toUpperCase()}
               </Tag>
             );
@@ -117,44 +132,49 @@ const BroadcastHistoryDrawer: FC<OperationDrawerProps> = (props) => {
       title: <FormattedMessage id="pages.broadcast.flow.flowLabel" defaultMessage="Flow" />,
       dataIndex: 'flow',
       render: (_, components) => {
-        return <>
+        return (
+          <>
             <Space direction="vertical" size={16}>
-                {components.flow.map((component, index) => renderComponent(component, index))}
+              {components.flow.map((component, index) => renderComponent(component, index))}
             </Space>
-        </>
+          </>
+        );
       },
-    }
+    },
   ];
-  
+
   return (
     <Drawer
-        style={{ whiteSpace: 'pre-line' }}
-        width={600}
-        visible={visible}
-        closable={false}
-        onClose={onClose}>
-        {current?.flow && (
-          <ProDescriptions<BroadcastHistoryItem>
-            column={1}
-            title={
-              <b
-                style={{
-                  fontSize: 20,
-                }}
-              >
-                Broadcast Details
-              </b>
-            }
-            request={async () => ({
-              data: current || {},
-            })}
-            params={{
-              id: current?.id,
-            }}
-            columns={broadcastHistoryDrawerColumns as ProDescriptionsItemProps<BroadcastHistoryItem>[]}
-          />
-        )}
-      </Drawer>
+      style={{ whiteSpace: 'pre-line' }}
+      width={600}
+      visible={visible}
+      closable={false}
+      onClose={onClose}
+    >
+      {current?.flow && (
+        <ProDescriptions<BroadcastHistoryItem>
+          column={1}
+          title={
+            <b
+              style={{
+                fontSize: 20,
+              }}
+            >
+              Broadcast Details
+            </b>
+          }
+          request={async () => ({
+            data: current || {},
+          })}
+          params={{
+            id: current?.id,
+          }}
+          columns={
+            broadcastHistoryDrawerColumns as ProDescriptionsItemProps<BroadcastHistoryItem>[]
+          }
+        />
+      )}
+    </Drawer>
   );
 };
 
