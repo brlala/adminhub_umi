@@ -1,13 +1,13 @@
-import { Card, Col, Divider, Form, List, Row, Button, Typography } from 'antd';
+import { Card, Col, Divider, Form, List, Row, Button, Typography, Select } from 'antd';
 import React, { FC, useState } from 'react';
 import { useParams} from "react-router";
 import { useRequest } from 'umi';
 import { Params, BroadcastTemplateListItem, BroadcastFlowList } from './data.d';
-import { queryBroadcastTemplate } from './service';
+import { getTags, queryBroadcastTemplate } from './service';
 import styles from './style.less';
 import ProCard from '@ant-design/pro-card';
 import { PageContainer } from '@ant-design/pro-layout';
-import { ImageAttachmentComponent, TextComponent, VideoAttachmentComponent, GenericTemplatesComponent, ButtonTemplatesComponent, FlowComponent } from '@/components/FlowItems/UpdateFlow';
+import { TextComponent, ImageComponent, VideoAttachmentComponent, GenericTemplatesComponent, ButtonTemplatesComponent, FlowComponent } from '@/components/FlowItems/UpdateFlow';
 
 const FormItem = Form.Item;
 const { Paragraph } = Typography;
@@ -17,67 +17,49 @@ const tailLayout = {
   wrapperCol: { offset: 12, span: 24 },
 };
 
+const { Option } = Select;
+
 const NewBroadcast: FC = () => {
   let { templateId } = useParams()
-  const [componentList, setComponentsList] = useState([]);
+  type component = {
+    type: string,
+    data: {}
+  }
+  const [componentList, setComponentsList] = useState<component[]>([]);
 
   const { data, loading, run} = useRequest((values: any) => {
     return queryBroadcastTemplate(templateId);
   });
 
   const renderComponent = (component: string, index: number) => {
-    let componentData;
     let renderedComponent;
-    switch (component) {
-      case 'text':
-        componentData = { type: component, data: { text: '' } };
-        break;
-      case 'image':
-        componentData = { type: component, data: { url: '' } };
-        break;
-      case 'videoAttachments':
-        componentData = { type: component, data: { attachments: [] } };
-        break;
-      case 'fileAttachments':
-        componentData = { type: component, data: { attachments: [] } };
-        break;
-      case 'genericTemplates':
-        componentData = { type: component, data: { templates: [] } };
-        break;
-      case 'buttonTemplates':
-        componentData = { type: component, data: { textField: null, buttons: [] } };
-        break;
-      case 'flow':
-        componentData = { type: component, data: { flowId: null, params: [] } };
-        break;
-      default:
-        componentData = { type: component, data: {} };
-    }
+    const componentData = { type: component, data: {} }
 
-    if (componentList.length < index + 1) {setComponentsList(prevArray => [...prevArray, componentData])}
+    if (componentList.length < index + 1) {setComponentsList((prevArray) => [...prevArray, componentData])}
     console.log('componentList', componentList)
     
+    console.log(componentData, index)
     switch (component) {
       case 'text':
-        renderedComponent = <TextComponent componentKey={index} componentData={componentData} onChange={setComponentsList} />;
+        renderedComponent = <TextComponent componentKey={index} onChange={setComponentsList} />;
         break;
       case 'image':
-        renderedComponent = <ImageAttachmentComponent componentKey={index}  componentData={componentData} onChange={setComponentsList} />;
+        renderedComponent = <ImageComponent componentKey={index} onChange={setComponentsList} />;
         break;
-      case 'videoAttachments':
-        renderedComponent = <VideoAttachmentComponent key={index}  componentData={componentData} />;
-        break;
+      // case 'videoAttachments':
+      //   renderedComponent = <VideoAttachmentComponent key={index} />;
+      //   break;
       case 'fileAttachments':
         renderedComponent = <div key={index} >Not implemented yet</div>;
         break;
       case 'genericTemplates':
-        renderedComponent = <GenericTemplatesComponent key={index}  componentData={componentData} />;
+        renderedComponent = <GenericTemplatesComponent key={index} />;
         break;
       case 'buttonTemplates':
-        renderedComponent = <ButtonTemplatesComponent key={index}  componentData={componentData} />;
+        renderedComponent = <ButtonTemplatesComponent key={index} />;
         break;
       case 'flow':
-        renderedComponent = <FlowComponent key={index}  componentData={componentData} />;
+        renderedComponent = <FlowComponent key={index} />;
         break;
       default:
         renderedComponent = <div key={index} >Cannot render {component}</div>;
@@ -89,8 +71,12 @@ const NewBroadcast: FC = () => {
   const list = data?.flow || [];
 
   const onFinish = (values: any) => {
-    console.log('Success:', values,componentList );
+    console.log('Success:', values, componentList );
   };
+
+  const { data: tags, loading: tagsLoading, run: tagsRun, cancel: tagsCancel } = useRequest(getTags, {
+    manual: true
+  });
 
   return (
     <PageContainer>
@@ -111,6 +97,26 @@ const NewBroadcast: FC = () => {
                 <Col span={12} key={2}>
                 <FormItem >
                 <ProCard title="Audience">
+
+                  <FormItem 
+                    name="tags">
+                    <Select
+                      mode="multiple"
+                      allowClear
+                      style={{ width: '100%' }}
+                      placeholder="Please select"
+                      defaultValue={[]}
+                      onSearch={tagsRun}
+                      onFocus={tagsRun}
+                      onBlur={tagsCancel}
+                      loading={tagsLoading}
+                      // onChange={handleChange}
+                    >
+                      {tags && tags.map(i => {
+                        return <Option key={i}>{i}</Option>
+                      })}
+                    </Select>
+                  </FormItem>
                 </ProCard>
                 </FormItem>
                 </Col>

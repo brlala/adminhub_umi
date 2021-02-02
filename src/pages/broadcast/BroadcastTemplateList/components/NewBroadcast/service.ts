@@ -10,8 +10,14 @@ export async function queryBroadcastTemplate(
 export async function addBroadcastTemplate(
   data: NewBroadcastTemplate,
 ): Promise<{}> {
-  return request.post('http://localhost:5000/broadcasts/templates', {
+  return request('http://localhost:5000/broadcasts/templates', {
     method: 'post',
     data: data,
   });
+}
+
+export async function getTags(
+  data: [],
+): Promise<[]> {
+  return request('http://localhost:5000/broadcasts/user-tags');
 }

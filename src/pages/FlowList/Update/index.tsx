@@ -14,6 +14,7 @@ import {
   FlowComponent,
   ButtonTemplatesComponent,
   VideoAttachmentComponent,
+  ImageComponent,
 } from '@/components/FlowItems/UpdateFlow';
 import { FlowList } from '@/pages/FlowList/data';
 import { FooterToolbar } from '@ant-design/pro-layout';
@@ -46,7 +47,7 @@ const NewFlow: React.FC = () => {
         break;
       case 'imageAttachments':
         renderedComponent = (
-          <ImageAttachmentComponent index={index} componentData={componentData} />
+          <ImageComponent componentKey={index} componentData={componentData} />
         );
         break;
       case 'videoAttachments':
