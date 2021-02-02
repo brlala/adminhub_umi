@@ -14,8 +14,7 @@ import {
   FlowComponent,
   ButtonTemplatesComponent,
   VideoAttachmentComponent,
-  FileAttachmentComponent,
-} from '@/components/FlowItems';
+} from '@/components/FlowItems/UpdateFlow';
 import { FlowList } from '@/pages/FlowList/data';
 import { FooterToolbar } from '@ant-design/pro-layout';
 import { CloseCircleOutlined } from '@ant-design/icons';
@@ -43,7 +42,7 @@ const NewFlow: React.FC = () => {
     let renderedComponent;
     switch (componentData.type) {
       case 'text':
-        renderedComponent = <TextComponent index={index} componentData={componentData} />;
+        renderedComponent = <TextComponent componentKey={index} componentData={componentData} />;
         break;
       case 'imageAttachments':
         renderedComponent = (

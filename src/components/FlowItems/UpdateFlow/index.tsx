@@ -32,9 +32,9 @@ import { queryFlowsFilter } from '@/pages/QuestionList/service';
 import { FormattedMessage } from '@@/plugin-locale/localeExports';
 import { Upload, Modal } from 'antd';
 const { TextArea } = Input;
-import { MinusCircleOutlined, PlusOutlined, UploadOutlined } from '@ant-design/icons';
+import { DeleteOutlined, InboxOutlined, MinusCircleOutlined, PlusOutlined, UploadOutlined } from '@ant-design/icons';
 import axios from 'axios';
-import './index.less';
+import styles from './index.less';
 
 export type TextComponentData = {
   type: string;
@@ -79,32 +79,111 @@ export type FlowComponentData = {
   name: string;
   data: { flowId: string; params: string[] };
 };
-export type TextComponentDataProps = {
-  componentData: TextComponentData;
-  index: Number;
-};
-export type GenericTemplateComponentDataProps = {
-  componentData: GenericTemplatesComponentData[];
-  index: Number;
-};
+// export type TextComponentDataProps = {
+//   componentData: TextComponentData;
+// };
 
 export type AttachmentsComponentDataProps = {
   componentData: AttachmentsComponentData;
-  index: Number;
 };
 
-export const TextComponent: React.FC<TextComponentDataProps> = ({ componentData, index }) => {
+export type TextComponentDataProps = {
+  componentKey: number;
+  componentData: TextComponentData;
+  onChange: (prevState: any) => void;
+};
+
+export const TextComponent: React.FC<TextComponentDataProps> = ({
+  componentKey,
+  componentData,
+  onChange,
+}) => {
+  console.log(componentData, componentKey);
   return (
     <>
       <Divider style={{ marginTop: -6 }} orientation="left">
-        Step {index}: Text
+        Text
       </Divider>
-      <Form.Item name="text" rules={[{ required: true, message: 'Field is required' }]}>
-        <TextArea rows={4} placeholder="Please input" defaultValue={componentData.data.textField} />
+      <Form.Item
+        id={componentKey.toString()}
+        name={componentKey}
+        rules={[{ required: true, message: 'Field is required' }]}
+      >
+        <TextArea
+          rows={4}
+          placeholder="Please input"
+          defaultValue={componentData.data.textField}
+          onChange={(e) => {
+            console.log('HERE', e.target.value);
+            onChange((prevState: any) =>
+              [...prevState].map((item, index) => {
+                if (index === componentKey) {
+                  return { ...item, data: { text: { EN: e.target.value } } };
+                } else return item;
+              }),
+            );
+          }}
+        />
       </Form.Item>
     </>
   );
 };
+
+// export const ImageAttachmentComponent: React.FC<AttachmentsComponentDataProps> = ({ componentKey, componentData, onChange }) => {
+//   const [previewImage, setPreviewImage] = useState(componentData.data.url);
+//   const props = {
+//     name: 'file',
+//     multiple: false,
+//     action: 'http://localhost:5000/flows/upload',
+//     onChange(info) {
+//       const { status } = info.file;
+//       if (status !== 'uploading') {
+//         console.log(info.file, info.fileList);
+//       }
+//       if (status === 'done') {
+//         setPreviewImage(info.file.response.url)
+
+//         console.log(info.file.response.url)
+//         onChange((prevState: any) => [...prevState].map((item, index) => {
+//           if(index === componentKey) {
+//             return { ...item, data: {url: previewImage}}
+//           }
+//           else return item;
+//         }))
+//         message.success(`${info.file.name} file uploaded successfully.`);
+//       } else if (status === 'error') {
+//         message.error(`${info.file.name} file upload failed.`);
+//       }
+//     },
+//   };
+
+//   const handleRemove = () => {
+//     setPreviewImage(null)
+//   }
+
+//   return (
+//         <>
+//           <Divider style={{ marginTop: -6 }} orientation="left">
+//             Image
+//           </Divider>
+//           {previewImage? 
+//             <Space>
+//               <ImageDisplayComponent componentKey={componentKey} componentData={{url: previewImage}}/>
+//               <Button onClick={handleRemove}><DeleteOutlined/></Button>
+//             </Space>
+//             : 
+//             <Dragger {...props}>
+//               <p className="ant-upload-drag-icon">
+//                 <InboxOutlined />
+//               </p>
+//               <p className="ant-upload-text">Click or drag file to this area to upload</p>
+//               <p className="ant-upload-hint">Support for a single upload.</p>
+//             </Dragger>
+//             }
+          
+//       </>
+//   );
+// };
 
 function getBase64(file) {
   return new Promise((resolve, reject) => {
@@ -117,7 +196,6 @@ function getBase64(file) {
 
 export const ImageAttachmentComponent: React.FC<AttachmentsComponentDataProps> = ({
   componentData,
-  index,
 }) => {
   const [previewVisible, setPreviewVisible] = useState(false);
   const [previewImage, setPreviewImage] = useState(null);
@@ -163,8 +241,8 @@ export const ImageAttachmentComponent: React.FC<AttachmentsComponentDataProps> =
     setPreviewVisible(true);
     setPreviewTitle(file.name || file.url.substring(file.url.lastIndexOf('/') + 1));
   };
-  const handleChange = ({ fileList: newFileList }) => {
-    setFileList(newFileList);
+  const handleChange = ({ fileList }) => {
+    setFileList(fileList);
   };
 
   const uploadButton = (
@@ -176,14 +254,14 @@ export const ImageAttachmentComponent: React.FC<AttachmentsComponentDataProps> =
   return (
     <>
       <Divider style={{ marginTop: -6 }} orientation="left">
-        Step {index}: Image
+        Image
       </Divider>
       <Form.Item>
         <Form.Item noStyle rules={[{ required: true, message: 'Image is required' }]}>
           <Upload
             customRequest={uploadImage}
             onChange={handleChange}
-            accept=".jpg,.jpeg"
+            accept="image/*"
             listType="picture-card"
             fileList={fileList}
             onPreview={handlePreview}
@@ -406,9 +484,10 @@ export const ButtonTemplatesComponent: React.FC = ({ componentData }) => {
   );
 };
 
+import { Icon, Spin } from 'antd';
+
 export const VideoAttachmentComponent: React.FC<AttachmentsComponentDataProps> = ({
   componentData,
-  index,
 }) => {
   const [progress, setProgress] = useState(0);
   const [url, setUrl] = useState(null);
@@ -446,20 +525,20 @@ export const VideoAttachmentComponent: React.FC<AttachmentsComponentDataProps> =
       onError({ err });
     }
   };
-  const handleChange = ({ fileList: newFileList }) => {
-    setFileList(newFileList);
+  const handleChange = ({ fileList }) => {
+    setFileList(fileList);
   };
 
   return (
     <>
       <Form.Item>
         <Divider style={{ marginTop: -6 }} orientation="left">
-          Step {index}: Video
+          Video
         </Divider>
         {url && <video controls style={{ width: '100%' }} src={url} />}
         <Upload
           customRequest={uploadVideo}
-          accept=".mp4"
+          accept="video/mp4"
           onChange={handleChange}
           fileList={fileList}
           onRemove={() => setUrl(null)}
@@ -481,6 +560,8 @@ import { StickyContainer, Sticky } from 'react-sticky';
 import ProCard from '@ant-design/pro-card';
 import { EditableProTable, ProColumns } from '@ant-design/pro-table';
 import FormItemLabel from 'antd/es/form/FormItemLabel';
+import Dragger from 'antd/lib/upload/Dragger';
+import { ImageDisplayComponent } from '../ReadFlow';
 
 const initialPanes = [{ title: '1', content: 'Content of Tab 1', key: '1' }];
 const { TabPane } = Tabs;
@@ -636,7 +717,7 @@ export const TemplateComponent: React.FC<GenericTemplateComponentDataProps> = ({
 
   const uploadButton = (
     <div>
-      <PlusOutlined />
+      {loading ? <LoadingOutlined /> : <PlusOutlined />}
       <div style={{ marginTop: 8 }}>Upload</div>
     </div>
   );
@@ -679,37 +760,27 @@ export const TemplateComponent: React.FC<GenericTemplateComponentDataProps> = ({
   return (
     <div>
       <Form.Item>
+        <Divider style={{ marginTop: -6 }} orientation="left">
+          Generic Templates
+        </Divider>
         <Card
           size="small"
           title={
             <>
-              <div className="GenericTemplate">
-                <ImgCrop rotate aspect={1.91}>
-                  <Upload
-                    customRequest={uploadImage}
-                    onChange={handleChange}
-                    accept=".jpg,.jpeg"
-                    listType="picture-card"
-                    fileList={fileList}
-                    onPreview={handlePreview}
-                  >
-                    {/*Choose File*/}
-                    {fileList.length >= 1 ? null : uploadButton}
-                  </Upload>
-                </ImgCrop>
-              </div>
-              <Modal
-                visible={previewVisible}
-                title={previewTitle}
-                footer={null}
-                onCancel={handleCancel}
+              <Upload
+                name="avatar"
+                listType="picture-card"
+                className="avatar-upsloader"
+                showUploadList={false}
+                action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
+                onChange={handleChange}
               >
-                <img alt="image-preview" style={{ width: '100%' }} src={previewImage} />
-                {/*<object*/}
-                {/*  style={{ width: '100%', height: '1000px' }}*/}
-                {/*  data="http://www.africau.edu/images/default/sample.pdf"*/}
-                {/*/>*/}
-              </Modal>
+                {imageUrl ? (
+                  <img src={'imageUrl'} alt="avatar" style={{ width: '100%' }} />
+                ) : (
+                  uploadButton
+                )}
+              </Upload>
               <Input placeholder="Title" />
               <Input placeholder="Subtitle" />
             </>
@@ -838,23 +909,13 @@ export const FlowComponent: React.FC = () => {
   );
 };
 
-export const FileAttachmentComponent: React.FC<AttachmentsComponentDataProps> = ({
-  componentData,
-}) => {
-  const [fileList, setFileList] = useState(componentData.data.attachments);
-  const handleChange = ({ fileList: newFileList }) => {
-    setFileList(newFileList);
-  };
+export const FileAttachmentComponent: React.FC = () => {
   return (
     <>
-      <Form.Item>
-        <Divider style={{ marginTop: -6 }} orientation="left">
-          File
-        </Divider>
-        <Upload onChange={handleChange} action={'http://localhost:5000/upload'} fileList={fileList}>
-          <Button icon={<UploadOutlined />}>Upload</Button>
-        </Upload>
-      </Form.Item>
+      <Divider style={{ marginTop: -6 }} orientation="left">
+        Flow
+      </Divider>
+      Flow Component Here <div />
     </>
   );
 };

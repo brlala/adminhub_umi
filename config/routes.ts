@@ -49,10 +49,50 @@
     component: './FlowList',
   },
   {
-    name: 'New Flow',
+    name: 'form.new-flow',
     icon: 'ApartmentOutlined',
     path: '/flows/new',
     component: './FlowList/Update',
+  },
+  // {
+  //   name: 'list.broadcast-list',
+  //   icon: 'NotificationOutlined',
+  //   path: '/broadcast',
+  //   component: './BroadcastList',
+  // },
+  {
+    path: '/broadcasts',
+    name: 'list.broadcast',
+    icon: 'NotificationOutlined',
+    hideInBreadcrumb: true,
+    routes: [
+      {
+        name: 'broadcast-list',
+        icon: 'NotificationOutlined',
+        path: '/broadcasts/broadcast-templates',
+        component: './broadcast/BroadcastTemplateList',
+      },
+      {
+        name: 'broadcast-list',
+        icon: 'NotificationOutlined',
+        hideInMenu: true,
+        path: '/broadcasts/broadcast-templates/',
+        component: './broadcast/BroadcastTemplateList',
+      },
+      {
+        name: 'broadcast-new',
+        icon: 'NotificationOutlined',
+        hideInMenu: true,
+        path: '/broadcasts/broadcast-templates/:templateId',
+        component: './broadcast/BroadcastTemplateList/components/NewBroadcast',
+      },
+      {
+        name: 'broadcast-history',
+        icon: 'NotificationOutlined',
+        path: '/broadcasts/history',
+        component: './broadcast/BroadcastHistory',
+      }
+    ],
   },
   {
     path: '/',
