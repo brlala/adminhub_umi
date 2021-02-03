@@ -12,7 +12,6 @@ interface DisplayComponentProps {
 
 export const QuickReplyDisplayComponent: FC<DisplayComponentProps> = (props) => {
   const { componentKey, componentData } = props;
-  console.log(componentData);
   return (
     <Space>
       {componentData &&

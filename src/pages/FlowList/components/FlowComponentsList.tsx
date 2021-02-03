@@ -56,18 +56,25 @@ const FlowComponentsList: React.FC<UpdateComponentsListProps> = ({ setNewCompone
           data: {
             templates: [
               {
+                attachments: [
+                  {
+                    name: 'test.png',
+                    url: 'https://sitechecker.pro/wp-content/uploads/2017/12/URL-meaning.png',
+                    uid: 1,
+                  },
+                ],
                 title: 'a',
                 subtitle: 'b',
                 buttons: [
                   {
-                    text: 'button text',
+                    text: 'button text1',
                     type: 'url',
                     content: 'www.apple.com',
                   },
                   {
-                    text: 'button text',
+                    text: 'button text2',
                     type: 'flow',
-                    content: '',
+                    content: '5e315217a38e6703b4d3f81d',
                   },
                 ],
               },
@@ -83,7 +90,7 @@ const FlowComponentsList: React.FC<UpdateComponentsListProps> = ({ setNewCompone
                   {
                     text: 'button text',
                     type: 'flow',
-                    content: '',
+                    content: '5e315217a38e6703b4d3f81d',
                   },
                 ],
               },

@@ -123,7 +123,6 @@ const NewFlow: React.FC = () => {
     );
   };
 
-  console.log(componentsContentList);
   let newComponentsImplementation = [];
   return (
     <div className={styles.componentsList}>

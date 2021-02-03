@@ -4,6 +4,7 @@ import ProForm, {
   ProFormSelect,
   ProFormText,
   ProFormTextArea,
+  StepsForm,
 } from '@ant-design/pro-form';
 import { Button, Divider, Form, Input, message, Progress, Radio, Card } from 'antd';
 import { queryFlowsFilter } from '@/pages/QuestionList/service';
@@ -16,8 +17,9 @@ import { ImageDisplayComponent } from '../ReadFlow';
 import { StringObject } from 'models/flows';
 import ImgCrop from 'antd-img-crop';
 import { Tabs } from 'antd';
-
+import { nanoid } from 'nanoid';
 import './index.less';
+import { DropdownProps } from '@/pages/QuestionList/data';
 
 export type TextComponentDataProps = {
   componentKey: number;
@@ -124,11 +126,12 @@ export type Attachments = {
   response?: { url: string };
 };
 export type Buttons = {
+  text: string;
   type: string;
-  response: string;
+  content: string;
 };
 export type Templates = {
-  imageUrl: string;
+  attachments: Attachments[];
   title: string;
   subtitle: string;
   buttons: Buttons[];
@@ -246,18 +249,6 @@ export const ImageAttachmentComponent: React.FC<AttachmentsComponentDataProps> =
             listType="picture-card"
             fileList={fileList}
             onPreview={handlePreview}
-            // previewFile={(file) => {
-            //   return new Promise((resolve) => {
-            //     const reader = new FileReader();
-            //     reader.readAsDataURL(file);
-            //     reader.onload = function (e) {
-            //       const dataUrl = e.target.result;
-            //       resolve(
-            //         'https://ss1.bdstatic.com/70cFuXSh_Q1YnxGkpoWK1HF6hhy/it/u=3498227956,2363956367&fm=26&gp=0.jpg',
-            //       );
-            //     };
-            //   });
-            // }}
           >
             {fileList.length >= 8 ? null : uploadButton}
           </Upload>
@@ -268,10 +259,6 @@ export const ImageAttachmentComponent: React.FC<AttachmentsComponentDataProps> =
             onCancel={handleCancel}
           >
             <img alt="image-preview" style={{ width: '100%' }} src={previewImage} />
-            {/*<object*/}
-            {/*  style={{ width: '100%', height: '1000px' }}*/}
-            {/*  data="http://www.africau.edu/images/default/sample.pdf"*/}
-            {/*/>*/}
           </Modal>
         </Form.Item>
         {progress > 0 ? <Progress percent={progress} /> : null}
@@ -314,15 +301,9 @@ export const ButtonTemplatesComponent: React.FC = ({ componentData }) => {
     responseArea = (
       <ProFormSelect
         width="xl"
-        prop
         name="flowResponse"
         label="Response"
         showSearch
-        // request={async () => {
-        //   const topics = await queryTopics();
-        //   setTopics(topics);
-        // }}
-        // options={topics}
         request={async () => {
           return await queryFlowsFilter('name,params');
         }}
@@ -347,10 +328,7 @@ export const ButtonTemplatesComponent: React.FC = ({ componentData }) => {
         <Divider style={{ marginTop: -6 }} orientation="left">
           Button Templates
         </Divider>
-        <Form.Item
-          // name={`${componentData.name}-text`}
-          rules={[{ required: true, message: 'Field is required' }]}
-        >
+        <Form.Item rules={[{ required: true, message: 'Field is required' }]}>
           <TextArea rows={4} placeholder="Please input" />
           <Form.Item>
             <ModalForm<{
@@ -400,67 +378,8 @@ export const ButtonTemplatesComponent: React.FC = ({ componentData }) => {
               <ProForm.Group>{responseArea}</ProForm.Group>
             </ModalForm>
           </Form.Item>
-          {/*<Button type="dashed" block>*/}
-          {/*  Dashed*/}
-          {/*</Button>*/}
         </Form.Item>
       </Form.Item>
-      {/*<Form.Item label="Username">*/}
-      {/*  <Form.Item*/}
-      {/*    name="username"*/}
-      {/*    noStyle*/}
-      {/*    rules={[{ required: true, message: 'Username is required' }]}*/}
-      {/*  >*/}
-      {/*    <Input style={{ width: 160 }} placeholder="Please input" />*/}
-      {/*  </Form.Item>*/}
-      {/*  <Tooltip title="Useful information">*/}
-      {/*    <a href="#API" style={{ margin: '0 8px' }}>*/}
-      {/*      Need Help?*/}
-      {/*    </a>*/}
-      {/*  </Tooltip>*/}
-      {/*</Form.Item>*/}
-      {/*<Form.Item label="Address">*/}
-      {/*  <Input.Group compact>*/}
-      {/*    <Form.Item*/}
-      {/*      name={['address', 'province']}*/}
-      {/*      noStyle*/}
-      {/*      rules={[{ required: true, message: 'Province is required' }]}*/}
-      {/*    >*/}
-      {/*      <Select placeholder="Select province">*/}
-      {/*        <Option value="Zhejiang">Zhejiang</Option>*/}
-      {/*        <Option value="Jiangsu">Jiangsu</Option>*/}
-      {/*      </Select>*/}
-      {/*    </Form.Item>*/}
-      {/*    <Form.Item*/}
-      {/*      name={['address', 'street']}*/}
-      {/*      noStyle*/}
-      {/*      rules={[{ required: true, message: 'Street is required' }]}*/}
-      {/*    >*/}
-      {/*      <Input style={{ width: '50%' }} placeholder="Input street" />*/}
-      {/*    </Form.Item>*/}
-      {/*  </Input.Group>*/}
-      {/*</Form.Item>*/}
-      {/*<Form.Item label="BirthDate" style={{ marginBottom: 0 }}>*/}
-      {/*  <Form.Item*/}
-      {/*    name="year"*/}
-      {/*    rules={[{ required: true }]}*/}
-      {/*    style={{ display: 'inline-block', width: 'calc(50% - 8px)' }}*/}
-      {/*  >*/}
-      {/*    <Input placeholder="Input birth year" />*/}
-      {/*  </Form.Item>*/}
-      {/*  <Form.Item*/}
-      {/*    name="month"*/}
-      {/*    rules={[{ required: true }]}*/}
-      {/*    style={{ display: 'inline-block', width: 'calc(50% - 8px)', margin: '0 8px' }}*/}
-      {/*  >*/}
-      {/*    <Input placeholder="Input birth month" />*/}
-      {/*  </Form.Item>*/}
-      {/*</Form.Item>*/}
-      {/*<Form.Item label=" " colon={false}>*/}
-      {/*  <Button type="primary" htmlType="submit">*/}
-      {/*    Submit*/}
-      {/*  </Button>*/}
-      {/*</Form.Item>*/}
     </>
   );
 };
@@ -533,13 +452,11 @@ export const VideoAttachmentComponent: React.FC<AttachmentsComponentDataProps> =
   );
 };
 
-const initialPanes = [{ title: '1', content: 'Content of Tab 1', key: '1' }];
 const { TabPane } = Tabs;
 
-export const GenericTemplatesComponent = (componentData, index) => {
-  const [tabIndex, setTabIndex] = useState(2);
-  const [activeKey, setActiveKey] = useState(initialPanes[0].key);
-  const [panes, setPanes] = useState(initialPanes);
+export const GenericTemplatesComponent = ({ componentData }, index) => {
+  const [activeKey, setActiveKey] = useState<string>();
+  const [panes, setPanes] = useState(componentData.data.templates);
 
   const onChange = (activeKey) => {
     setActiveKey(activeKey);
@@ -554,16 +471,17 @@ export const GenericTemplatesComponent = (componentData, index) => {
   };
 
   const add = () => {
-    console.log(tabIndex);
-    const activeKey = `newTab${tabIndex}`;
+    const activeKey = nanoid(4);
     const newPanes = [...panes];
     newPanes.push({
-      title: `${tabIndex}`,
-      content: <TemplateComponent componentData={componentData} />,
+      title: null,
+      attachments: [],
+      buttons: [],
+      subtitle: null,
       key: activeKey,
     });
+    console.log(newPanes);
     setPanes(newPanes);
-    setTabIndex(tabIndex + 1);
     setActiveKey(activeKey);
   };
 
@@ -575,7 +493,16 @@ export const GenericTemplatesComponent = (componentData, index) => {
         lastIndex = i - 1;
       }
     });
-    const newPanes = panes.filter((pane) => pane.key !== targetKey);
+    // if targetkey does not exist, then it is the position of the pane in the list
+    let newPanes;
+    if (!lastIndex) {
+      lastIndex = targetKey - 1;
+
+      newPanes = panes.filter((_, i) => i !== Number(targetKey));
+    } else {
+      newPanes = panes.filter((pane) => pane.key !== targetKey);
+    }
+
     if (newPanes.length && newActiveKey === targetKey) {
       if (lastIndex && lastIndex >= 0) {
         newActiveKey = newPanes[lastIndex].key;
@@ -599,27 +526,28 @@ export const GenericTemplatesComponent = (componentData, index) => {
         onEdit={onEdit}
         hideAdd={!(panes.length < 10)}
       >
-        {panes.map((pane) => (
-          <TabPane tab={pane.title} key={pane.key} closable={pane.closable}>
-            {pane.content}
-          </TabPane>
-        ))}
+        {panes.map((pane, index) => {
+          console.log(pane);
+          return (
+            <TabPane tab={index} key={pane.key ? pane.key : index} closable={pane.closable}>
+              <TemplateComponent key={nanoid(4)} componentData={pane} />
+            </TabPane>
+          );
+        })}
       </Tabs>
     </>
   );
 };
 
-export const TemplateComponent: React.FC<GenericTemplateComponentDataProps> = ({
-  componentData,
-}) => {
-  const [imageUrl, setImageUrl] = useState(null);
-  const [loading, setLoading] = useState(false);
+export const TemplateComponent: React.FC<Templates> = ({ componentData }) => {
   const [previewVisible, setPreviewVisible] = useState(false);
   const [previewImage, setPreviewImage] = useState(null);
   const [previewTitle, setPreviewTitle] = useState(false);
   // const [fileList, setFileList] = useState(componentData.data.attachments);
-  const [fileList, setFileList] = useState([]);
-  const [buttonType, setButtonType] = useState(['flow', 'flow', 'flow']);
+  const [fileList, setFileList] = useState(componentData.attachments);
+  const [selectRow, setSelectRow] = useState(null);
+  const [responseType, setResponseType] = useState('flow');
+  const [flows, setFlows] = useState<DropdownProps[]>([]);
 
   // useEffect(() => {
   //   if (componentData.data.attachments.length > 0) {
@@ -692,40 +620,53 @@ export const TemplateComponent: React.FC<GenericTemplateComponentDataProps> = ({
     </div>
   );
 
-  const getButtonField = (index: Number) => {
-    console.log(index);
-    if (buttonType[index] === 'url') {
-      return <ProFormText width="md" name={`url${index}`} label="Content" />;
-    }
-    return (
-      <ProFormSelect
-        width="md"
-        prop
-        name={`flow${index}`}
-        label="Content"
-        showSearch
-        // request={async () => {
-        //   const topics = await queryTopics();
-        //   setTopics(topics);
-        // }}
-        // options={topics}
-        request={async () => {
-          return await queryFlowsFilter('name,params');
-        }}
-        rules={[
-          {
-            required: true,
-            message: (
-              <FormattedMessage
-                id="pages.searchTable.response"
-                defaultMessage="Response is required"
-              />
-            ),
-          },
-        ]}
+  let responseArea;
+  if (responseType === 'url') {
+    responseArea = (
+      <ProFormTextArea
+        label="URL"
+        name="urlResponse"
+        placeholder="Link to URL"
+        // rules={[
+        //   {
+        //     required: true,
+        //     message: (
+        //       <FormattedMessage
+        //         id="pages.searchTable.response"
+        //         defaultMessage="Response is required"
+        //       />
+        //     ),
+        //   },
+        // ]}
       />
     );
-  };
+  } else {
+    responseArea = (
+      <ProFormSelect
+        name="flowResponse"
+        label="Flow Response"
+        initialValue={selectRow?.type === 'flow' ? selectRow?.content : null}
+        showSearch
+        // @ts-ignore
+        request={async () => {
+          const flowsRequest = await queryFlowsFilter('name,params');
+          setFlows(flowsRequest);
+        }}
+        options={flows}
+        // rules={[
+        //   {
+        //     required: true,
+        //     message: (
+        //       <FormattedMessage
+        //         id="pages.searchTable.response"
+        //         defaultMessage="Response is required"
+        //       />
+        //     ),
+        //   },
+        // ]}
+      />
+    );
+  }
 
   return (
     <div>
@@ -744,8 +685,7 @@ export const TemplateComponent: React.FC<GenericTemplateComponentDataProps> = ({
                     fileList={fileList}
                     onPreview={handlePreview}
                   >
-                    {/*Choose File*/}
-                    {fileList.length >= 1 ? null : uploadButton}
+                    {fileList?.length >= 1 ? null : uploadButton}
                   </Upload>
                 </ImgCrop>
               </div>
@@ -756,97 +696,95 @@ export const TemplateComponent: React.FC<GenericTemplateComponentDataProps> = ({
                 onCancel={handleCancel}
               >
                 <img alt="image-preview" style={{ width: '100%' }} src={previewImage} />
-                {/*<object*/}
-                {/*  style={{ width: '100%', height: '1000px' }}*/}
-                {/*  data="http://www.africau.edu/images/default/sample.pdf"*/}
-                {/*/>*/}
               </Modal>
-              <Input placeholder="Title" />
-              <Input placeholder="Subtitle" />
+              <Input placeholder="Title" defaultValue={componentData.title} />
             </>
           }
           style={{ width: 300 }}
         >
-          <Input placeholder="Subtitle" />
-          <Button onClick={showModal} type="dashed" block>
-            <PlusOutlined /> Add Button
-          </Button>
+          <Input placeholder="Subtitle" defaultValue={componentData.subtitle} />
+          {componentData.buttons.map((button) => (
+            <Button
+              block
+              onClick={() => {
+                console.log({ row: button });
+                setSelectRow(button);
+                setResponseType(button.type);
+                showModal();
+              }}
+            >
+              {button.text}
+            </Button>
+          ))}
+          {componentData.buttons.length < 3 && (
+            <Button
+              onClick={() => {
+                showModal();
+                setSelectRow(null);
+              }}
+              type="dashed"
+              block
+            >
+              <PlusOutlined /> Add Button
+            </Button>
+          )}
           <Modal
             title="New Button"
             visible={isModalVisible}
             onOk={handleOkModal}
             onCancel={handleCancelModal}
             destroyOnClose={true}
-            width={900}
+            width={450}
+            footer={[
+              <Button key="back" onClick={handleCancelModal}>
+                Cancel
+              </Button>,
+              <Button type="primary" htmlType="submit" onClick={handleOkModal} form="my-form">
+                Submit
+              </Button>,
+            ]}
           >
-            <ProForm<{
-              name: string;
-              company: string;
-            }>
+            <Form
+              id="my-form"
               onFinish={async (values) => {
                 console.log(values);
-                message.success('提交成功');
+                message.success('Button added');
               }}
               initialValues={{
-                name: '蚂蚁设计有限公司',
-                useMode: 'chapter',
+                // text: selectRow?.text,
+                // content: selectRow?.type,
+                urlResponse: selectRow?.type === 'url' ? selectRow?.content : null,
               }}
+              labelCol={{ span: 7 }}
+              wrapperCol={{ span: 16 }}
             >
-              <ProFormText width="sm" name="title" label="Title" tooltip="最长为 24 位" />
-              <ProFormTextArea
-                name="subtitle"
-                label="Subtitle"
-                fieldProps={{ maxLength: '80', showCount: true }}
-              />
-              <ProForm.Item
-                name="dataSource"
-                // initialValue={defaultData}
-                trigger="onValuesChange"
+              <Form.Item
+                label="Display Text"
+                name="text"
+                rules={[{ required: true, message: 'Please input display text' }]}
+                initialValue={selectRow?.text}
               >
-                <ProForm.Group>
-                  Button 1:
-                  <ProFormText name="text1" label="Display Text" />
-                  <ProFormSelect
-                    initialValue={buttonType[0]}
-                    label="Type"
-                    options={[
-                      {
-                        value: 'url',
-                        label: 'URL',
-                      },
-                      {
-                        value: 'flow',
-                        label: 'Flow',
-                      },
-                    ]}
-                    width="xs"
-                    name="type1"
-                  />
-                  {getButtonField(0)}
-                </ProForm.Group>
-                {/*<ProForm.Group>*/}
-                {/*  Button 2:*/}
-                {/*  <ProFormText name="text2" label="Display Text" />*/}
-                {/*  <ProFormText width="sm" name="type2" label="type" />*/}
-                {/*  <ProFormText width="sm" name="type" label="type" />*/}
-                {/*</ProForm.Group>*/}
-                {/*<ProForm.Group>*/}
-                {/*  Button 3:*/}
-                {/*  <ProFormText name="text3" label="Display Text" />*/}
-                {/*  <ProFormText width="sm" name="type3" label="type" />*/}
-                {/*  <ProFormText width="sm" name="type" label="type" />*/}
-                {/*</ProForm.Group>*/}
-                {/*<Form.Item>*/}
-
-                {/*{getButtonField(1)}*/}
-                {/*{getButtonField(2)}*/}
-                {/*  Button 1:*/}
-                {/*  <Input placeholder="Basic usage" />*/}
-                {/*  <Input placeholder="Basic usage" />*/}
-                {/*  <Input placeholder="Basic usage" />*/}
-                {/*</Form.Item>*/}
-              </ProForm.Item>
-            </ProForm>
+                <Input />
+              </Form.Item>
+              {/*<ProFormText name="text" label="Display Text" initialValue={selectRow?.text} />*/}
+              {/*{selectRow?.text}*/}
+              <Form.Item
+                label="Type"
+                name="type"
+                initialValue={selectRow ? selectRow.type : 'flow'}
+              >
+                <Radio.Group
+                  onChange={(event) => {
+                    console.log(event.target.value);
+                    setResponseType(event.target.value);
+                  }}
+                >
+                  <Radio.Button value="flow">Flow</Radio.Button>
+                  <Radio.Button value="url">URL</Radio.Button>
+                </Radio.Group>
+              </Form.Item>
+              {responseArea}
+            </Form>
           </Modal>
         </Card>
       </Form.Item>
