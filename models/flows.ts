@@ -13,6 +13,15 @@ export type FlowDb = {
   type: string;
 };
 
+export type FlowNew = {
+  name?: string;
+  topic?: string | null;
+  flow: FlowItem[];
+  platforms: string[];
+  params?: string[];
+  type: "storyboard" | "broadcast";
+};
+
 export type FlowItem = {
   data: FlowItemData;
   type: string;
@@ -38,7 +47,7 @@ export type ButtonData = {
 };
 
 export type QrButtonData = {
-  title: StringObject;
+  text: StringObject;
   payload: string;
 };
 

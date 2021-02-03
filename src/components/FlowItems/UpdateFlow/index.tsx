@@ -1,48 +1,23 @@
-<<<<<<< HEAD
-import React, { useEffect, useState, useContext } from 'react';
-=======
 import React, { useEffect, useState } from 'react';
->>>>>>> master
 import ProForm, {
   ModalForm,
   ProFormSelect,
   ProFormText,
   ProFormTextArea,
 } from '@ant-design/pro-form';
-<<<<<<< HEAD
-import {
-  Button,
-  Divider,
-  Form,
-  Input,
-  message,
-  Progress,
-  Space,
-  Radio,
-  Card,
-  Tabs
-} from 'antd';
-import Dragger from 'antd/lib/upload/Dragger';
-=======
 import { Button, Divider, Form, Input, message, Progress, Radio, Card } from 'antd';
->>>>>>> master
 import { queryFlowsFilter } from '@/pages/QuestionList/service';
 import { FormattedMessage } from '@@/plugin-locale/localeExports';
 import { Upload, Modal } from 'antd';
 const { TextArea } = Input;
-<<<<<<< HEAD
 import { DeleteOutlined, InboxOutlined, PlusOutlined, UploadOutlined } from '@ant-design/icons';
 import axios from 'axios';
 import { ImageDisplayComponent } from '../ReadFlow';
 import { StringObject } from 'models/flows';
-=======
-import { PlusOutlined, UploadOutlined } from '@ant-design/icons';
-import axios from 'axios';
 import ImgCrop from 'antd-img-crop';
 import { Tabs } from 'antd';
 
 import './index.less';
->>>>>>> master
 
 export type TextComponentDataProps = {
   componentKey: number;
@@ -73,7 +48,7 @@ export const TextComponent: React.FC<TextComponentDataProps> = (props) => {
             onChange((prevState: any) =>
               [...prevState].map((item, index) => {
                 if (index === componentKey) {
-                  return { ...item, data: { text: { EN: e.target.value } } };
+                  return { type: "message", data: { text: { EN: e.target.value } } };
                 } else return item;
               }),
             );
@@ -142,11 +117,6 @@ export const ImageComponent: React.FC<ImageComponentDataProps> = (props) => {
   );
 };
 
-
-export type AttachmentsComponentDataProps = {
-  componentData: AttachmentsComponentData;
-};
-
 export type Attachments = {
   name: string;
   url?: string;
@@ -185,16 +155,7 @@ export type FlowComponentData = {
   name: string;
   data: { flowId: string; params: string[] };
 };
-<<<<<<< HEAD
-=======
-// export type TextComponentDataProps = {
-//   componentData: TextComponentData;
-// };
 
-export type TextComponentDataProps = {
-  componentData: TextComponentData;
-  index: Number;
-};
 export type GenericTemplateComponentDataProps = {
   componentData: GenericTemplatesComponentData[];
   index: Number;
@@ -203,42 +164,6 @@ export type GenericTemplateComponentDataProps = {
 export type AttachmentsComponentDataProps = {
   componentData: AttachmentsComponentData;
   index: Number;
-};
-
-export const TextComponent: React.FC<TextComponentDataProps> = ({
-  componentKey,
-  componentData,
-  onChange,
-}) => {
-  console.log(componentData, componentKey);
-  return (
-    <>
-      <Divider style={{ marginTop: -6 }} orientation="left">
-        Text
-      </Divider>
-      <Form.Item
-        id={componentKey.toString()}
-        name={componentKey}
-        rules={[{ required: true, message: 'Field is required' }]}
-      >
-        <TextArea
-          rows={4}
-          placeholder="Please input"
-          defaultValue={componentData.data.textField}
-          onChange={(e) => {
-            console.log('HERE', e.target.value);
-            onChange((prevState: any) =>
-              [...prevState].map((item, index) => {
-                if (index === componentKey) {
-                  return { ...item, data: { text: { EN: e.target.value } } };
-                } else return item;
-              }),
-            );
-          }}
-        />
-      </Form.Item>
-    </>
-  );
 };
 
 function getBase64(file) {
@@ -355,7 +280,6 @@ export const ImageAttachmentComponent: React.FC<AttachmentsComponentDataProps> =
   );
 };
 
->>>>>>> master
 export const ButtonTemplatesComponent: React.FC = ({ componentData }) => {
   const [buttonIndex, setButtonIndex] = useState(0);
   const [responseType, setResponseType] = useState<string>('flow');
@@ -609,22 +533,7 @@ export const VideoAttachmentComponent: React.FC<AttachmentsComponentDataProps> =
   );
 };
 
-<<<<<<< HEAD
-const initialPanes = [
-  { title: '1', content: 'Content of Tab 1', key: '1' },
-  // { title: '2', content: 'Content of Tab 2', key: '2' },
-  // { title: '3', content: 'Content of Tab 3', key: '3' },
-  // { title: '4', content: 'Content of Tab 3', key: '4' },
-  // { title: '5', content: 'Content of Tab 3', key: '5' },
-  // { title: '6', content: 'Content of Tab 3', key: '6' },
-  // { title: '7', content: 'Content of Tab 3', key: '7' },
-  // { title: '8', content: 'Content of Tab 3', key: '8' },
-  // { title: '9', content: 'Content of Tab 3', key: '9' },
-  // { title: '10', content: 'Content of Tab 3', key: '10' },
-];
-=======
 const initialPanes = [{ title: '1', content: 'Content of Tab 1', key: '1' }];
->>>>>>> master
 const { TabPane } = Tabs;
 
 export const GenericTemplatesComponent = (componentData, index) => {
@@ -996,123 +905,6 @@ export const FileAttachmentComponent: React.FC<AttachmentsComponentDataProps> = 
         <Upload onChange={handleChange} action={'http://localhost:5000/upload'} fileList={fileList}>
           <Button icon={<UploadOutlined />}>Upload</Button>
         </Upload>
-      </Form.Item>
-    </>
-  );
-};
-
-
-
-
-function getBase64(file) {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.onload = () => resolve(reader.result);
-    reader.onerror = (error) => reject(error);
-  });
-}
-
-export const ImageAttachmentComponent: React.FC<AttachmentsComponentDataProps> = ({
-  componentData,
-}) => {
-  const [previewVisible, setPreviewVisible] = useState(false);
-  const [previewImage, setPreviewImage] = useState(null);
-  const [previewTitle, setPreviewTitle] = useState(false);
-  const [progress, setProgress] = useState(0);
-  const [fileList, setFileList] = useState(componentData.data.attachments); // old items is in "url", new items is in "response" key
-
-  const uploadImage = async (options) => {
-    const { onSuccess, onError, file, onProgress } = options;
-
-    const formData = new FormData();
-    const config = {
-      headers: { 'content-type': 'multipart/form-data' },
-      onUploadProgress: (event) => {
-        const percent = Math.floor((event.loaded / event.total) * 100);
-        setProgress(percent);
-        if (percent === 100) {
-          setTimeout(() => setProgress(0), 1000);
-        }
-        onProgress({ percent: (event.loaded / event.total) * 100 });
-      },
-    };
-    formData.append('file', file);
-    try {
-      const res = await axios.post('http://localhost:5000/upload', formData, config);
-      onSuccess({ url: res.data.url });
-      console.log('server res: ', res);
-    } catch (err) {
-      console.log('Error: ', err);
-      const error = new Error('Some error');
-      onError({ err });
-    }
-  };
-
-  const handleCancel = () => setPreviewVisible(false);
-
-  const handlePreview = async (file) => {
-    if (!file.url && !file.preview) {
-      file.preview = await getBase64(file.originFileObj);
-    }
-
-    setPreviewImage(file.url || file.preview);
-    setPreviewVisible(true);
-    setPreviewTitle(file.name || file.url.substring(file.url.lastIndexOf('/') + 1));
-  };
-  const handleChange = ({ fileList }) => {
-    setFileList(fileList);
-  };
-
-  const uploadButton = (
-    <div>
-      <PlusOutlined />
-      <div style={{ marginTop: 8 }}>Upload</div>
-    </div>
-  );
-  return (
-    <>
-      <Divider style={{ marginTop: -6 }} orientation="left">
-        Image
-      </Divider>
-      <Form.Item>
-        <Form.Item noStyle rules={[{ required: true, message: 'Image is required' }]}>
-          <Upload
-            customRequest={uploadImage}
-            onChange={handleChange}
-            accept="image/*"
-            listType="picture-card"
-            fileList={fileList}
-            onPreview={handlePreview}
-            // previewFile={(file) => {
-            //   return new Promise((resolve) => {
-            //     const reader = new FileReader();
-            //     reader.readAsDataURL(file);
-            //     reader.onload = function (e) {
-            //       const dataUrl = e.target.result;
-            //       resolve(
-            //         'https://ss1.bdstatic.com/70cFuXSh_Q1YnxGkpoWK1HF6hhy/it/u=3498227956,2363956367&fm=26&gp=0.jpg',
-            //       );
-            //     };
-            //   });
-            // }}
-          >
-            {fileList.length >= 8 ? null : uploadButton}
-          </Upload>
-          <Modal
-            visible={previewVisible}
-            title={previewTitle}
-            footer={null}
-            onCancel={handleCancel}
-          >
-            <img alt="image-preview" style={{ width: '100%' }} src={previewImage} />
-            {/*<object*/}
-            {/*  style={{ width: '100%', height: '1000px' }}*/}
-            {/*  data="http://www.africau.edu/images/default/sample.pdf"*/}
-            {/*/>*/}
-          </Modal>
-        </Form.Item>
-        {progress > 0 ? <Progress percent={progress} /> : null}
       </Form.Item>
     </>
   );

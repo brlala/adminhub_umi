@@ -1,13 +1,14 @@
-import { Card, Col, Divider, Form, List, Row, Button, Typography, Select } from 'antd';
+import { Card, Col, Divider, Form, List, Row, Button, Typography, Select, Switch } from 'antd';
 import React, { FC, useState } from 'react';
 import { useParams} from "react-router";
-import { useRequest } from 'umi';
+import { Redirect, useRequest } from 'umi';
 import { Params, BroadcastTemplateListItem, BroadcastFlowList } from './data.d';
-import { getTags, queryBroadcastTemplate } from './service';
+import { getTags, queryBroadcastTemplate, sendBroadcast } from './service';
 import styles from './style.less';
 import ProCard from '@ant-design/pro-card';
 import { PageContainer } from '@ant-design/pro-layout';
 import { TextComponent, ImageComponent, VideoAttachmentComponent, GenericTemplatesComponent, ButtonTemplatesComponent, FlowComponent } from '@/components/FlowItems/UpdateFlow';
+import { NewBroadcastEntry } from '../../data';
 
 const FormItem = Form.Item;
 const { Paragraph } = Typography;
@@ -26,10 +27,25 @@ const NewBroadcast: FC = () => {
     data: {}
   }
   const [componentList, setComponentsList] = useState<component[]>([]);
+  const [redirect, setRedirect] = useState(false);
 
   const { data, loading, run} = useRequest((values: any) => {
     return queryBroadcastTemplate(templateId);
   });
+
+  const { run: postRun } = useRequest(
+    (data) => {
+      return sendBroadcast(data);
+    }, {
+      manual: true,
+      onSuccess: (result) => {
+        console.log(result)
+        // message.success('Success');
+        // run({}).catch();
+      },
+      throwOnError: true
+    }
+  );
 
   const renderComponent = (component: string, index: number) => {
     let renderedComponent;
@@ -71,24 +87,29 @@ const NewBroadcast: FC = () => {
   const list = data?.flow || [];
 
   const onFinish = (values: any) => {
-    console.log('Success:', values, componentList );
+    console.log('Success:', values, componentList);
+    postRun({...values, flow: componentList, platforms: ["line"]} as NewBroadcastEntry)
+    setRedirect(true) 
   };
 
   const { data: tags, loading: tagsLoading, run: tagsRun, cancel: tagsCancel } = useRequest(getTags, {
     manual: true
   });
 
+  const [toAll, setToAll] = React.useState(false);
+
   return (
-    <PageContainer>
+    redirect? (<Redirect to="/broadcasts/history" />):
+    (<PageContainer>
       <div className={styles.coverCardList}>
         <ProCard title="Create New Broadcast">
             <Form 
-              name="broadcast-form" 
+              name="broadcast-form"
+              initialValues={{tags: [], exclude: [], sendToAll: false}} 
               onFinish={onFinish}>
               <Row>
                 <Col span={12} key={1}>
-                  <FormItem 
-                    name="flow" >
+                  <FormItem>
                     <ProCard title="Component">
                       {list.map((flowNode, index) => renderComponent(flowNode, index))}
                     </ProCard>
@@ -97,9 +118,31 @@ const NewBroadcast: FC = () => {
                 <Col span={12} key={2}>
                 <FormItem >
                 <ProCard title="Audience">
-
+                  <Form.Item name="sendToAll" label="Broadcast to Everyone">
+                    <Switch checked={toAll} onChange={setToAll} />
+                  </Form.Item>
+                    <FormItem 
+                    name="tags" label="Select Tags">
+                    <Select
+                      mode="multiple"
+                      allowClear
+                      style={{ width: '100%' }}
+                      placeholder="Please select"
+                      disabled={toAll}
+                      defaultValue={[]}
+                      onSearch={tagsRun}
+                      onFocus={tagsRun}
+                      onBlur={tagsCancel}
+                      loading={tagsLoading}
+                      // onChange={handleChange}
+                    >
+                      {tags && tags.map(i => {
+                        return <Option key={i}>{i}</Option>
+                      })}
+                    </Select>
+                  </FormItem>
                   <FormItem 
-                    name="tags">
+                    name="exclude" label="Exclude Tags">
                     <Select
                       mode="multiple"
                       allowClear
@@ -117,6 +160,7 @@ const NewBroadcast: FC = () => {
                       })}
                     </Select>
                   </FormItem>
+                  
                 </ProCard>
                 </FormItem>
                 </Col>
@@ -131,7 +175,7 @@ const NewBroadcast: FC = () => {
         </ProCard>
       </div>
 
-    </PageContainer>
+    </PageContainer>)
   );
 };
 

@@ -1,5 +1,6 @@
+import { FlowNew } from 'models/flows';
 import request from 'umi-request';
-import { BroadcastTemplateListItem, NewBroadcastTemplate } from '../../data';
+import { BroadcastTemplateListItem } from '../../data';
 
 export async function queryBroadcastTemplate(
   id: string,
@@ -7,10 +8,10 @@ export async function queryBroadcastTemplate(
   return request(`http://localhost:5000/broadcasts/templates/${id}`);
 }
 
-export async function addBroadcastTemplate(
-  data: NewBroadcastTemplate,
+export async function sendBroadcast(
+  data: FlowNew,
 ): Promise<{}> {
-  return request('http://localhost:5000/broadcasts/templates', {
+  return request('http://localhost:5000/broadcasts/send', {
     method: 'post',
     data: data,
   });

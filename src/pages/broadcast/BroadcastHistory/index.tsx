@@ -112,18 +112,21 @@ const BroadcastHistory: FC = () => {
     },
     {
       title: <FormattedMessage id="pages.searchTable.titleTags" defaultMessage="Tags" />,
-      dataIndex: 'tags',
       hideInSearch: true,
       render: (_, object) => (
         <>
+          {object.sendToAll? <Tag color='green' key="everyone">Everyone</Tag>: ""}
           {object.tags.map((tag) => {
-            let color = tag.length > 5 ? 'geekblue' : 'green';
-            if (tag === 'loser') {
-              color = 'volcano';
-            }
             return (
-              <Tag color={color} key={tag}>
+              <Tag color='geekblue' key={tag}>
                 {tag.toUpperCase()}
+              </Tag>
+            );
+          })}
+          {object.exclude.map((tag) => {
+            return (
+              <Tag color='red' key={tag}>
+                {"- " + tag.toUpperCase()}
               </Tag>
             );
           })}

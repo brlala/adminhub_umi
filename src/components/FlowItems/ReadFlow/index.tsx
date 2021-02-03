@@ -18,7 +18,7 @@ export const QuickReplyDisplayComponent: FC<DisplayComponentProps> = (props) => 
       {componentData &&
         componentData.quick_replies?.map((element, index) => (
           <Button key={componentKey + 'qr' + index} type="default" style={{ borderRadius: 20 }}>
-            {element.title.EN}
+            {element.text.EN}
           </Button>
         ))}{' '}
     </Space>

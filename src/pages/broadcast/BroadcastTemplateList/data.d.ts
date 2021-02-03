@@ -1,3 +1,7 @@
+import { FlowComponentData } from "@/components/FlowItems/UpdateFlow";
+import { FlowListItem } from "@/pages/FlowList/data";
+import { NewFormProps } from "@/pages/QuestionList/components/UpdateForm";
+
 export interface Member {
   avatar: string;
   name: string;
@@ -19,6 +23,14 @@ export interface NewBroadcastTemplate {
   id?: string;
   name: string;
   flow: string[];
+  platforms?: string[];
+}
+
+export interface NewBroadcastEntry {
+  id?: string;
+  name: string;
+  flow: NewFlow[];
+  tags: string[];
   platforms?: string[];
 }
 
