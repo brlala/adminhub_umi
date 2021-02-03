@@ -51,10 +51,10 @@ const TemplateModal: FC<OperationModalProps> = (props) => {
   };
 
   const componentsList = [
-    { name: 'Text', key: 'text' },
+    { name: 'Text', key: 'message' },
     { name: 'Image', key: 'image' },
-    { name: 'Generic Templates', key: 'genericTemplates' },
-    { name: 'Button Templates', key: 'buttonTemplates' },
+    { name: 'Generic Template', key: 'genericTemplate' },
+    { name: 'Button Template', key: 'buttonTemplate' },
     { name: 'Flow', key: 'flow' },
   ];
 

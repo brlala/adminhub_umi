@@ -39,6 +39,31 @@ export type FlowItemData = {
   quick_replies?: QrButtonData[];
 };
 
+export type FlowEditableComponent = {
+  title: string;
+  key: string;
+  id: string;
+  type: 
+    | 'text'
+    | 'imageAttachments'
+    | 'videoAttachments'
+    | 'fileAttachments'
+    | 'genericTemplates'
+    | 'buttonTemplates'
+    | 'flow';
+  data: {
+    buttons?: ButtonData[];
+    text?: StringObject;
+    url?: string;
+    imageUrl?: string;
+    title?: StringObject;
+    subtitle?: StringObject;
+    elements?: FlowItemData[];
+    flow?: FlowData;
+    quickReplies?: QrButtonData[];
+  }
+}
+
 export type ButtonData = {
   type: string;
   title: StringObject;

@@ -48,12 +48,12 @@ export type FlowListParams = {
 export type FlowList = {
   name: string;
   type:
-    | 'text'
-    | 'imageAttachments'
-    | 'videoAttachments'
-    | 'fileAttachments'
-    | 'genericTemplates'
-    | 'buttonTemplates'
+    | 'message'
+    | 'image'
+    | 'videos'
+    | 'files'
+    | 'genericTemplate'
+    | 'buttonTemplate'
     | 'flow';
 };
 

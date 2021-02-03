@@ -26,7 +26,7 @@ const NewBroadcast: FC = () => {
     type: string,
     data: {}
   }
-  const [componentList, setComponentsList] = useState<component[]>([]);
+  const [componentList, setComponentList] = useState<component[]>([]);
   const [redirect, setRedirect] = useState(false);
 
   const { data, loading, run} = useRequest((values: any) => {
@@ -51,27 +51,21 @@ const NewBroadcast: FC = () => {
     let renderedComponent;
     const componentData = { type: component, data: {} }
 
-    if (componentList.length < index + 1) {setComponentsList((prevArray) => [...prevArray, componentData])}
+    if (componentList.length < index + 1) {setComponentList((prevArray) => [...prevArray, componentData])}
     console.log('componentList', componentList)
     
     console.log(componentData, index)
     switch (component) {
-      case 'text':
-        renderedComponent = <TextComponent componentKey={index} onChange={setComponentsList} />;
+      case 'message':
+        renderedComponent = <TextComponent componentKey={index} onChange={setComponentList} />;
         break;
       case 'image':
-        renderedComponent = <ImageComponent componentKey={index} onChange={setComponentsList} />;
+        renderedComponent = <ImageComponent componentKey={index} onChange={setComponentList} />;
         break;
-      // case 'videoAttachments':
-      //   renderedComponent = <VideoAttachmentComponent key={index} />;
-      //   break;
-      case 'fileAttachments':
-        renderedComponent = <div key={index} >Not implemented yet</div>;
+      case 'genericTemplate':
+        renderedComponent = <GenericTemplatesComponent componentKey={index} onChange={setComponentList} />;
         break;
-      case 'genericTemplates':
-        renderedComponent = <GenericTemplatesComponent key={index} />;
-        break;
-      case 'buttonTemplates':
+      case 'buttonTemplate':
         renderedComponent = <ButtonTemplatesComponent key={index} />;
         break;
       case 'flow':

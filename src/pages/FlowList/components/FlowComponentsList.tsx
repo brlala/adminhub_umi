@@ -10,12 +10,12 @@ export type UpdateComponentsListProps = {
 
 const FlowComponentsList: React.FC<UpdateComponentsListProps> = ({ setNewComponentsList }) => {
   const componentsList: FlowList[] = [
-    { name: 'Text', type: 'text' },
-    { name: 'Image', type: 'imageAttachments' },
-    { name: 'Video', type: 'videoAttachments' },
-    { name: 'File', type: 'fileAttachments' },
-    { name: 'Generic Templates', type: 'genericTemplates' },
-    { name: 'Button Templates', type: 'buttonTemplates' },
+    { name: 'Text', type: 'message' },
+    { name: 'Image', type: 'image' },
+    { name: 'Video', type: 'videos' },
+    { name: 'File', type: 'files' },
+    { name: 'Generic Template', type: 'genericTemplate' },
+    { name: 'Button Template', type: 'buttonTemplate' },
     { name: 'Flow', type: 'flow' },
   ];
 
@@ -24,16 +24,16 @@ const FlowComponentsList: React.FC<UpdateComponentsListProps> = ({ setNewCompone
     const uniqueId = `${type}-${nanoid(4)}`;
     let componentData;
     switch (type) {
-      case 'text':
-        componentData = { type, name: uniqueId, data: { textField: null } };
+      case 'message':
+        componentData = { type, data: { text: {} } };
         break;
-      case 'imageAttachments':
+      case 'image':
+        componentData = { type, name: uniqueId, data: { url: '' } };
+        break;
+      case 'videos':
         componentData = { type, name: uniqueId, data: { attachments: [] } };
         break;
-      case 'videoAttachments':
-        componentData = { type, name: uniqueId, data: { attachments: [] } };
-        break;
-      case 'fileAttachments':
+      case 'files':
         componentData = {
           type,
           name: uniqueId,
@@ -49,56 +49,10 @@ const FlowComponentsList: React.FC<UpdateComponentsListProps> = ({ setNewCompone
           },
         };
         break;
-      case 'genericTemplates':
-        componentData = {
-          type,
-          name: uniqueId,
-          data: {
-            templates: [
-              {
-                attachments: [
-                  {
-                    name: 'test.png',
-                    url: 'https://sitechecker.pro/wp-content/uploads/2017/12/URL-meaning.png',
-                    uid: 1,
-                  },
-                ],
-                title: 'a',
-                subtitle: 'b',
-                buttons: [
-                  {
-                    text: 'button text1',
-                    type: 'url',
-                    content: 'www.apple.com',
-                  },
-                  {
-                    text: 'button text2',
-                    type: 'flow',
-                    content: '5e315217a38e6703b4d3f81d',
-                  },
-                ],
-              },
-              {
-                title: 'c1',
-                subtitle: 'd',
-                buttons: [
-                  {
-                    text: 'button text1',
-                    type: 'url',
-                    content: 'www.firefox.com',
-                  },
-                  {
-                    text: 'button text',
-                    type: 'flow',
-                    content: '5e315217a38e6703b4d3f81d',
-                  },
-                ],
-              },
-            ],
-          },
-        };
+      case 'genericTemplate':
+        componentData = { type, data: { elements: [{ imageUrl: '', title: {EN: ''}, subtitle: {EN: ''}, buttons: [] } ] } };
         break;
-      case 'buttonTemplates':
+      case 'buttonTemplate':
         componentData = { type, name: uniqueId, data: { textField: null, buttons: [] } };
         break;
       case 'flow':
@@ -111,8 +65,9 @@ const FlowComponentsList: React.FC<UpdateComponentsListProps> = ({ setNewCompone
       title: name,
       key: uniqueId,
       id: uniqueId,
-      componentData,
+      ...componentData
     };
+    console.log(entry)
 
     setNewComponentsList((prevState) => [...prevState, entry]);
   };

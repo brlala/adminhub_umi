@@ -74,17 +74,17 @@ const BroadcastTemplateList: FC = () => {
   const renderComponent = (component: string, index: number) => {
     let renderedComponent;
     switch (component) {
-      case 'text':
+      case 'message':
         renderedComponent = 'Text';
         break;
       case 'image':
         renderedComponent = 'Image';
         break;
-      case 'genericTemplates':
-        renderedComponent = 'Generic Templates';
+      case 'genericTemplate':
+        renderedComponent = 'Generic Template';
         break;
-      case 'buttonTemplates':
-        renderedComponent = 'Button Templates';
+      case 'buttonTemplate':
+        renderedComponent = 'Button Template';
         break;
       case 'flow':
         renderedComponent = 'Flow';
