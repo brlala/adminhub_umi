@@ -218,10 +218,13 @@ export const ImageAttachmentComponent: React.FC<AttachmentsComponentDataProps> =
 export const ButtonTemplatesComponent: React.FC = ({ componentData }) => {
   const [buttonIndex, setButtonIndex] = useState(0);
   const [responseType, setResponseType] = useState<string>('flow');
+  const [selectRow, setSelectRow] = useState(null);
+  const [isModalVisible, setIsModalVisible] = useState(false);
   const onFinish = (values) => {
     console.log('Received values of form: ', values);
   };
 
+  console.log(componentData);
   const waitTime = (time: number = 100) => {
     return new Promise((resolve) => {
       setTimeout(() => {
@@ -230,42 +233,59 @@ export const ButtonTemplatesComponent: React.FC = ({ componentData }) => {
     });
   };
 
+  const showModal = () => {
+    setIsModalVisible(true);
+  };
+
+  const handleOkModal = () => {
+    setIsModalVisible(false);
+  };
+
+  const handleCancelModal = () => {
+    setIsModalVisible(false);
+  };
   let responseArea;
   if (responseType === 'url') {
     responseArea = (
-      <ProFormText
-        width="xl"
+      <ProFormTextArea
         label="URL"
         name="urlResponse"
-        rules={[
-          {
-            required: true,
-            message: <FormattedMessage id="pages.flowTable.url" defaultMessage="URL is required" />,
-          },
-        ]}
+        placeholder="Link to URL"
+        // rules={[
+        //   {
+        //     required: true,
+        //     message: (
+        //       <FormattedMessage
+        //         id="pages.searchTable.response"
+        //         defaultMessage="Response is required"
+        //       />
+        //     ),
+        //   },
+        // ]}
       />
     );
   } else {
     responseArea = (
       <ProFormSelect
-        width="xl"
         name="flowResponse"
-        label="Response"
+        label="Flow Response"
+        initialValue={selectRow?.type === 'flow' ? selectRow?.content : null}
         showSearch
+        // @ts-ignore
         request={async () => {
           return await queryFlowsFilter('name,params');
         }}
-        rules={[
-          {
-            required: true,
-            message: (
-              <FormattedMessage
-                id="pages.searchTable.response"
-                defaultMessage="Response is required"
-              />
-            ),
-          },
-        ]}
+        // rules={[
+        //   {
+        //     required: true,
+        //     message: (
+        //       <FormattedMessage
+        //         id="pages.searchTable.response"
+        //         defaultMessage="Response is required"
+        //       />
+        //     ),
+        //   },
+        // ]}
       />
     );
   }
@@ -277,55 +297,94 @@ export const ButtonTemplatesComponent: React.FC = ({ componentData }) => {
           Button Templates
         </Divider>
         <Form.Item rules={[{ required: true, message: 'Field is required' }]}>
-          <TextArea rows={4} placeholder="Please input" />
-          <Form.Item>
-            <ModalForm<{
-              name: string;
-              company: string;
-            }>
-              title="Add Button"
-              trigger={
-                <Button type="dashed">
-                  <PlusOutlined />
-                  Add Button
-                </Button>
-              }
-              modalProps={{
-                onCancel: () => console.log('run'),
-              }}
-              onFinish={async (values) => {
-                await waitTime(2000);
-                console.log(values.name);
-                message.success('提交成功');
-                return true;
+          <TextArea
+            rows={4}
+            placeholder="Please input"
+            defaultValue={componentData.data.textField}
+          />
+          {componentData.data.buttons.map((button) => (
+            <Button
+              block
+              onClick={() => {
+                console.log({ row: button });
+                setSelectRow(button);
+                setResponseType(button.type);
+                showModal();
               }}
             >
-              <ProForm.Group>
-                <ProFormText
-                  width="sm"
-                  name="textas"
-                  label="Display Button Text"
-                  placeholder="Please enter"
-                />
-              </ProForm.Group>
-              <div className="ant-row ant-form-item">
-                <div className="ant-col ant-form-item-label">
-                  <label title="Type of Button">Type of Response</label>
-                </div>
-                <div className="ant-col ant-form-item-control">
-                  <Radio.Group
-                    onChange={(event) => setResponseType(event.target.value)}
-                    defaultValue="text"
-                    name="responseSelect"
-                  >
-                    <Radio.Button value="url">URL</Radio.Button>
-                    <Radio.Button value="flow">Flow</Radio.Button>
-                  </Radio.Group>
-                </div>
-              </div>
-              <ProForm.Group>{responseArea}</ProForm.Group>
-            </ModalForm>
-          </Form.Item>
+              {button.text}
+            </Button>
+          ))}
+          {componentData.data.buttons.length < 3 && (
+            <Button
+              onClick={() => {
+                showModal();
+                setSelectRow(null);
+              }}
+              type="dashed"
+              block
+            >
+              <PlusOutlined /> Add Button
+            </Button>
+          )}
+          <Modal
+            title="New Button"
+            visible={isModalVisible}
+            onOk={handleOkModal}
+            onCancel={handleCancelModal}
+            destroyOnClose={true}
+            width={450}
+            footer={[
+              <Button key="back" onClick={handleCancelModal}>
+                Cancel
+              </Button>,
+              <Button type="primary" htmlType="submit" onClick={handleOkModal} form="my-form">
+                Submit
+              </Button>,
+            ]}
+          >
+            <Form
+              id="my-form"
+              onFinish={async (values) => {
+                console.log(values);
+                message.success('Button added');
+              }}
+              initialValues={{
+                // text: selectRow?.text,
+                // content: selectRow?.type,
+                urlResponse: selectRow?.type === 'url' ? selectRow?.content : null,
+              }}
+              labelCol={{ span: 7 }}
+              wrapperCol={{ span: 16 }}
+            >
+              <Form.Item
+                label="Display Text"
+                name="text"
+                rules={[{ required: true, message: 'Please input display text' }]}
+                initialValue={selectRow?.text}
+              >
+                <Input />
+              </Form.Item>
+              {/*<ProFormText name="text" label="Display Text" initialValue={selectRow?.text} />*/}
+              {/*{selectRow?.text}*/}
+              <Form.Item
+                label="Type"
+                name="type"
+                initialValue={selectRow ? selectRow.type : 'flow'}
+              >
+                <Radio.Group
+                  onChange={(event) => {
+                    console.log(event.target.value);
+                    setResponseType(event.target.value);
+                  }}
+                >
+                  <Radio.Button value="flow">Flow</Radio.Button>
+                  <Radio.Button value="url">URL</Radio.Button>
+                </Radio.Group>
+              </Form.Item>
+              {responseArea}
+            </Form>
+          </Modal>
         </Form.Item>
       </Form.Item>
     </>

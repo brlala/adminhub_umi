@@ -99,7 +99,25 @@ const FlowComponentsList: React.FC<UpdateComponentsListProps> = ({ setNewCompone
         };
         break;
       case 'buttonTemplates':
-        componentData = { type, name: uniqueId, data: { textField: null, buttons: [] } };
+        componentData = {
+          type,
+          name: uniqueId,
+          data: {
+            textField: 'test',
+            buttons: [
+              {
+                text: 'button text1',
+                type: 'url',
+                content: 'www.firefox.com',
+              },
+              {
+                text: 'button text',
+                type: 'flow',
+                content: '5e315217a38e6703b4d3f81d',
+              },
+            ],
+          },
+        };
         break;
       case 'flow':
         componentData = { type, name: uniqueId, data: { flowId: null, params: [] } };
