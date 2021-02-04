@@ -7,7 +7,7 @@ import { getTags, queryBroadcastTemplate, sendBroadcast } from './service';
 import styles from './style.less';
 import ProCard from '@ant-design/pro-card';
 import { PageContainer } from '@ant-design/pro-layout';
-import { TextComponent, ImageComponent, VideoAttachmentComponent, GenericTemplatesComponent, ButtonTemplatesComponent, FlowComponent } from '@/components/FlowItems/UpdateFlow';
+import { TextComponent, ImageComponent, VideoAttachmentComponent, GenericTemplateComponent, ButtonTemplateComponent, FlowComponent } from '@/components/FlowItems/UpdateFlow';
 import { NewBroadcastEntry } from '../../data';
 
 const FormItem = Form.Item;
@@ -49,27 +49,69 @@ const NewBroadcast: FC = () => {
 
   const renderComponent = (component: string, index: number) => {
     let renderedComponent;
-    const componentData = { type: component, data: {} }
+    // const componentData = { type: component, data: {} }
 
+    let componentData: any;
+    switch (component) {
+      case 'message':
+        componentData = { type: component, data: { text: {} } };
+        break;
+      case 'image':
+        componentData = { type: component, data: { url: '' } };
+        break;
+      case 'genericTemplate':
+        componentData = { type: component, data: { elements: [{ imageUrl: '', title: {}, subtitle: {}, buttons: [] } ] } };
+        break;
+      case 'buttonTemplate':
+        componentData = { type: component, data: { text: {}, buttons: [] } };
+        break;
+      case 'videos':
+        componentData = { type: component, data: { attachments: [] } };
+        break;
+      case 'files':
+        componentData = { type: component, data: { attachments: [] }};
+        break;
+      case 'flow':
+        componentData = { type: component, data: { flowId: null, params: [] } };
+        break;
+      default:
+        componentData = { type: component, data: {} };
+    }
+    
     if (componentList.length < index + 1) {setComponentList((prevArray) => [...prevArray, componentData])}
     console.log('componentList', componentList)
     
     console.log(componentData, index)
     switch (component) {
       case 'message':
-        renderedComponent = <TextComponent componentKey={index} onChange={setComponentList} />;
+        renderedComponent = <TextComponent 
+          componentKey={index} 
+          componentData={{ text: {} }} 
+          onChange={setComponentList} />;
         break;
       case 'image':
-        renderedComponent = <ImageComponent componentKey={index} onChange={setComponentList} />;
+        renderedComponent = <ImageComponent 
+          componentKey={index} 
+          componentData={{ url: '' }} 
+          onChange={setComponentList} />;
         break;
       case 'genericTemplate':
-        renderedComponent = <GenericTemplatesComponent componentKey={index} onChange={setComponentList} />;
+        renderedComponent = <GenericTemplateComponent 
+          componentKey={index} 
+          componentData={{ elements: [{ imageUrl: '', title: {}, subtitle: {}, buttons: [] }] }} 
+          onChange={setComponentList} />;
         break;
       case 'buttonTemplate':
-        renderedComponent = <ButtonTemplatesComponent key={index} />;
+        renderedComponent = <ButtonTemplateComponent
+          componentKey={index} 
+          componentData={{ text: {}, buttons: [] }} 
+          onChange={setComponentList} />;
         break;
       case 'flow':
-        renderedComponent = <FlowComponent key={index} />;
+        renderedComponent = <FlowComponent 
+        componentKey={index} 
+        componentData={{ flowId:'' }} 
+        onChange={setComponentList} />;
         break;
       default:
         renderedComponent = <div key={index} >Cannot render {component}</div>;

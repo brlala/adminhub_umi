@@ -49,7 +49,7 @@ export interface BroadcastTemplateListItem {
 export const componentsList = [
   { name: 'Text', key: 'text' },
   { name: 'Image', key: 'image' },
-  { name: 'Generic Templates', key: 'genericTemplates' },
-  { name: 'Button Templates', key: 'buttonTemplates' },
+  { name: 'Generic Template', key: 'genericTemplate' },
+  { name: 'Button Template', key: 'buttonTemplate' },
   { name: 'Flow', key: 'flow' },
 ];

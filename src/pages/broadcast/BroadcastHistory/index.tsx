@@ -1,8 +1,8 @@
-import { Card, Form, Typography, Tag, Tooltip, Progress } from 'antd';
+import { Card, Form, Tag, Tooltip, Progress } from 'antd';
 import React, { FC, useState } from 'react';
 import { useIntl, useRequest, FormattedMessage } from 'umi';
 
-import type { ProColumns, ActionType } from '@ant-design/pro-table';
+import type { ProColumns } from '@ant-design/pro-table';
 import StandardFormRow from './components/StandardFormRow';
 import TagSelect from './components/TagSelect';
 import { BroadcastHistoryItem, BroadcastHistoryListItem } from './data.d';
@@ -14,7 +14,6 @@ import BroadcastHistoryDrawer from './components/BroadcastHistoryDrawer';
 import { PageContainer } from '@ant-design/pro-layout';
 
 const FormItem = Form.Item;
-const { Paragraph } = Typography;
 
 const BroadcastHistory: FC = () => {
   const { data, loading, run } = useRequest((values: any) => {

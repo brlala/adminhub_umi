@@ -8,11 +8,11 @@ import styles from './index.less';
 import NewComponentsList from '../components/NewComponentsList';
 import FlowComponentsList from '@/pages/FlowList/components/FlowComponentsList';
 import {
-  GenericTemplatesComponent,
+  GenericTemplateComponent,
   ImageAttachmentComponent,
   TextComponent,
   FlowComponent,
-  ButtonTemplatesComponent,
+  ButtonTemplateComponent,
   VideoAttachmentComponent,
   ImageComponent,
   FileAttachmentComponent,
@@ -52,36 +52,34 @@ const NewFlow: FC = (props) => {
 
   const onFinish = (values: any) => {
     const toSubmit = componentList.map((item)=> {return {type: item.type, data: item.data}})
-    console.log('Received: ', toSubmit);
-    console.log('componentList: ', componentList);
+    console.log('values: ', values);
+    console.log('componentList: ', toSubmit);
     postRun({...values, flow: toSubmit})
 
   };
 
-  const renderComponent = (component: { data: FlowList, type: string }, index: number) => {
+  const renderComponent = (component: { data: any, type: string }, index: number) => {
     const { data, type } = component;
     let renderedComponent;
 
     switch (type) {
       case 'message':
-        renderedComponent = <TextComponent componentKey={index} componentData={data} onChange={setComponentList}/>;
+        renderedComponent = <TextComponent componentKey={index} componentData={data} onChange={setComponentList} />
         break;
       case 'image':
         renderedComponent = <ImageComponent componentKey={index} componentData={data}  onChange={setComponentList} />
+        break;
+      case 'genericTemplate':
+        renderedComponent = <GenericTemplateComponent componentKey={index} componentData={data} onChange={setComponentList} />
+        break;
+      case 'buttonTemplate':
+        renderedComponent = <ButtonTemplateComponent componentKey={index} componentData={data} onChange={setComponentList} />
         break;
       case 'videos':
         renderedComponent = <VideoAttachmentComponent index={index} componentData={data} />
         break;
       case 'files':
         renderedComponent = <FileAttachmentComponent index={index} componentData={data} />;
-        break;
-      case 'genericTemplate':
-        renderedComponent = <GenericTemplatesComponent componentKey={index} componentData={data} onChange={setComponentList}/>
-        break;
-      case 'buttonTemplate':
-        renderedComponent = (
-          <ButtonTemplatesComponent index={index} componentData={data} />
-        );
         break;
       case 'flow':
         renderedComponent = <FlowComponent index={index} componentData={data} />;

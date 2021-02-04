@@ -45,11 +45,11 @@ export type FlowEditableComponent = {
   id: string;
   type: 
     | 'text'
-    | 'imageAttachments'
-    | 'videoAttachments'
-    | 'fileAttachments'
-    | 'genericTemplates'
-    | 'buttonTemplates'
+    | 'image'
+    | 'videos'
+    | 'files'
+    | 'genericTemplate'
+    | 'buttonTemplate'
     | 'flow';
   data: {
     buttons?: ButtonData[];

@@ -28,10 +28,16 @@ const FlowComponentsList: React.FC<UpdateComponentsListProps> = ({ setNewCompone
         componentData = { type, data: { text: {} } };
         break;
       case 'image':
-        componentData = { type, name: uniqueId, data: { url: '' } };
+        componentData = { type, data: { url: '' } };
+        break;
+      case 'genericTemplate':
+        componentData = { type, data: { elements: [{ imageUrl: '', title: {}, subtitle: {}, buttons: [] } ] } };
+        break;
+      case 'buttonTemplate':
+        componentData = { type, data: { text: {}, buttons: [] } };
         break;
       case 'videos':
-        componentData = { type, name: uniqueId, data: { attachments: [] } };
+        componentData = { type, data: { attachments: [] } };
         break;
       case 'files':
         componentData = {
@@ -49,17 +55,11 @@ const FlowComponentsList: React.FC<UpdateComponentsListProps> = ({ setNewCompone
           },
         };
         break;
-      case 'genericTemplate':
-        componentData = { type, data: { elements: [{ imageUrl: '', title: {EN: ''}, subtitle: {EN: ''}, buttons: [] } ] } };
-        break;
-      case 'buttonTemplate':
-        componentData = { type, name: uniqueId, data: { textField: null, buttons: [] } };
-        break;
       case 'flow':
-        componentData = { type, name: uniqueId, data: { flowId: null, params: [] } };
+        componentData = { type, data: { flowId: '', params: [] } };
         break;
       default:
-        componentData = { type, name: uniqueId, data: {} };
+        componentData = { type, data: {} };
     }
     const entry = {
       title: name,
