@@ -16,6 +16,7 @@ import {
   VideoAttachmentComponent,
   ImageComponent,
   FileAttachmentComponent,
+  QuickReplyComponent,
 } from '@/components/FlowItems/UpdateFlow';
 import { FlowList } from '@/pages/FlowList/data';
 import { FooterToolbar } from '@ant-design/pro-layout';
@@ -83,6 +84,9 @@ const NewFlow: FC = (props) => {
         break;
       case 'flow':
         renderedComponent = <FlowComponent index={index} componentData={data} />;
+        break;
+      case 'quickReply':
+        renderedComponent = <QuickReplyComponent index={index} componentData={componentData} />;
         break;
       default:
         renderedComponent = <div>Cannot render {type}</div>;

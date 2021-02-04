@@ -5,7 +5,7 @@ import { queryFlowsFilter } from '@/pages/QuestionList/service';
 import { FormattedMessage } from '@@/plugin-locale/localeExports';
 import { Upload, Modal } from 'antd';
 const { TextArea } = Input;
-import { DeleteOutlined, InboxOutlined, PlusOutlined, UploadOutlined } from '@ant-design/icons';
+import { DeleteOutlined, InboxOutlined, PlusOutlined, SearchOutlined, UploadOutlined } from '@ant-design/icons';
 import axios from 'axios';
 import { ImageDisplayComponent } from '../ReadFlow';
 import { StringObject } from 'models/flows';
@@ -20,6 +20,10 @@ export type TextComponentDataProps = {
   componentKey: number;
   componentData?: { text: StringObject };
   onChange: (prevState: any) => void;
+};
+export type QuickReplyComponentDataProps = {
+  componentData: QuickReplyComponentData;
+  index: Number;
 };
 
 export const TextComponent: FC<TextComponentDataProps> = (props) => {
@@ -619,7 +623,6 @@ export const ButtonTemplateComponent: FC<ButtonTemplateComponentDataProps> = (pr
   );
 };
 
-
 export type FlowComponentDataProps = {
   componentKey: number;
   componentData: {
@@ -881,6 +884,166 @@ export const FileAttachmentComponent: React.FC<AttachmentsComponentDataProps> = 
         <Upload onChange={handleChange} action={'http://localhost:5000/upload'} fileList={fileList}>
           <Button icon={<UploadOutlined />}>Upload</Button>
         </Upload>
+      </Form.Item>
+    </>
+  );
+};
+
+export const QuickReplyComponent: React.FC<QuickReplyComponentDataProps> = ({ componentData }) => {
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [selectRow, setSelectRow] = useState(null);
+  const [responseType, setResponseType] = useState('flow');
+  const [flows, setFlows] = useState<DropdownProps[]>([]);
+  const addNewQuickReplyButton = (
+    <Button
+      type="dashed"
+      shape="round"
+      icon={<PlusOutlined />}
+      onClick={() => {
+        showModal();
+        setSelectRow(null);
+      }}
+    >
+      Quick Reply
+    </Button>
+  );
+  const showModal = () => {
+    setIsModalVisible(true);
+  };
+
+  const handleOkModal = () => {
+    setIsModalVisible(false);
+  };
+
+  const handleCancelModal = () => {
+    setIsModalVisible(false);
+  };
+
+  let responseArea;
+  if (responseType === 'url') {
+    responseArea = (
+      <ProFormTextArea
+        label="URL"
+        name="urlResponse"
+        placeholder="Link to URL"
+        // rules={[
+        //   {
+        //     required: true,
+        //     message: (
+        //       <FormattedMessage
+        //         id="pages.searchTable.response"
+        //         defaultMessage="Response is required"
+        //       />
+        //     ),
+        //   },
+        // ]}
+      />
+    );
+  } else {
+    responseArea = (
+      <ProFormSelect
+        name="flowResponse"
+        label="Flow Response"
+        initialValue={selectRow?.type === 'flow' ? selectRow?.content : null}
+        showSearch
+        // @ts-ignore
+        request={async () => {
+          const flowsRequest = await queryFlowsFilter('name,params');
+          setFlows(flowsRequest);
+        }}
+        options={flows}
+        // rules={[
+        //   {
+        //     required: true,
+        //     message: (
+        //       <FormattedMessage
+        //         id="pages.searchTable.response"
+        //         defaultMessage="Response is required"
+        //       />
+        //     ),
+        //   },
+        // ]}
+      />
+    );
+  }
+
+  return (
+    <>
+      <Divider style={{ marginTop: -6 }} orientation="left">
+        Quick Replies
+      </Divider>
+      <Form.Item>
+        <Space>
+          {componentData.data.buttons.map((button) => (
+            <Button
+              block
+              shape="round"
+              onClick={() => {
+                console.log({ row: button });
+                setSelectRow(button);
+                setResponseType(button.type);
+                showModal();
+              }}
+            >
+              {button.text}
+            </Button>
+          ))}
+          {componentData.data.buttons.length < 3 && addNewQuickReplyButton}
+        </Space>
+        <Modal
+          title="New Button"
+          visible={isModalVisible}
+          onOk={handleOkModal}
+          onCancel={handleCancelModal}
+          destroyOnClose={true}
+          width={450}
+          footer={[
+            <Button key="back" onClick={handleCancelModal}>
+              Cancel
+            </Button>,
+            <Button type="primary" htmlType="submit" onClick={handleOkModal} form="my-form">
+              Submit
+            </Button>,
+          ]}
+        >
+          <Form
+            id="my-form"
+            onFinish={async (values) => {
+              console.log(values);
+              message.success('Button added');
+            }}
+            initialValues={{
+              // text: selectRow?.text,
+              // content: selectRow?.type,
+              urlResponse: selectRow?.type === 'url' ? selectRow?.content : null,
+            }}
+            labelCol={{ span: 7 }}
+            wrapperCol={{ span: 16 }}
+          >
+            <Form.Item
+              label="Display Text"
+              name="text"
+              rules={[{ required: true, message: 'Please input display text' }]}
+              initialValue={selectRow?.text}
+            >
+              <Input />
+            </Form.Item>
+            {/*<ProFormText name="text" label="Display Text" initialValue={selectRow?.text} />*/}
+            {/*{selectRow?.text}*/}
+            <Form.Item label="Type" name="type" initialValue={selectRow ? selectRow.type : 'flow'}>
+              <Radio.Group
+                onChange={(event) => {
+                  console.log(event.target.value);
+                  setResponseType(event.target.value);
+                }}
+              >
+                <Radio.Button value="flow">Flow</Radio.Button>
+                <Radio.Button value="url">URL</Radio.Button>
+              </Radio.Group>
+            </Form.Item>
+            {responseArea}
+          </Form>
+        </Modal>
       </Form.Item>
     </>
   );
