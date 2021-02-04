@@ -117,7 +117,6 @@ const BroadcastTemplateList: FC = () => {
                   {item.flow.map((item, index) => renderComponent(item, index)
                   )}
                 </Space>
-                
               }
             />
           </Card>
