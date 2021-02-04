@@ -821,7 +821,6 @@ export const FlowComponent: React.FC<FlowComponentDataProps> = ({ componentData 
       </Divider>
       <ProFormSelect
         width="xl"
-        prop
         name={componentData.name}
         showSearch
         initialValue={componentData?.data.flowId}
@@ -833,6 +832,7 @@ export const FlowComponent: React.FC<FlowComponentDataProps> = ({ componentData 
         request={async () => {
           return await queryFlowsFilter('name,params');
         }}
+        fieldProps={{ onSelect: (e) => console.log(e) }}
         rules={[
           {
             required: true,
