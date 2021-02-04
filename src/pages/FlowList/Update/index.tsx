@@ -158,9 +158,9 @@ const NewFlow: React.FC = () => {
             <FooterToolbar>
               {getErrorInfo(error)}
               {/*<Button type="primary" onClick={() => form?.submit()} loading={submitting}>*/}
-              <Button key="3">重置</Button>
+              <Button key="3">Cancel</Button>
               <Button type="primary" onClick={() => form?.submit()} loading={false}>
-                提交
+                Submit
               </Button>
             </FooterToolbar>
           </Form>
