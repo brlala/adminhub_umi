@@ -54,7 +54,8 @@ export type FlowList = {
     | 'fileAttachments'
     | 'genericTemplates'
     | 'buttonTemplates'
-    | 'flow';
+    | 'flow'
+    | 'quickReply';
 };
 
 export type DraggableListItems = {

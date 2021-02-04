@@ -64,3 +64,8 @@ You can view full document on our [official website](https://pro.ant.design). An
 3. after editing, need to click on question twice for the detail to refresh
 4. last triggered data is not currently present(using last updated instead)
 5. keywords api not yet present
+
+### Flows Page
+1. response area for quick button can be refactored
+2. implement deletion of quick reply/buttons
+3. draggable or movable buttons/templates
