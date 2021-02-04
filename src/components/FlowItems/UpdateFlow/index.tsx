@@ -5,7 +5,7 @@ import { queryFlowsFilter } from '@/pages/QuestionList/service';
 import { FormattedMessage } from '@@/plugin-locale/localeExports';
 import { Upload, Modal } from 'antd';
 const { TextArea } = Input;
-import { DeleteOutlined, InboxOutlined, PlusOutlined, UploadOutlined } from '@ant-design/icons';
+import { DeleteOutlined, InboxOutlined, LoadingOutlined, PaperClipOutlined, PlusOutlined, UploadOutlined } from '@ant-design/icons';
 import axios from 'axios';
 import { ImageDisplayComponent } from '../ReadFlow';
 import { FlowEditableComponent, StringObject } from 'models/flows';
@@ -52,28 +52,33 @@ export const TextComponent: FC<TextComponentDataProps> = (props) => {
   );
 };
 
-export type ImageComponentDataProps = {
+export type AttachmentComponentDataProps = {
   componentKey: number;
-  componentData?:{ url: string };
+  componentData:{ url: string, fileName?: string };
   onChange: (prevState: any) => void;
 };
 
-export const ImageComponent: FC<ImageComponentDataProps> = (props) => {
+export const ImageComponent: FC<AttachmentComponentDataProps> = (props) => {
   const { componentKey, componentData, onChange } = props
-  const [previewImage, setPreviewImage] = useState(componentData?.url);
+  const [previewImage, setPreviewImage] = useState(componentData.url);
+  const [uploading, setUploading] = useState(componentData.url?true:false);
   const draggerProps = {
     key: 'image' + componentKey.toString(),
     accept: "image/*",
     multiple: false,
-    style: {height: "85px"},
+    showUploadList: false,
     action: 'http://localhost:5000/upload',
     onChange(info: { file: { response?: any; name?: any; status?: any; }; fileList: any; }) {
       const { status } = info.file;
-      if (status === 'done') {
+      if (status === 'uploading') {
+        setUploading(true)
+      }
+      else if (status === 'done') {
+        setUploading(false)
         setPreviewImage(info.file.response.url)
         onChange((prevState: any) => [...prevState].map((item, index) => {
           if (index === componentKey) {
-            return { ...item, data: {url: info.file.response.url}}
+            return { ...item, data: {url: info.file.response.url, fileName: info.file.name}}
           }
           else return item;
         }))
@@ -101,14 +106,131 @@ export const ImageComponent: FC<ImageComponentDataProps> = (props) => {
                 <Button shape="round" onClick={() => setPreviewImage('')}><DeleteOutlined/></Button>
               </Space>
               : 
-
               <Dragger {...draggerProps}>
                 <p className="ant-upload-drag-icon">
-                  <InboxOutlined />
+                  {uploading ? <LoadingOutlined /> : <UploadOutlined />}
                 </p>
-                <p className="ant-upload-hint">Click or drag file to this area to upload</p>
+                <p className="ant-upload-hint">{uploading ? "Uploading" : "Click or drag image to this area to upload"}</p>
               </Dragger>
               }
+          </Form.Item>
+      </>
+  );
+};
+
+export const VideoComponent: FC<AttachmentComponentDataProps> = (props) => {
+  const { componentKey, componentData, onChange } = props
+  const [previewImage, setPreviewImage] = useState(componentData.url);
+  const [uploading, setUploading] = useState(componentData.url?true:false);
+  const draggerProps = {
+    key: 'image' + componentKey.toString(),
+    accept: "video/*",
+    multiple: false,
+    showUploadList: false,
+    action: 'http://localhost:5000/upload',
+    onChange(info: { file: { response?: any; name?: any; status?: any; }; fileList: any; }) {
+      const { status } = info.file;
+      if (status === 'uploading') {
+        setUploading(true)
+      }
+      else if (status === 'done') {
+        setUploading(false)
+        setPreviewImage(info.file.response.url)
+        onChange((prevState: any) => [...prevState].map((item, index) => {
+          if (index === componentKey) {
+            return { ...item, data: {url: info.file.response.url, fileName: info.file.name}}
+          }
+          else return item;
+        }))
+        message.success(`${info.file.name} file uploaded successfully.`);
+      } else if (status === 'error') {
+        message.error(`${info.file.name} file upload failed.`);
+      }
+    },
+  };
+
+  return (
+        <>
+          <Divider style={{ marginTop: -6 }} orientation="left">
+            Video
+          </Divider>
+          <Form.Item
+            key={'component' + componentKey.toString() + 'image'}
+            name={'component' + componentKey.toString() + 'image'}
+            initialValue={previewImage}
+            rules={[{ required: true, message: 'Image is required' }]}
+          >
+            {previewImage? 
+              <Space>
+                <video key={componentKey} controls style={{ width: '100%' }} src={previewImage} />
+                <Button shape="round" onClick={() => setPreviewImage('')}><DeleteOutlined/></Button>
+              </Space>
+              : 
+              <Dragger {...draggerProps}>
+                <p className="ant-upload-drag-icon">
+                  {uploading ? <LoadingOutlined /> : <UploadOutlined />}
+                </p>
+                <p className="ant-upload-hint">{uploading ? "Uploading" : "Click or drag image to this area to upload"}</p>
+              </Dragger>
+              }
+          </Form.Item>
+      </>
+  );
+};
+
+export const FileComponent: FC<AttachmentComponentDataProps> = (props) => {
+  const { componentKey, componentData, onChange } = props
+  const [fileName, setFileName] = useState(componentData.fileName);
+  const [uploading, setUploading] = useState(componentData.url?true:false);
+  const draggerProps = {
+    key: 'image' + componentKey.toString(),
+    multiple: false,
+    action: 'http://localhost:5000/upload',
+    onChange(info: { file: { response?: any; name?: any; status?: any; }; fileList: any; }) {
+      const { status } = info.file;
+      if (status === 'uploading') {
+        setUploading(true)
+      }
+      else if (status === 'done') {
+        setUploading(false)
+        setFileName(info.file.name)
+        onChange((prevState: any) => [...prevState].map((item, index) => {
+          if (index === componentKey) {
+            return { ...item, data: {url: info.file.response.url, fileName: info.file.name}}
+          }
+          else return item;
+        }))
+        message.success(`${info.file.name} file uploaded successfully.`);
+      } else if (status === 'error') {
+        message.error(`${info.file.name} file upload failed.`);
+      }
+    },
+  };
+
+  return (
+        <>
+          <Divider style={{ marginTop: -6 }} orientation="left">
+            File
+          </Divider>
+          <Form.Item
+            key={'component' + componentKey.toString() + 'image'}
+            name={'component' + componentKey.toString() + 'image'}
+            initialValue={fileName}
+            rules={[{ required: true, message: 'Image is required' }]}
+          >
+            {fileName? 
+              <Space>
+                <PaperClipOutlined /> {fileName}
+                <Button shape="round" onClick={() => setFileName('')}><DeleteOutlined/></Button>
+              </Space>
+              : 
+              <Dragger {...draggerProps}>
+                <p className="ant-upload-drag-icon">
+                  {uploading ? <LoadingOutlined /> : <UploadOutlined />}
+                </p>
+                <p className="ant-upload-hint">{uploading ? "Uploading" : "Click or drag file to this area to upload"}</p>
+              </Dragger>
+            }
           </Form.Item>
       </>
   );
@@ -213,7 +335,7 @@ const { TabPane } = Tabs;
 export const TemplateComponent: FC<TemplateComponentDataProps> = (props) => {
   const { componentKey, componentData, onChange, parentKey } = props
   const [previewImage, setPreviewImage] = useState(componentData.imageUrl);
-  const [hideUpload, setHideUpload] = useState(componentData.imageUrl?true:false);
+  const [uploading, setUploading] = useState(componentData.imageUrl?true:false);
   const [previewVisible, setPreviewVisible] = useState(false);
   const [previewTitle, setPreviewTitle] = useState(false);
   const [selectRow, setSelectRow] = useState(null);
@@ -264,13 +386,15 @@ export const TemplateComponent: FC<TemplateComponentDataProps> = (props) => {
     key: "Component" + parentKey.toString() + "Image"+ componentKey?.toString(),
     multiple: false,
     accept: "image/*",
+    showUploadList: false,
     action: 'http://localhost:5000/upload',
     onChange(info: { file: { response?: any; name?: any; status?: any; }; fileList: any; }) {
       const { status } = info.file;
       if (status === 'uploading') {
-        setHideUpload(true)
+        setUploading(true)
       }
-      if (status === 'done') {
+      else if (status === 'done') {
+        setUploading(false)
         setPreviewImage(info.file.response.url)
         onChange((prevState: any) => [...prevState].map((item, index) => {
           if (index === parentKey) {
@@ -299,18 +423,18 @@ export const TemplateComponent: FC<TemplateComponentDataProps> = (props) => {
           title={
             <>
               <div className="GenericTemplate">
-              {hideUpload? 
+              {previewImage? 
                 <Space>
                   <ImageDisplayComponent componentKey={componentKey} componentData={{url: previewImage}}/>
-                  <Button shape="round" onClick={() => {setPreviewImage(''); setHideUpload(false)}}><DeleteOutlined/></Button>
+                  <Button shape="round" onClick={() => setPreviewImage('')}><DeleteOutlined/></Button>
                 </Space>
                 : 
                 <ImgCrop rotate aspect={1.91}>
                   <Dragger  {...draggerProps}>
                     <p className="ant-upload-drag-icon">
-                      <InboxOutlined />
+                      {uploading ? <LoadingOutlined /> : <UploadOutlined />}
                     </p>
-                    <p className="ant-upload-hint">Click or drag file to this area to upload</p>
+                    <p className="ant-upload-hint">{uploading ? "Uploading" : "Click or drag file to this area to upload"}</p>
                   </Dragger>
                 </ImgCrop>
                 }
@@ -646,20 +770,12 @@ export type FlowComponentDataProps = {
 export const FlowComponent: FC<FlowComponentDataProps> = (props) => {
   const { componentKey, componentData, onChange } = props
 
-  // const { data, loading, run, cancel } = useRequest(() => {
-  //     return queryFlowsFilter('name,params');
-  //   }, {
-  //   manual: true
-  // });
-  
-  // const { Option } = Select;  
-
   return (
     <>
       <Divider style={{ marginTop: -6 }} orientation="left">
         Flow
       </Divider>
-      {/* <Select
+      <Select
         allowClear
         style={{ width: '100%' }}
         placeholder="Please select"
@@ -672,9 +788,7 @@ export const FlowComponent: FC<FlowComponentDataProps> = (props) => {
         {data && data.map(i => {
           return <Option key={i}>{i}</Option>
         })}
-      </Select> */}
-
-
+      </Select>
       <ProFormSelect
         width="xl"
         name="flowResponse"
@@ -698,6 +812,125 @@ export const FlowComponent: FC<FlowComponentDataProps> = (props) => {
   );
 };
 
+export type QrButtons = {
+  text: StringObject;
+  flowId?: string;
+};
+
+export type QuickReplyComponentDataProps = {
+  componentKey: number;
+  componentData: { quickReplies: QrButtons[] };
+  onChange: (prevState: any) => void;
+};
+
+export const QuickReplyComponent: React.FC<QuickReplyComponentDataProps> = (props) => {
+  const { componentKey, componentData, onChange } = props
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [selectRow, setSelectRow] = useState<QrButtons>();
+  const [flows, setFlows] = useState<DropdownProps[]>([]);
+  const addNewQuickReplyButton = (
+    <Button
+      type="dashed"
+      shape="round"
+      icon={<PlusOutlined />}
+      onClick={() => {
+        showModal();
+        setSelectRow(null);
+      }}
+    >
+      Quick Reply
+    </Button>
+  );
+  const showModal = () => {
+    setIsModalVisible(true);
+  };
+
+  const handleOkModal = () => {
+    setIsModalVisible(false);
+  };
+
+  const handleCancelModal = () => {
+    setIsModalVisible(false);
+  };
+
+  return (
+    <>
+      <Form.Item style={{ marginTop: -6 }} >
+        <Space>
+          {componentData.quickReplies.map((button) => (
+            <Button
+              block
+              shape="round"
+              onClick={() => {
+                console.log({ row: button });
+                setSelectRow(button);
+                showModal();
+              }}
+            >
+              {button.text.EN}
+            </Button>
+          ))}
+          {componentData.quickReplies.length < 3 && addNewQuickReplyButton}
+        </Space>
+        <Modal
+          title="New Button"
+          visible={isModalVisible}
+          onOk={handleOkModal}
+          onCancel={handleCancelModal}
+          destroyOnClose={true}
+          width={450}
+          footer={[
+            <Button key="back" onClick={handleCancelModal}>
+              Cancel
+            </Button>,
+            <Button type="primary" htmlType="submit" onClick={handleOkModal} form="my-form">
+              Submit
+            </Button>,
+          ]}
+        >
+          <Form
+            id="my-form"
+            onFinish={async (values) => {
+              console.log(values);
+              onChange((prevState: any) => [...prevState].map((item, index) => {
+                if (index === componentKey) {
+                  return { ...item, data: { ...item.data, quickReplies: [...item.data.quickReplies, {...values, text: {EN: values.text}}]}}
+                }
+                else return item;
+              }))
+              message.success('Button added');
+            }}
+            initialValues={{}}
+            labelCol={{ span: 7 }}
+            wrapperCol={{ span: 16 }}>
+            <Form.Item
+              label="Display Text"
+              name="text"
+              rules={[{ required: true, message: 'Please input display text' }]}
+              initialValue={selectRow?.text.EN}>
+              <Input />
+            </Form.Item>
+            <ProFormSelect
+              name="flowId"
+              label="Flow Response"
+              initialValue={selectRow?.flowId}
+              showSearch
+              // @ts-ignore
+              request={async () => {
+                const flowsRequest = await queryFlowsFilter('name,params');
+                setFlows(flowsRequest);
+              }}
+              options={flows}
+            />
+          </Form>
+        </Modal>
+      </Form.Item>
+    </>
+  );
+};
+
+
+//  ARCHIVES
 export type Attachments = {
   name: string;
   url?: string;
@@ -713,7 +946,6 @@ export type AttachmentsComponentDataProps = {
   componentData: AttachmentsComponentData;
   index: Number;
 };
-
 function getBase64(file) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -722,7 +954,6 @@ function getBase64(file) {
     reader.onerror = (error) => reject(error);
   });
 }
-
 export const ImageAttachmentComponent: React.FC<AttachmentsComponentDataProps> = ({
   componentData,
 }) => {
@@ -896,177 +1127,6 @@ export const FileAttachmentComponent: React.FC<AttachmentsComponentDataProps> = 
         <Upload onChange={handleChange} action={'http://localhost:5000/upload'} fileList={fileList}>
           <Button icon={<UploadOutlined />}>Upload</Button>
         </Upload>
-      </Form.Item>
-    </>
-  );
-};
-
-export type QuickReplyComponentData = {
-  type: string;
-  name: string;
-  data: { buttons: Buttons[] };
-};
-
-export type QuickReplyComponentDataProps = {
-  componentData: QuickReplyComponentData;
-  index: Number;
-};
-
-export const QuickReplyComponent: React.FC<QuickReplyComponentDataProps> = ({ componentData }) => {
-  const [isModalVisible, setIsModalVisible] = useState(false);
-  const [selectRow, setSelectRow] = useState(null);
-  const [responseType, setResponseType] = useState('flow');
-  const [flows, setFlows] = useState<DropdownProps[]>([]);
-  const addNewQuickReplyButton = (
-    <Button
-      type="dashed"
-      shape="round"
-      icon={<PlusOutlined />}
-      onClick={() => {
-        showModal();
-        setSelectRow(null);
-      }}
-    >
-      Quick Reply
-    </Button>
-  );
-  const showModal = () => {
-    setIsModalVisible(true);
-  };
-
-  const handleOkModal = () => {
-    setIsModalVisible(false);
-  };
-
-  const handleCancelModal = () => {
-    setIsModalVisible(false);
-  };
-
-  let responseArea;
-  if (responseType === 'url') {
-    responseArea = (
-      <ProFormTextArea
-        label="URL"
-        name="urlResponse"
-        placeholder="Link to URL"
-        // rules={[
-        //   {
-        //     required: true,
-        //     message: (
-        //       <FormattedMessage
-        //         id="pages.searchTable.response"
-        //         defaultMessage="Response is required"
-        //       />
-        //     ),
-        //   },
-        // ]}
-      />
-    );
-  } else {
-    responseArea = (
-      <ProFormSelect
-        name="flowResponse"
-        label="Flow Response"
-        initialValue={selectRow?.type === 'flow' ? selectRow?.content : null}
-        showSearch
-        // @ts-ignore
-        request={async () => {
-          const flowsRequest = await queryFlowsFilter('name,params');
-          setFlows(flowsRequest);
-        }}
-        options={flows}
-        // rules={[
-        //   {
-        //     required: true,
-        //     message: (
-        //       <FormattedMessage
-        //         id="pages.searchTable.response"
-        //         defaultMessage="Response is required"
-        //       />
-        //     ),
-        //   },
-        // ]}
-      />
-    );
-  }
-
-  return (
-    <>
-      <Divider style={{ marginTop: -6 }} orientation="left">
-        Quick Replies
-      </Divider>
-      <Form.Item>
-        <Space>
-          {componentData.data.buttons.map((button) => (
-            <Button
-              block
-              shape="round"
-              onClick={() => {
-                console.log({ row: button });
-                setSelectRow(button);
-                setResponseType(button.type);
-                showModal();
-              }}
-            >
-              {button.text}
-            </Button>
-          ))}
-          {componentData.data.buttons.length < 3 && addNewQuickReplyButton}
-        </Space>
-        <Modal
-          title="New Button"
-          visible={isModalVisible}
-          onOk={handleOkModal}
-          onCancel={handleCancelModal}
-          destroyOnClose={true}
-          width={450}
-          footer={[
-            <Button key="back" onClick={handleCancelModal}>
-              Cancel
-            </Button>,
-            <Button type="primary" htmlType="submit" onClick={handleOkModal} form="my-form">
-              Submit
-            </Button>,
-          ]}
-        >
-          <Form
-            id="my-form"
-            onFinish={async (values) => {
-              console.log(values);
-              message.success('Button added');
-            }}
-            initialValues={{
-              // text: selectRow?.text,
-              // content: selectRow?.type,
-              urlResponse: selectRow?.type === 'url' ? selectRow?.content : null,
-            }}
-            labelCol={{ span: 7 }}
-            wrapperCol={{ span: 16 }}
-          >
-            <Form.Item
-              label="Display Text"
-              name="text"
-              rules={[{ required: true, message: 'Please input display text' }]}
-              initialValue={selectRow?.text}
-            >
-              <Input />
-            </Form.Item>
-            {/*<ProFormText name="text" label="Display Text" initialValue={selectRow?.text} />*/}
-            {/*{selectRow?.text}*/}
-            <Form.Item label="Type" name="type" initialValue={selectRow ? selectRow.type : 'flow'}>
-              <Radio.Group
-                onChange={(event) => {
-                  console.log(event.target.value);
-                  setResponseType(event.target.value);
-                }}
-              >
-                <Radio.Button value="flow">Flow</Radio.Button>
-                <Radio.Button value="url">URL</Radio.Button>
-              </Radio.Group>
-            </Form.Item>
-            {responseArea}
-          </Form>
-        </Modal>
       </Form.Item>
     </>
   );

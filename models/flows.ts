@@ -24,7 +24,15 @@ export type FlowNew = {
 
 export type FlowItem = {
   data: FlowItemData;
-  type: string;
+  type: 
+    | 'text'
+    | 'image'
+    | 'video'
+    | 'file'
+    | 'genericTemplate'
+    | 'buttonTemplate'
+    | 'flow'
+    | 'quickReplies';
 };
 
 export type FlowItemData = {
@@ -36,7 +44,7 @@ export type FlowItemData = {
   subtitle?: StringObject;
   elements?: FlowItemData[];
   flow?: FlowData;
-  quick_replies?: QrButtonData[];
+  quickReplies?: QrButtonData[];
 };
 
 export type FlowEditableComponent = {
@@ -46,11 +54,12 @@ export type FlowEditableComponent = {
   type: 
     | 'text'
     | 'image'
-    | 'videos'
-    | 'files'
+    | 'video'
+    | 'file'
     | 'genericTemplate'
     | 'buttonTemplate'
-    | 'flow';
+    | 'flow'
+    | 'quickReplies';
   data: {
     buttons?: ButtonData[];
     text?: StringObject;

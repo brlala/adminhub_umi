@@ -3,26 +3,24 @@ import ProCard from '@ant-design/pro-card';
 // @ts-ignore
 import { FormattedMessage, useIntl, useRequest } from 'umi';
 import { changeLanguage } from '@/utils/language';
-import { Button, Divider, Form, Input, Menu, Popover, Row, Space } from 'antd';
+import { Button, Divider, Form, Input, Popover } from 'antd';
 import styles from './index.less';
 import NewComponentsList from '../components/NewComponentsList';
 import FlowComponentsList from '@/pages/FlowList/components/FlowComponentsList';
 import {
   GenericTemplateComponent,
-  ImageAttachmentComponent,
   TextComponent,
   FlowComponent,
   ButtonTemplateComponent,
-  VideoAttachmentComponent,
   ImageComponent,
-  FileAttachmentComponent,
   QuickReplyComponent,
+  VideoComponent,
+  FileComponent,
 } from '@/components/FlowItems/UpdateFlow';
-import { FlowList } from '@/pages/FlowList/data';
 import { FooterToolbar } from '@ant-design/pro-layout';
 import { CloseCircleOutlined, DeleteOutlined } from '@ant-design/icons';
 import { addFlow } from '../service';
-import { FlowEditableComponent } from 'models/flows';
+import { FlowEditableComponent, FlowItemData } from 'models/flows';
 
 
 changeLanguage('en-US');
@@ -35,7 +33,6 @@ interface ErrorField {
 }
 
 const NewFlow: FC = (props) => {
-  const { flow } = props
   const [componentList, setComponentList] = useState<FlowEditableComponent[]>([]);
   const [error, setError] = useState<ErrorField[]>([]);
 
@@ -52,17 +49,29 @@ const NewFlow: FC = (props) => {
   );
 
   const onFinish = (values: any) => {
-    const toSubmit = componentList.map((item)=> {return {type: item.type, data: item.data}})
+    let toSubmit: FlowItemData[] = [];
+    // let lastElement = array.pop();
+    componentList.map((item)=> {
+      if (item.type === 'quickReplies') {
+        let prevItem = toSubmit.pop()
+        toSubmit.push({...prevItem, data: {...prevItem.data, ...item.data}})
+      } else {
+        toSubmit.push({type: item.type, data: item.data})
+      }
+    })
+    // const toSubmit = componentList.map((item)=> {
+    //   return {type: item.type, data: item.data}
+    // })
     console.log('values: ', values);
     console.log('componentList: ', toSubmit);
-    postRun({...values, flow: toSubmit})
+    postRun({name: values.name, flow: toSubmit})
 
   };
 
   const renderComponent = (component: { data: any, type: string }, index: number) => {
     const { data, type } = component;
     let renderedComponent;
-
+    console.log(type)
     switch (type) {
       case 'message':
         renderedComponent = <TextComponent componentKey={index} componentData={data} onChange={setComponentList} />
@@ -76,17 +85,17 @@ const NewFlow: FC = (props) => {
       case 'buttonTemplate':
         renderedComponent = <ButtonTemplateComponent componentKey={index} componentData={data} onChange={setComponentList} />
         break;
-      case 'videos':
-        renderedComponent = <VideoAttachmentComponent index={index} componentData={data} />
+      case 'video':
+        renderedComponent = <VideoComponent componentKey={index} componentData={data}  onChange={setComponentList} />
         break;
-      case 'files':
-        renderedComponent = <FileAttachmentComponent index={index} componentData={data} />;
+      case 'file':
+        renderedComponent = <FileComponent componentKey={index} componentData={data}  onChange={setComponentList} />
         break;
       case 'flow':
         renderedComponent = <FlowComponent index={index} componentData={data} />;
         break;
-      case 'quickReply':
-        renderedComponent = <QuickReplyComponent index={index} componentData={componentData} />;
+      case 'quickReplies':
+        renderedComponent = <QuickReplyComponent componentKey={index} componentData={data}  onChange={setComponentList} />;
         break;
       default:
         renderedComponent = <div>Cannot render {type}</div>;

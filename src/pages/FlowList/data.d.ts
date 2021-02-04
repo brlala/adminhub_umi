@@ -50,12 +50,12 @@ export type FlowList = {
   type:
     | 'message'
     | 'image'
-    | 'videos'
-    | 'files'
+    | 'video'
+    | 'file'
     | 'genericTemplate'
     | 'buttonTemplate'
     | 'flow'
-    | 'quickReply';
+    | 'quickReplies';
 };
 
 export type DraggableListItems = {
