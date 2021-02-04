@@ -31,6 +31,8 @@ export interface NewBroadcastEntry {
   name: string;
   flow: NewFlow[];
   tags: string[];
+  exclude: string[];
+  sendToAll: boolean;
   platforms?: string[];
 }
 

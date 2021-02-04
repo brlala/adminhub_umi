@@ -21,7 +21,7 @@ const tailLayout = {
 const { Option } = Select;
 
 const NewBroadcast: FC = () => {
-  let { templateId } = useParams()
+  let { templateId } = useParams<{templateId: string}>()
   type component = {
     type: string,
     data: {}
@@ -49,7 +49,6 @@ const NewBroadcast: FC = () => {
 
   const renderComponent = (component: string, index: number) => {
     let renderedComponent;
-    // const componentData = { type: component, data: {} }
 
     let componentData: any;
     switch (component) {
@@ -116,15 +115,16 @@ const NewBroadcast: FC = () => {
       default:
         renderedComponent = <div key={index} >Cannot render {component}</div>;
     }
-    return renderedComponent
+    return <div key={'component' + index}> {renderedComponent} </div>
   };
 
 
   const list = data?.flow || [];
 
   const onFinish = (values: any) => {
-    console.log('Success:', values, componentList);
-    postRun({...values, flow: componentList, platforms: ["line"]} as NewBroadcastEntry)
+    console.log('Values:', values);
+    console.log('componentList:', componentList);
+    postRun({ tags: values.tags, exclude: values.exclude, sendToAll: values.sendToAll, flow: componentList, platforms: ["line"] } as NewBroadcastEntry)
     setRedirect(true) 
   };
 
@@ -145,11 +145,9 @@ const NewBroadcast: FC = () => {
               onFinish={onFinish}>
               <Row>
                 <Col span={12} key={1}>
-                  <FormItem>
-                    <ProCard title="Component">
-                      {list.map((flowNode, index) => renderComponent(flowNode, index))}
-                    </ProCard>
-                  </FormItem>
+                  <ProCard title="Component">
+                    {list.map((flowNode, index) => renderComponent(flowNode, index))}
+                  </ProCard>
                 </Col>
                 <Col span={12} key={2}>
                 <FormItem >

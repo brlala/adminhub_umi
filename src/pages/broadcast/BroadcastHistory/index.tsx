@@ -99,12 +99,12 @@ const BroadcastHistory: FC = () => {
       render: (_, object) => (
         <>
           <Tooltip
-            title={object.processed + ' sent / ' + (object.total - object.processed) + ' to do'}
+            title={object.sent + ' Sent / ' + (object.processed - object.sent) + ' Failed / ' + (object.total - object.processed) + ' Pending'}
           >
-            <Progress
-              percent={(object.processed * 100) / object.total}
-              success={{ percent: (object.sent * 100) / object.total }}
-            />
+            {(object.total === object.processed || object.processed === 0) ? <> {object.sent} / {object.total} </> :
+            <Progress percent={(object.processed * 100) / object.total} status="active"
+              success={{percent: (object.sent * 100) / object.total}}
+            />}
           </Tooltip>
         </>
       ),

@@ -71,7 +71,7 @@ const NewFlow: FC = (props) => {
         renderedComponent = <ImageComponent componentKey={index} componentData={data}  onChange={setComponentList} />
         break;
       case 'genericTemplate':
-        renderedComponent = <GenericTemplateComponent componentKey={index} componentData={data} onChange={setComponentList} />
+        renderedComponent = <GenericTemplateComponent componentKey={index} componentData={data} onChange={setComponentList} current={componentList}/>
         break;
       case 'buttonTemplate':
         renderedComponent = <ButtonTemplateComponent componentKey={index} componentData={data} onChange={setComponentList} />

@@ -1,29 +1,24 @@
 import React, { useEffect, useState, FC } from 'react';
 import { ProFormSelect, ProFormTextArea } from '@ant-design/pro-form';
-import { Button, Divider, Form, Input, message, Progress, Radio, Card, Space, Select } from 'antd';
+import { Button, Divider, Form, Input, message, Progress, Radio, Card, Space } from 'antd';
 import { queryFlowsFilter } from '@/pages/QuestionList/service';
 import { FormattedMessage } from '@@/plugin-locale/localeExports';
 import { Upload, Modal } from 'antd';
 const { TextArea } = Input;
-import { DeleteOutlined, InboxOutlined, PlusOutlined, SearchOutlined, UploadOutlined } from '@ant-design/icons';
+import { DeleteOutlined, InboxOutlined, PlusOutlined, UploadOutlined } from '@ant-design/icons';
 import axios from 'axios';
 import { ImageDisplayComponent } from '../ReadFlow';
-import { StringObject } from 'models/flows';
+import { FlowEditableComponent, StringObject } from 'models/flows';
 import ImgCrop from 'antd-img-crop';
 import { Tabs } from 'antd';
 import './index.less';
 import { DropdownProps } from '@/pages/QuestionList/data';
-import Dragger from 'antd/lib/upload/Dragger';
-import { useRequest } from 'umi';
+import Dragger from 'antd/lib/upload/Dragger'
 
 export type TextComponentDataProps = {
   componentKey: number;
   componentData?: { text: StringObject };
   onChange: (prevState: any) => void;
-};
-export type QuickReplyComponentDataProps = {
-  componentData: QuickReplyComponentData;
-  index: Number;
 };
 
 export const TextComponent: FC<TextComponentDataProps> = (props) => {
@@ -34,13 +29,15 @@ export const TextComponent: FC<TextComponentDataProps> = (props) => {
         Text
       </Divider>
       <Form.Item
-        key={componentKey.toString()}
+        key={'component' + componentKey.toString() + 'text'}
+        name={'component' + componentKey.toString() + 'text'}
+        initialValue={componentData?.text?.EN}
         rules={[{ required: true, message: 'Field is required' }]}
       >
         <TextArea
+          // required
           rows={4}
           placeholder="Please input"
-          defaultValue={componentData?.text?.EN}
           onChange={(e) => {
             onChange((prevState: any) =>
               [...prevState].map((item, index) => {
@@ -93,19 +90,27 @@ export const ImageComponent: FC<ImageComponentDataProps> = (props) => {
           <Divider style={{ marginTop: -6 }} orientation="left">
             Image
           </Divider>
-          {previewImage? 
-            <Space>
-              <ImageDisplayComponent componentKey={componentKey} componentData={{url: previewImage}}/>
-              <Button shape="round" onClick={() => setPreviewImage('')}><DeleteOutlined/></Button>
-            </Space>
-            : 
-            <Dragger {...draggerProps}>
-              <p className="ant-upload-drag-icon">
-                <InboxOutlined />
-              </p>
-              <p className="ant-upload-hint">Click or drag file to this area to upload</p>
-            </Dragger>
-            }
+          <Form.Item
+            key={'component' + componentKey.toString() + 'image'}
+            name={'component' + componentKey.toString() + 'image'}
+            initialValue={previewImage}
+            rules={[{ required: true, message: 'Image is required' }]}
+          >
+            {previewImage? 
+              <Space>
+                <ImageDisplayComponent componentKey={componentKey} componentData={{url: previewImage}}/>
+                <Button shape="round" onClick={() => setPreviewImage('')}><DeleteOutlined/></Button>
+              </Space>
+              : 
+
+              <Dragger {...draggerProps}>
+                <p className="ant-upload-drag-icon">
+                  <InboxOutlined />
+                </p>
+                <p className="ant-upload-hint">Click or drag file to this area to upload</p>
+              </Dragger>
+              }
+          </Form.Item>
       </>
   );
 };
@@ -129,14 +134,15 @@ export type GenericTemplateComponentDataProps = {
   componentKey: number;
   componentData: { elements: Templates[] };
   onChange: (prevState: any) => void;
+  current: FlowEditableComponent[];
 };
 
 export const GenericTemplateComponent: FC<GenericTemplateComponentDataProps> = (props) => {
-  const { componentKey, componentData, onChange } = props
+  const { componentKey, componentData, onChange, current } = props
   const [activeKey, setActiveKey] = useState<number>(0);
+  const [panes, setPanes] = useState(componentData.elements)
   
-  // if (panes.length === 1) { setPanes((prevArray: Templates[]) => prevArray.map((pane) => {return { ...pane, closable: false}})) };
-
+  console.log(panes, current)
   const onEdit = (targetKey: string, action: string) => {
     if (action === 'add') {
       add();
@@ -150,6 +156,7 @@ export const GenericTemplateComponent: FC<GenericTemplateComponentDataProps> = (
     onChange((prevState: any) => [...prevState].map((item, index) => {
       if (index === componentKey) {
         activeIndex = item.data.elements.length
+        setPanes([...item.data.elements, { title: null, buttons: [], subtitle: null, imageUrl: "" }])
         return { ...item, data: {elements: 
           [...item.data.elements, { title: null, buttons: [], subtitle: null, imageUrl: "" }]
         }}
@@ -161,9 +168,11 @@ export const GenericTemplateComponent: FC<GenericTemplateComponentDataProps> = (
   const remove = (idx: number) => {
     onChange((prevState: any) => [...prevState].map((item, index) => {
       if (index === componentKey) {
-        const panes = item.data.elements
-        panes.splice(idx, 1)
-        return { ...item, data: {elements: panes }}
+        const newPanes = item.data.elements
+        newPanes.splice(idx, 1)
+        console.log('current panes:', newPanes)
+        setPanes(newPanes)
+        return { ...item, data: { elements: newPanes }}
       } 
       else return item}))
     setActiveKey(Math.max(idx - 1, 0))
@@ -179,11 +188,10 @@ export const GenericTemplateComponent: FC<GenericTemplateComponentDataProps> = (
         onChange={(activeKey: string) => {setActiveKey(parseInt(activeKey))}}
         activeKey={activeKey?.toString()}
         onEdit={onEdit}
-        hideAdd={!(componentData.elements.length < 10)}
-      >
-        {componentData.elements.map((pane, index: number) => {
+        hideAdd={!(panes.length < 10)} >
+        {panes.map((pane, index: number) => {
           return (
-            <TabPane tab={index + 1} key={index.toString()} closable={componentData.elements.length !== 1}>
+            <TabPane tab={index + 1} key={index.toString()} closable={componentData.elements.length !== 1} forceRender>
               <TemplateComponent componentKey={index} componentData={pane} onChange={onChange} parentKey={componentKey} />
             </TabPane>
           );
@@ -887,6 +895,17 @@ export const FileAttachmentComponent: React.FC<AttachmentsComponentDataProps> = 
       </Form.Item>
     </>
   );
+};
+
+export type QuickReplyComponentData = {
+  type: string;
+  name: string;
+  data: { buttons: Buttons[] };
+};
+
+export type QuickReplyComponentDataProps = {
+  componentData: QuickReplyComponentData;
+  index: Number;
 };
 
 export const QuickReplyComponent: React.FC<QuickReplyComponentDataProps> = ({ componentData }) => {
