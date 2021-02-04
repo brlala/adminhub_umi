@@ -1011,7 +1011,7 @@ export const QuickReplyComponent: React.FC<QuickReplyComponentDataProps> = ({ co
             </Form.Item>
             {/*<ProFormText name="text" label="Display Text" initialValue={selectRow?.text} />*/}
             {/*{selectRow?.text}*/}
-            <Form.Item label="Type" name="type" initialValue={selectRow ? selectRow.type : 'flow'}>
+            <Form.Item label="Type" name="type" initialValue={selectRow ? selectRow.type : 'url'}>
               <Radio.Group
                 onChange={(event) => {
                   console.log(event.target.value);
@@ -1019,7 +1019,9 @@ export const QuickReplyComponent: React.FC<QuickReplyComponentDataProps> = ({ co
                 }}
               >
                 <Radio.Button value="flow">Flow</Radio.Button>
-                <Radio.Button value="url">URL</Radio.Button>
+                <Radio.Button disabled value="url">
+                  URL
+                </Radio.Button>
               </Radio.Group>
             </Form.Item>
             {responseArea}
