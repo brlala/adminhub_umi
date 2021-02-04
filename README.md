@@ -69,3 +69,4 @@ You can view full document on our [official website](https://pro.ant.design). An
 1. response area for quick button can be refactored
 2. implement deletion of quick reply/buttons
 3. draggable or movable buttons/templates
+4. generic template on delete tab reload

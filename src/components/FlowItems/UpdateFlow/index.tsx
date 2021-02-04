@@ -35,7 +35,6 @@ export const TextComponent: FC<TextComponentDataProps> = (props) => {
         rules={[{ required: true, message: 'Field is required' }]}
       >
         <TextArea
-          // required
           rows={4}
           placeholder="Please input"
           onChange={(e) => {
@@ -124,6 +123,7 @@ export type Buttons = {
 
 export type Templates = {
   imageUrl?: {};
+  fileName?: string;
   title?: StringObject;
   subtitle?: StringObject;
   buttons?: Buttons[];
@@ -143,7 +143,7 @@ export const GenericTemplateComponent: FC<GenericTemplateComponentDataProps> = (
   const [panes, setPanes] = useState(componentData.elements)
   
   console.log(panes, current)
-  const onEdit = (targetKey: string, action: string) => {
+  const onEdit = (targetKey: any, action: string) => {
     if (action === 'add') {
       add();
     } else {
@@ -156,9 +156,9 @@ export const GenericTemplateComponent: FC<GenericTemplateComponentDataProps> = (
     onChange((prevState: any) => [...prevState].map((item, index) => {
       if (index === componentKey) {
         activeIndex = item.data.elements.length
-        setPanes([...item.data.elements, { title: null, buttons: [], subtitle: null, imageUrl: "" }])
+        setPanes([...item.data.elements, { title: null, buttons: [], subtitle: null, imageUrl: "", fileName: "" }])
         return { ...item, data: {elements: 
-          [...item.data.elements, { title: null, buttons: [], subtitle: null, imageUrl: "" }]
+          [...item.data.elements, { title: null, buttons: [], subtitle: null, imageUrl: "", fileName: "" }]
         }}
       } 
       else return item}))
@@ -212,7 +212,8 @@ const { TabPane } = Tabs;
 
 export const TemplateComponent: FC<TemplateComponentDataProps> = (props) => {
   const { componentKey, componentData, onChange, parentKey } = props
-  const [previewImage, setPreviewImage] = useState(componentData?.imageUrl);
+  const [previewImage, setPreviewImage] = useState(componentData.imageUrl);
+  const [hideUpload, setHideUpload] = useState(componentData.imageUrl?true:false);
   const [previewVisible, setPreviewVisible] = useState(false);
   const [previewTitle, setPreviewTitle] = useState(false);
   const [selectRow, setSelectRow] = useState(null);
@@ -266,6 +267,9 @@ export const TemplateComponent: FC<TemplateComponentDataProps> = (props) => {
     action: 'http://localhost:5000/upload',
     onChange(info: { file: { response?: any; name?: any; status?: any; }; fileList: any; }) {
       const { status } = info.file;
+      if (status === 'uploading') {
+        setHideUpload(true)
+      }
       if (status === 'done') {
         setPreviewImage(info.file.response.url)
         onChange((prevState: any) => [...prevState].map((item, index) => {
@@ -273,7 +277,7 @@ export const TemplateComponent: FC<TemplateComponentDataProps> = (props) => {
             return { ...item, data: {elements: 
               item.data.elements.map((pane: any, paneIndex: number) => {
                 if (paneIndex === componentKey) {
-                  return { ...pane, imageUrl: info.file.response.url}
+                  return { ...pane, imageUrl: info.file.response.url, fileName: info.file.name}
                 }
                 else return pane;})
             }}
@@ -295,10 +299,10 @@ export const TemplateComponent: FC<TemplateComponentDataProps> = (props) => {
           title={
             <>
               <div className="GenericTemplate">
-              {previewImage? 
+              {hideUpload? 
                 <Space>
                   <ImageDisplayComponent componentKey={componentKey} componentData={{url: previewImage}}/>
-                  <Button shape="round" onClick={() => setPreviewImage('')}><DeleteOutlined/></Button>
+                  <Button shape="round" onClick={() => {setPreviewImage(''); setHideUpload(false)}}><DeleteOutlined/></Button>
                 </Space>
                 : 
                 <ImgCrop rotate aspect={1.91}>
