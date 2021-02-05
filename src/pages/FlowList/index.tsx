@@ -12,6 +12,7 @@ import type { FlowListItem } from './data.d';
 import { queryFlows, removeQuestion, updateRule } from './service';
 import moment from 'moment';
 import { changeLanguage } from '@/utils/language';
+import { Link } from '@umijs/preset-dumi/lib/theme';
 
 /**
  * 更新节点
@@ -93,6 +94,7 @@ const FlowList: React.FC = () => {
         );
       },
     },
+
     {
       title: <FormattedMessage id="pages.flow.size.sizeLabel" defaultMessage="Size" />,
       dataIndex: 'size',
@@ -118,6 +120,17 @@ const FlowList: React.FC = () => {
           />
         );
       },
+    },
+    {
+      title: <FormattedMessage id="pages.flow.size.sizeLabel" defaultMessage="Preview" />,
+      dataIndex: 'preview',
+      valueType: 'digit',
+      hideInSearch: true,
+      hideInForm: true,
+      hideInTable: true,
+      render: (dom, entity) => (
+        <img src="https://pandai-admin-portal.s3-ap-southeast-1.amazonaws.com/portal/flows/Screenshot%202021-02-05%20at%201.39.37%20PM.png" />
+      ),
     },
     {
       title: (
@@ -193,15 +206,11 @@ const FlowList: React.FC = () => {
           // layout: 'vertical',
         }}
         toolBarRender={() => [
-          <Button
-            type="primary"
-            key="primary"
-            onClick={() => {
-              console.log('clicked new');
-            }}
-          >
-            <PlusOutlined /> <FormattedMessage id="pages.searchTable.new" defaultMessage="New" />
-          </Button>,
+          <Link to="/flows/new">
+            <Button type="primary" key="primary">
+              <PlusOutlined /> <FormattedMessage id="pages.searchTable.new" defaultMessage="New" />
+            </Button>
+          </Link>,
         ]}
         request={async (params, sorter, filter) => {
           const flows = await queryFlows({ sorter, filter, ...params });
@@ -258,7 +267,7 @@ const FlowList: React.FC = () => {
                   fontSize: 20,
                 }}
               >
-                Question Details
+                Flow Details
               </b>
             }
             request={async () => ({

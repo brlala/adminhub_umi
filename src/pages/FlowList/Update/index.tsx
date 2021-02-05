@@ -22,6 +22,8 @@ import { CloseCircleOutlined, DeleteOutlined } from '@ant-design/icons';
 import { addFlow } from '../service';
 import { FlowEditableComponent, FlowItemData } from 'models/flows';
 
+import { Link } from '@umijs/preset-dumi/lib/theme';
+import moment from 'moment';
 
 changeLanguage('en-US');
 
@@ -80,7 +82,7 @@ const NewFlow: FC = (props) => {
         renderedComponent = <ImageComponent componentKey={index} componentData={data}  onChange={setComponentList} />
         break;
       case 'genericTemplate':
-        renderedComponent = <GenericTemplateComponent componentKey={index} componentData={data} onChange={setComponentList} />
+        renderedComponent = <GenericTemplateComponent componentKey={index} componentData={data} onChange={setComponentList} current={componentList} />
         break;
       case 'buttonTemplate':
         renderedComponent = <ButtonTemplateComponent componentKey={index} componentData={data} onChange={setComponentList} />
@@ -148,17 +150,17 @@ const NewFlow: FC = (props) => {
     );
   };
 
-  let newComponentsImplementation = [];
   return (
     <div className={styles.componentsList}>
       <Form name="complex-form" onFinish={onFinish}>
         <ProCard
-          title={<Form.Item
-            name="name"
-          >
-            <Input placeholder="Flow Name" />
-          </Form.Item>}
-          extra={<Button size="small"><DeleteOutlined /></Button>}
+          title="New Flow"
+          // title={<Form.Item
+          //   name="name"
+          // >
+          //   <Input placeholder="Flow Name" />
+          // </Form.Item>}
+          // extra={<Button size="small"><DeleteOutlined /></Button>}
           split="vertical"
           bordered
           headerBordered
@@ -181,7 +183,9 @@ const NewFlow: FC = (props) => {
               <FooterToolbar>
                 {getErrorInfo(error)}
                 {/*<Button type="primary" onClick={() => form?.submit()} loading={submitting}>*/}
-                <Button key="3">重置</Button>
+                <Link to="/flows">
+                  <Button key="3">Cancel</Button>
+                </Link>
                 <Button type="primary" htmlType="submit" loading={false}>
                   提交
                 </Button>
@@ -190,7 +194,9 @@ const NewFlow: FC = (props) => {
               <div style={{ height: 360 }}>Add a flow to see the contents here</div>
             )}
           </ProCard>
-          <ProCard title="Placeholder" colSpan={{ xs: 4, sm: 4, md: 10, lg: 10, xl: 8 }}></ProCard>
+          <ProCard title="Placeholder" colSpan={{ xs: 4, sm: 4, md: 10, lg: 10, xl: 8 }}>
+            <img src="https://pandai-admin-portal.s3-ap-southeast-1.amazonaws.com/portal/flows/Screenshot%202021-02-05%20at%201.39.37%20PM.png" />
+          </ProCard>
         </ProCard>
       </Form>
     </div>

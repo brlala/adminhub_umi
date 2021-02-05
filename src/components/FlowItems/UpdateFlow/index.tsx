@@ -5,10 +5,10 @@ import { queryFlowsFilter } from '@/pages/QuestionList/service';
 import { FormattedMessage } from '@@/plugin-locale/localeExports';
 import { Upload, Modal } from 'antd';
 const { TextArea } = Input;
-import { DeleteOutlined, InboxOutlined, LoadingOutlined, PaperClipOutlined, PlusOutlined, UploadOutlined } from '@ant-design/icons';
+import { DeleteOutlined, FileAddOutlined, LoadingOutlined, PaperClipOutlined, PlusOutlined, UploadOutlined, VideoCameraAddOutlined } from '@ant-design/icons';
 import axios from 'axios';
 import { ImageDisplayComponent } from '../ReadFlow';
-import { FlowEditableComponent, StringObject } from 'models/flows';
+import { StringObject } from 'models/flows';
 import ImgCrop from 'antd-img-crop';
 import { Tabs } from 'antd';
 import './index.less';
@@ -107,10 +107,8 @@ export const ImageComponent: FC<AttachmentComponentDataProps> = (props) => {
               </Space>
               : 
               <Dragger {...draggerProps}>
-                <p className="ant-upload-drag-icon">
-                  {uploading ? <LoadingOutlined /> : <UploadOutlined />}
-                </p>
-                <p className="ant-upload-hint">{uploading ? "Uploading" : "Click or drag image to this area to upload"}</p>
+                <p style={{marginBottom: 12}}> {uploading ? <LoadingOutlined /> : <PlusOutlined style={{ fontSize: '40px'}} />} </p>
+                <p className="ant-upload-hint">{uploading ? "Uploading" : "Click or drag image here to upload"}</p>
               </Dragger>
               }
           </Form.Item>
@@ -167,10 +165,8 @@ export const VideoComponent: FC<AttachmentComponentDataProps> = (props) => {
               </Space>
               : 
               <Dragger {...draggerProps}>
-                <p className="ant-upload-drag-icon">
-                  {uploading ? <LoadingOutlined /> : <UploadOutlined />}
-                </p>
-                <p className="ant-upload-hint">{uploading ? "Uploading" : "Click or drag image to this area to upload"}</p>
+                <p style={{marginBottom: 12}}> {uploading ? <LoadingOutlined /> : <VideoCameraAddOutlined style={{ fontSize: '40px'}} />} </p>
+                <p className="ant-upload-hint">{uploading ? "Uploading" : "Click or drag video here to upload"}</p>
               </Dragger>
               }
           </Form.Item>
@@ -225,10 +221,8 @@ export const FileComponent: FC<AttachmentComponentDataProps> = (props) => {
               </Space>
               : 
               <Dragger {...draggerProps}>
-                <p className="ant-upload-drag-icon">
-                  {uploading ? <LoadingOutlined /> : <UploadOutlined />}
-                </p>
-                <p className="ant-upload-hint">{uploading ? "Uploading" : "Click or drag file to this area to upload"}</p>
+                <p style={{marginBottom: 12}}> {uploading ? <LoadingOutlined /> : <FileAddOutlined style={{ fontSize: '40px'}} />} </p>
+                <p className="ant-upload-hint">{uploading ? "Uploading" : "Click or drag file here to upload"}</p>
               </Dragger>
             }
           </Form.Item>
@@ -256,10 +250,11 @@ export type GenericTemplateComponentDataProps = {
   componentKey: number;
   componentData: { elements: Templates[] };
   onChange: (prevState: any) => void;
+  current: any;
 };
 
 export const GenericTemplateComponent: FC<GenericTemplateComponentDataProps> = (props) => {
-  const { componentKey, componentData, onChange } = props
+  const { componentKey, componentData, onChange, current } = props
   const [activeKey, setActiveKey] = useState<number>(0);
   const [panes, setPanes] = useState(componentData.elements)
   
@@ -311,7 +306,7 @@ export const GenericTemplateComponent: FC<GenericTemplateComponentDataProps> = (
         hideAdd={!(panes.length < 10)} >
         {panes.map((pane, index: number) => {
           return (
-            <TabPane tab={index + 1} key={index.toString()} closable={componentData.elements.length !== 1} forceRender>
+            <TabPane tab={index + 1} key={index.toString()} closable={panes.length !== 1} forceRender>
               <TemplateComponent componentKey={index} componentData={pane} onChange={onChange} parentKey={componentKey} />
             </TabPane>
           );
@@ -340,6 +335,8 @@ export const TemplateComponent: FC<TemplateComponentDataProps> = (props) => {
   const [responseType, setResponseType] = useState('flow');
   const [flows, setFlows] = useState<DropdownProps[]>([]);
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [buttons, setButtons] = useState(componentData.buttons)
+
 
   const showModal = () => {
     setIsModalVisible(true);
@@ -429,10 +426,8 @@ export const TemplateComponent: FC<TemplateComponentDataProps> = (props) => {
                 : 
                 <ImgCrop rotate aspect={1.91}>
                   <Dragger  {...draggerProps}>
-                    <p className="ant-upload-drag-icon">
-                      {uploading ? <LoadingOutlined /> : <UploadOutlined />}
-                    </p>
-                    <p className="ant-upload-hint">{uploading ? "Uploading" : "Click or drag file to this area to upload"}</p>
+                    <p style={{marginBottom: 12}}> {uploading ? <LoadingOutlined /> : <PlusOutlined />} </p>
+                    <p className="ant-upload-hint">{uploading ? "Uploading" : "Click or drag image here to upload"}</p>
                   </Dragger>
                 </ImgCrop>
                 }
@@ -486,7 +481,7 @@ export const TemplateComponent: FC<TemplateComponentDataProps> = (props) => {
               }))
             }}
           />
-          {componentData.buttons.map((button, buttonIndex) => (
+          {buttons.map((button, buttonIndex) => (
             <Button
               key={"component" + parentKey + "pane" + componentKey + "button" + buttonIndex}
               block
@@ -500,7 +495,7 @@ export const TemplateComponent: FC<TemplateComponentDataProps> = (props) => {
               {button.title.EN}
             </Button>
           ))}
-          {componentData.buttons.length < 3 && (
+          {buttons.length < 3 && (
             <Button
               key={"component" + parentKey + "pane" + componentKey + "buttonNew"}
               onClick={() => {
@@ -538,6 +533,7 @@ export const TemplateComponent: FC<TemplateComponentDataProps> = (props) => {
                     return { ...item, data: {elements: 
                       item.data.elements.map((pane: any, paneIndex: number) => {
                         if (paneIndex === componentKey) {
+                          setButtons((prevButtons: any) => [...prevButtons, {...values, title: {EN: values.title}}])
                           return { ...pane, buttons: [...pane.buttons, {...values, title: {EN: values.title}}]}
                         }
                         else return pane;})
@@ -775,7 +771,7 @@ export const FlowComponent: FC<FlowComponentDataProps> = (props) => {
       </Divider>
       <ProFormSelect
         width="xl"
-        name="flowResponse"
+        name={componentData.name}
         showSearch
         fieldProps={{ onSelect: (e) => {
           console.log(e);
@@ -790,6 +786,7 @@ export const FlowComponent: FC<FlowComponentDataProps> = (props) => {
         request={async () => {
           return await queryFlowsFilter('name,params');
         }}
+        fieldProps={{ onSelect: (e) => console.log(e) }}
         rules={[
           {
             required: true,

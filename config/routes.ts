@@ -53,6 +53,7 @@
     icon: 'ApartmentOutlined',
     path: '/flows/new',
     component: './FlowList/Update',
+    hideInMenu: true,
   },
   // {
   //   name: 'list.broadcast-list',
