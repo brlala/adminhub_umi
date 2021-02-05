@@ -4,6 +4,7 @@ import Meta from 'antd/lib/card/Meta';
 import styles from './index.less';
 import ProCard from '@ant-design/pro-card';
 import { FlowItemData } from 'models/flows';
+import { LeftOutlined, RightOutlined } from '@ant-design/icons';
 
 interface DisplayComponentProps {
   componentKey: number;
@@ -77,7 +78,8 @@ export const GenericTemplateDisplayComponent: FC<DisplayComponentProps> = (props
           lineHeight: '1.5715',
         }}
         onClick={onClick}
-      ></div>
+      >
+      <RightOutlined /></div>
     );
   };
 
@@ -93,7 +95,8 @@ export const GenericTemplateDisplayComponent: FC<DisplayComponentProps> = (props
           lineHeight: '1.5715',
         }}
         onClick={onClick}
-      ></div>
+      >
+      <LeftOutlined /></div>
     );
   };
 
