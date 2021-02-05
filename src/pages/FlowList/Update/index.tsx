@@ -41,63 +41,92 @@ const NewFlow: FC = (props) => {
   const { run: postRun } = useRequest(
     (data) => {
       return addFlow(data);
-    }, {
+    },
+    {
       manual: true,
       onSuccess: (result) => {
-        console.log(result)
+        console.log(result);
       },
-      throwOnError: true
-    }
+      throwOnError: true,
+    },
   );
 
   const onFinish = (values: any) => {
     let toSubmit: FlowItemData[] = [];
     // let lastElement = array.pop();
-    componentList.map((item)=> {
+    componentList.map((item) => {
       if (item.type === 'quickReplies') {
-        let prevItem = toSubmit.pop()
-        toSubmit.push({...prevItem, data: {...prevItem.data, ...item.data}})
+        let prevItem = toSubmit.pop();
+        toSubmit.push({ ...prevItem, data: { ...prevItem.data, ...item.data } });
       } else {
-        toSubmit.push({type: item.type, data: item.data})
+        toSubmit.push({ type: item.type, data: item.data });
       }
-    })
+    });
     // const toSubmit = componentList.map((item)=> {
     //   return {type: item.type, data: item.data}
     // })
     console.log('values: ', values);
     console.log('componentList: ', toSubmit);
-    postRun({name: values.name, flow: toSubmit})
-
+    postRun({ name: values.name, flow: toSubmit });
   };
 
-  const renderComponent = (component: { data: any, type: string }, index: number) => {
+  const renderComponent = (component: { data: any; type: string }, index: number) => {
     const { data, type } = component;
     let renderedComponent;
-    console.log(type)
+    console.log(type);
     switch (type) {
       case 'message':
-        renderedComponent = <TextComponent componentKey={index} componentData={data} onChange={setComponentList} />
+        renderedComponent = (
+          <TextComponent componentKey={index} componentData={data} onChange={setComponentList} />
+        );
         break;
       case 'image':
-        renderedComponent = <ImageComponent componentKey={index} componentData={data}  onChange={setComponentList} />
+        renderedComponent = (
+          <ImageComponent componentKey={index} componentData={data} onChange={setComponentList} />
+        );
         break;
       case 'genericTemplate':
-        renderedComponent = <GenericTemplateComponent componentKey={index} componentData={data} onChange={setComponentList} current={componentList} />
+        renderedComponent = (
+          <GenericTemplateComponent
+            componentKey={index}
+            componentData={data}
+            onChange={setComponentList}
+            current={componentList}
+          />
+        );
         break;
       case 'buttonTemplate':
-        renderedComponent = <ButtonTemplateComponent componentKey={index} componentData={data} onChange={setComponentList} />
+        renderedComponent = (
+          <ButtonTemplateComponent
+            componentKey={index}
+            componentData={data}
+            onChange={setComponentList}
+          />
+        );
         break;
       case 'video':
-        renderedComponent = <VideoComponent componentKey={index} componentData={data}  onChange={setComponentList} />
+        renderedComponent = (
+          <VideoComponent componentKey={index} componentData={data} onChange={setComponentList} />
+        );
         break;
       case 'file':
-        renderedComponent = <FileComponent componentKey={index} componentData={data}  onChange={setComponentList} />
+        renderedComponent = (
+          <FileComponent componentKey={index} componentData={data} onChange={setComponentList} />
+        );
         break;
       case 'flow':
-        renderedComponent = <FlowComponent componentKey={index} componentData={data}  onChange={setComponentList} />
+        renderedComponent = (
+          <FlowComponent componentKey={index} componentData={data} onChange={setComponentList} />
+        );
         break;
       case 'quickReplies':
-        renderedComponent = <QuickReplyComponent componentKey={index} componentData={data}  onChange={setComponentList} />
+        renderedComponent = (
+          <QuickReplyComponent
+            componentKey={index}
+            componentData={data}
+            onChange={setComponentList}
+          />
+        );
         break;
       default:
         renderedComponent = <div>Cannot render {type}</div>;
@@ -169,27 +198,23 @@ const NewFlow: FC = (props) => {
             <Divider style={{ marginTop: -6 }} orientation="center">
               Components
             </Divider>
-            <FlowComponentsList setNewComponentsList={setComponentList}
-            />
+            <FlowComponentsList setNewComponentsList={setComponentList} />
             <Divider orientation="center">Current Flow</Divider>
-            <NewComponentsList
-              componentList={componentList}
-              setComponentsList={setComponentList}
-            />
+            <NewComponentsList componentList={componentList} setComponentsList={setComponentList} />
           </ProCard>
           <ProCard title="Flow Content" colSpan={{ xs: 20, sm: 20, md: 20, lg: 20, xl: 16 }}>
-              {console.log('componentList', componentList)}
-              {componentList.map((flowNode, index) => renderComponent(flowNode, index))}
-              <FooterToolbar>
-                {getErrorInfo(error)}
-                {/*<Button type="primary" onClick={() => form?.submit()} loading={submitting}>*/}
-                <Link to="/flows">
-                  <Button key="3">Cancel</Button>
-                </Link>
-                <Button type="primary" htmlType="submit" loading={false}>
-                  提交
-                </Button>
-              </FooterToolbar>
+            {console.log('componentList', componentList)}
+            {componentList.map((flowNode, index) => renderComponent(flowNode, index))}
+            <FooterToolbar>
+              {getErrorInfo(error)}
+              {/*<Button type="primary" onClick={() => form?.submit()} loading={submitting}>*/}
+              <Link to="/flows">
+                <Button key="3">Cancel</Button>
+              </Link>
+              <Button type="primary" htmlType="submit" loading={false}>
+                Submit
+              </Button>
+            </FooterToolbar>
             {componentList.length === 0 && (
               <div style={{ height: 360 }}>Add a flow to see the contents here</div>
             )}
