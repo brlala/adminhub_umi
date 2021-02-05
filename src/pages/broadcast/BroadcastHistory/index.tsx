@@ -1,8 +1,8 @@
-import { Card, Form, Typography, Tag, Tooltip, Progress } from 'antd';
+import { Card, Form, Tag, Tooltip, Progress, Row, Switch, Col } from 'antd';
 import React, { FC, useState } from 'react';
 import { useIntl, useRequest, FormattedMessage } from 'umi';
 
-import type { ProColumns, ActionType } from '@ant-design/pro-table';
+import type { ProColumns } from '@ant-design/pro-table';
 import StandardFormRow from './components/StandardFormRow';
 import TagSelect from './components/TagSelect';
 import { BroadcastHistoryItem, BroadcastHistoryListItem } from './data.d';
@@ -14,7 +14,6 @@ import BroadcastHistoryDrawer from './components/BroadcastHistoryDrawer';
 import { PageContainer } from '@ant-design/pro-layout';
 
 const FormItem = Form.Item;
-const { Paragraph } = Typography;
 
 const BroadcastHistory: FC = () => {
   const { data, loading, run } = useRequest((values: any) => {
@@ -60,6 +59,7 @@ const BroadcastHistory: FC = () => {
       ),
       dataIndex: 'sendAt',
       valueType: 'dateTimeRange',
+      hideInSearch: true,
       sorter: (a, b) => a.total - b.total,
       render: (_, object) => {
         return moment(object.sendAt).format('yyyy-MM-DD HH:mm');
@@ -100,30 +100,33 @@ const BroadcastHistory: FC = () => {
       render: (_, object) => (
         <>
           <Tooltip
-            title={object.processed + ' sent / ' + (object.total - object.processed) + ' to do'}
+            title={object.sent + ' Sent / ' + (object.processed - object.sent) + ' Failed / ' + (object.total - object.processed) + ' Pending'}
           >
-            <Progress
-              percent={(object.processed * 100) / object.total}
-              success={{ percent: (object.sent * 100) / object.total }}
-            />
+            {(object.total === object.processed || object.processed === 0) ? <> {object.sent} / {object.total} </> :
+            <Progress percent={(object.processed * 100) / object.total} status="active"
+              success={{percent: (object.sent * 100) / object.total}}
+            />}
           </Tooltip>
         </>
       ),
     },
     {
       title: <FormattedMessage id="pages.searchTable.titleTags" defaultMessage="Tags" />,
-      dataIndex: 'tags',
       hideInSearch: true,
       render: (_, object) => (
         <>
+          {object.sendToAll? <Tag color='green' key="everyone">Everyone</Tag>: ""}
           {object.tags.map((tag) => {
-            let color = tag.length > 5 ? 'geekblue' : 'green';
-            if (tag === 'loser') {
-              color = 'volcano';
-            }
             return (
-              <Tag color={color} key={tag}>
+              <Tag color='geekblue' key={tag}>
                 {tag.toUpperCase()}
+              </Tag>
+            );
+          })}
+          {object.exclude.map((tag) => {
+            return (
+              <Tag color='red' key={tag}>
+                {"- " + tag.toUpperCase()}
               </Tag>
             );
           })}
@@ -148,9 +151,6 @@ const BroadcastHistory: FC = () => {
     },
   ];
 
-  console.log(columns);
-  console.log(list);
-
   return (
     <PageContainer>
       <div className={styles.coverCardList}>
@@ -163,43 +163,51 @@ const BroadcastHistory: FC = () => {
             }}
           >
             <StandardFormRow title="Tags" block style={{ paddingBottom: 11 }}>
-              <FormItem name="tags">
-                <TagSelect>
-                  <TagSelect.Option value="Pandai">Pandai</TagSelect.Option>
-                  <TagSelect.Option value="BBL">BBL</TagSelect.Option>
-                  <TagSelect.Option value="RMs">RMs</TagSelect.Option>
-                </TagSelect>
-              </FormItem>
+              <Row>
+                <Col span={2}>
+                  <FormItem name="intersect">
+                    <Switch checkedChildren="ALL" unCheckedChildren="OR" />
+                  </FormItem>
+                </Col>
+                <FormItem name="tags">
+                    <TagSelect hideCheckAll>
+                      <TagSelect.Option value="Pandai">Pandai</TagSelect.Option>
+                      <TagSelect.Option value="Testers">Testers</TagSelect.Option>
+                      <TagSelect.Option value="BBL">BBL</TagSelect.Option>
+                      <TagSelect.Option value="RMs">RMs</TagSelect.Option>
+                    </TagSelect>
+                  </FormItem>
+              </Row>
             </StandardFormRow>
-            <StandardFormRow title="Status" block style={{ paddingBottom: 11 }}>
-              <FormItem name="status">
-                <TagSelect>
-                  <TagSelect.Option value="completed">Completed</TagSelect.Option>
-                  <TagSelect.Option value="sending">Sending</TagSelect.Option>
-                  <TagSelect.Option value="scheduled">Scheduled</TagSelect.Option>
-                  <TagSelect.Option value="failed">Failed</TagSelect.Option>
-                </TagSelect>
-              </FormItem>
+            <StandardFormRow title="Status"  style={{ marginBottom: -16, borderBottom: 0 }}>
+              <Row>
+                <FormItem name="status">
+                  <TagSelect hideCheckAll singleOption>
+                    <TagSelect.Option value="completed">Completed</TagSelect.Option>
+                    <TagSelect.Option value="sending">Sending</TagSelect.Option>
+                    <TagSelect.Option value="scheduled">Scheduled</TagSelect.Option>
+                    <TagSelect.Option value="failed">Failed</TagSelect.Option>
+                  </TagSelect>
+                </FormItem>
+              </Row>
             </StandardFormRow>
           </Form>
         </Card>
-
+      </div>
         <ProTable<BroadcastHistoryListItem>
           headerTitle={intl.formatMessage({
-            id: 'pages.searchTable.title',
-            defaultMessage: '查询表格',
+            id: 'pages.broadcast.history',
+            defaultMessage: 'Broadcast History',
           })}
           rowKey="id"
-          search={{
-            labelWidth: 120,
-          }}
+          search={false}
           loading={loading}
           dataSource={list}
           columns={columns}
         />
 
         <BroadcastHistoryDrawer visible={visible} current={current} onClose={onClose} />
-      </div>
+      
     </PageContainer>
   );
 };

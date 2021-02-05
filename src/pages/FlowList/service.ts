@@ -68,3 +68,11 @@ export async function updateRule(params: QuestionListParams) {
     },
   });
 }
+
+export async function addFlow(data
+): Promise<{}> {
+  return request('http://localhost:5000/flows', {
+    method: 'post',
+    data: data,
+  });
+}

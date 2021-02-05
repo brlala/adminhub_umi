@@ -4,6 +4,7 @@ import Meta from 'antd/lib/card/Meta';
 import styles from './index.less';
 import ProCard from '@ant-design/pro-card';
 import { FlowItemData } from 'models/flows';
+import { LeftOutlined, RightOutlined } from '@ant-design/icons';
 
 interface DisplayComponentProps {
   componentKey: number;
@@ -15,9 +16,9 @@ export const QuickReplyDisplayComponent: FC<DisplayComponentProps> = (props) => 
   return (
     <Space>
       {componentData &&
-        componentData.quick_replies?.map((element, index) => (
+        componentData.quickReplies?.map((element, index) => (
           <Button key={componentKey + 'qr' + index} type="default" style={{ borderRadius: 20 }}>
-            {element.title.EN}
+            {element.text.EN}
           </Button>
         ))}{' '}
     </Space>
@@ -44,15 +45,13 @@ export const TextDisplayComponent: FC<DisplayComponentProps> = (props) => {
 export const ImageDisplayComponent: FC<DisplayComponentProps> = (props) => {
   const { componentKey, componentData } = props;
   if (componentData) {
-    return <Image width={300} key={componentKey} src={componentData.url} />;
+    return <Image style={{maxWidth: 300, maxHeight: 200}} key={componentKey} src={componentData.url} />;
   }
-  return <Image width={300} key={componentKey} src="https://placekitten.com/300/150" />;
+  return <Image style={{maxWidth: 300, maxHeight: 200}}key={componentKey} src="https://placekitten.com/300/150" />;
 };
 
 export const GenericTemplateDisplayComponent: FC<DisplayComponentProps> = (props) => {
   const { componentKey, componentData } = props;
-  console.log('Here', componentData);
-
   const CarouselButtonGroup = (total: number, current: number) => {
     const items = [];
     for (let x = 0; x < total; x++) {
@@ -79,7 +78,8 @@ export const GenericTemplateDisplayComponent: FC<DisplayComponentProps> = (props
           lineHeight: '1.5715',
         }}
         onClick={onClick}
-      ></div>
+      >
+      <RightOutlined /></div>
     );
   };
 
@@ -95,7 +95,8 @@ export const GenericTemplateDisplayComponent: FC<DisplayComponentProps> = (props
           lineHeight: '1.5715',
         }}
         onClick={onClick}
-      ></div>
+      >
+      <LeftOutlined /></div>
     );
   };
 
@@ -122,7 +123,7 @@ export const GenericTemplateDisplayComponent: FC<DisplayComponentProps> = (props
               key={index}
               style={{ borderRadius: 10, background: '#F6F6F6' }}
               size="small"
-              cover={<img src={element ? element.image_url : ''} />}
+              cover={<img src={element ? element.imageUrl : ''} />}
             >
               <Meta title={element.title?.EN} description={element.subtitle?.EN} />
               {element.buttons?.map((button, buttonIdex) => (

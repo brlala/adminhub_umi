@@ -5,12 +5,12 @@ import { Modal, Result, Button, Form, List, Input, Space, Row, Col } from 'antd'
 
 import ProCard from '@ant-design/pro-card';
 import TagSelect from '../components/TagSelect';
-import { BroadcastTemplateListItem, BroadcastTemplateComponent } from '../data';
+import { BroadcastTemplateListItem } from '../data';
 import styles from '../style.less';
 
 interface OperationModalProps {
   visible: boolean;
-  current: Partial<BroadcastTemplateListItem> | undefined;
+  current?: Partial<BroadcastTemplateListItem>;
   onSubmit: (values: BroadcastTemplateListItem) => void;
   onCancel: () => void
 }
@@ -46,16 +46,16 @@ const TemplateModal: FC<OperationModalProps> = (props) => {
 
   const handleFinish = (values: { [key: string]: any }) => {
     if (onSubmit) {
-      onSubmit({...values, flow: templateComponent} as BroadcastTemplateListItem);
+      onSubmit({...current, ...values, flow: templateComponent} as BroadcastTemplateListItem);
     }
   };
 
   const componentsList = [
-    { name: 'Text', key: 'text' },
+    { name: 'Text', key: 'message' },
     { name: 'Image', key: 'image' },
-    { name: 'Generic Templates', key: 'genericTemplates' },
-    { name: 'Button Templates', key: 'buttonTemplates' },
-    { name: 'Flow', key: 'flow' },
+    { name: 'Generic Template', key: 'genericTemplate' },
+    { name: 'Button Template', key: 'buttonTemplate' },
+    { name: 'Video', key: 'video' },
   ];
 
 

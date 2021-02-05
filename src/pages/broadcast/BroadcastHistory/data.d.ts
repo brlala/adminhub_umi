@@ -27,6 +27,8 @@ export interface BroadcastHistoryListItem {
   id: string;
   status: string;
   tags: string[];
+  exclude: string[];
+  sendToAll: boolean;
   sent: number;
   processed: number;
   total: number;
@@ -35,10 +37,13 @@ export interface BroadcastHistoryListItem {
 }
 
 export interface BroadcastHistoryItem {
+  processed: number;
   id: string;
   flow: FlowItem[];
   status: string;
   tags: string[];
+  exclude: string[];
+  sendToAll: boolean;
   sent: number;
   total: number;
   sendAt: string;

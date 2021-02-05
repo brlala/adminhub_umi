@@ -13,22 +13,65 @@ export type FlowDb = {
   type: string;
 };
 
+export type FlowNew = {
+  name?: string;
+  topic?: string | null;
+  flow: FlowItem[];
+  platforms: string[];
+  params?: string[];
+  type: "storyboard" | "broadcast";
+};
+
 export type FlowItem = {
   data: FlowItemData;
-  type: string;
+  type: 
+    | 'message'
+    | 'image'
+    | 'video'
+    | 'file'
+    | 'genericTemplate'
+    | 'buttonTemplate'
+    | 'flow'
+    | 'quickReplies';
 };
 
 export type FlowItemData = {
   buttons?: ButtonData[];
   text?: StringObject;
   url?: string;
-  image_url?: string;
+  imageUrl?: string;
   title?: StringObject;
   subtitle?: StringObject;
   elements?: FlowItemData[];
   flow?: FlowData;
-  quick_replies?: QrButtonData[];
+  quickReplies?: QrButtonData[];
 };
+
+export type FlowEditableComponent = {
+  title: string;
+  key: string;
+  id: string;
+  type: 
+    | 'text'
+    | 'image'
+    | 'video'
+    | 'file'
+    | 'genericTemplate'
+    | 'buttonTemplate'
+    | 'flow'
+    | 'quickReplies';
+  data: {
+    buttons?: ButtonData[];
+    text?: StringObject;
+    url?: string;
+    imageUrl?: string;
+    title?: StringObject;
+    subtitle?: StringObject;
+    elements?: FlowItemData[];
+    flow?: FlowData;
+    quickReplies?: QrButtonData[];
+  }
+}
 
 export type ButtonData = {
   type: string;
@@ -38,7 +81,7 @@ export type ButtonData = {
 };
 
 export type QrButtonData = {
-  title: StringObject;
+  text: StringObject;
   payload: string;
 };
 

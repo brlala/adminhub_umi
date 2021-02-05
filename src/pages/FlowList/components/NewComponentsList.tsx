@@ -32,8 +32,8 @@ const generateData = (_level, _preKey, _tns) => {
 generateData(z);
 
 export type NewComponentsListProps = {
-  setComponentsList: (items: DraggableListItems[]) => void;
   componentList: DraggableListItems[];
+  setComponentsList: (items: DraggableListItems[]) => void;
 };
 
 const NewComponentsList: React.FC<NewComponentsListProps> = ({

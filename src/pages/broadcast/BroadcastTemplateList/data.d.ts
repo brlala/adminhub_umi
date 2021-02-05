@@ -1,3 +1,7 @@
+import { FlowComponentData } from "@/components/FlowItems/UpdateFlow";
+import { FlowListItem } from "@/pages/FlowList/data";
+import { NewFormProps } from "@/pages/QuestionList/components/UpdateForm";
+
 export interface Member {
   avatar: string;
   name: string;
@@ -22,6 +26,16 @@ export interface NewBroadcastTemplate {
   platforms?: string[];
 }
 
+export interface NewBroadcastEntry {
+  id?: string;
+  name: string;
+  flow: NewFlow[];
+  tags: string[];
+  exclude: string[];
+  sendToAll: boolean;
+  platforms?: string[];
+}
+
 export interface BroadcastTemplateListItem {
   id: string;
   name: string;
@@ -37,7 +51,7 @@ export interface BroadcastTemplateListItem {
 export const componentsList = [
   { name: 'Text', key: 'text' },
   { name: 'Image', key: 'image' },
-  { name: 'Generic Templates', key: 'genericTemplates' },
-  { name: 'Button Templates', key: 'buttonTemplates' },
+  { name: 'Generic Template', key: 'genericTemplate' },
+  { name: 'Button Template', key: 'buttonTemplate' },
   { name: 'Flow', key: 'flow' },
 ];

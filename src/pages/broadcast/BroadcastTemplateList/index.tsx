@@ -1,4 +1,4 @@
-import { Card, Button, Form, List, message, Space } from 'antd';
+import { Card, Button, Form, List, message, Space, Switch, Row, Col } from 'antd';
 import { PlusOutlined, DeleteOutlined } from '@ant-design/icons';
 import React, { FC, useState } from 'react';
 import { Link, useRequest } from 'umi';
@@ -23,7 +23,7 @@ const BroadcastTemplateList: FC = () => {
   const list = data? data : [];
 
   const [visible, setVisible] = useState<boolean>(false);
-  const [current, setCurrent] = useState<Partial<BroadcastTemplateListItem> | undefined>(undefined);
+  const [current, setCurrent] = useState<Partial<BroadcastTemplateListItem>>();
   
   const { run: postRun } = useRequest(
     (method, data) => {
@@ -67,27 +67,26 @@ const BroadcastTemplateList: FC = () => {
   };
 
   const showModal = () => {
-    console.log('Current', current)
     setVisible(true);
   };
 
   const renderComponent = (component: string, index: number) => {
     let renderedComponent;
     switch (component) {
-      case 'text':
+      case 'message':
         renderedComponent = 'Text';
         break;
       case 'image':
         renderedComponent = 'Image';
         break;
-      case 'genericTemplates':
-        renderedComponent = 'Generic Templates';
+      case 'genericTemplate':
+        renderedComponent = 'Generic Template';
         break;
-      case 'buttonTemplates':
-        renderedComponent = 'Button Templates';
+      case 'buttonTemplate':
+        renderedComponent = 'Button Template';
         break;
-      case 'flow':
-        renderedComponent = 'Flow';
+      case 'video':
+        renderedComponent = 'Video';
         break;
       default:
         renderedComponent = 'others';
@@ -117,7 +116,6 @@ const BroadcastTemplateList: FC = () => {
                   {item.flow.map((item, index) => renderComponent(item, index)
                   )}
                 </Space>
-                
               }
             />
           </Card>
@@ -137,16 +135,23 @@ const BroadcastTemplateList: FC = () => {
             run(values);
           }}
         >
-          <StandardFormRow title="Platforms" block style={{ paddingBottom: 11 }}>
-            <FormItem name="platforms">
-              <TagSelect>
-                <TagSelect.Option value="facebook">Messenger</TagSelect.Option>
-                <TagSelect.Option value="line">Line</TagSelect.Option>
-                <TagSelect.Option value="slack">Slack</TagSelect.Option>
-                <TagSelect.Option value="whatsapp">Whatsapp</TagSelect.Option>
-                <TagSelect.Option value="telegram">Telegram</TagSelect.Option>
-              </TagSelect>
-            </FormItem>
+          <StandardFormRow title="Contains" block>
+            <Row>
+              <Col span={2}>
+                <FormItem name="intersect">
+                  <Switch checkedChildren="ALL" unCheckedChildren="OR" />
+                </FormItem>
+              </Col>
+              <FormItem name="flow">
+                <TagSelect hideCheckAll>
+                  <TagSelect.Option value="message">Text</TagSelect.Option>
+                  <TagSelect.Option value="image">Image</TagSelect.Option>
+                  <TagSelect.Option value="video">Video</TagSelect.Option>
+                  <TagSelect.Option value="genericTemplate">Generic Template</TagSelect.Option>
+                  <TagSelect.Option value="buttonTemplate">Button Template</TagSelect.Option>
+                </TagSelect>
+              </FormItem>
+            </Row>
           </StandardFormRow>
         </Form>
       </Card>

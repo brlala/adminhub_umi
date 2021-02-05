@@ -10,14 +10,14 @@ export type UpdateComponentsListProps = {
 
 const FlowComponentsList: React.FC<UpdateComponentsListProps> = ({ setNewComponentsList }) => {
   const componentsList: FlowList[] = [
-    { name: 'Text', type: 'text' },
-    { name: 'Image', type: 'imageAttachments' },
-    { name: 'Video', type: 'videoAttachments' },
-    { name: 'File', type: 'fileAttachments' },
-    { name: 'Generic Templates', type: 'genericTemplates' },
-    { name: 'Button Templates', type: 'buttonTemplates' },
+    { name: 'Text', type: 'message' },
+    { name: 'Image', type: 'image' },
+    { name: 'Video', type: 'video' },
+    { name: 'File', type: 'file' },
+    { name: 'Generic Template', type: 'genericTemplate' },
+    { name: 'Button Template', type: 'buttonTemplate' },
     { name: 'Flow', type: 'flow' },
-    { name: 'Quick Reply', type: 'quickReply' },
+    { name: 'Quick Replies', type: 'quickReplies' },
   ];
 
   const addComponent = (item: FlowList) => {
@@ -25,141 +25,40 @@ const FlowComponentsList: React.FC<UpdateComponentsListProps> = ({ setNewCompone
     const uniqueId = `${type}-${nanoid(4)}`;
     let componentData;
     switch (type) {
-      case 'text':
-        componentData = { type, name: uniqueId, data: { textField: null } };
+      case 'message':
+        componentData = { type, data: { text: {} } };
         break;
-      case 'imageAttachments':
-        componentData = { type, name: uniqueId, data: { attachments: [] } };
+      case 'image':
+        componentData = { type, data: { url: '' } };
         break;
-      case 'videoAttachments':
-        componentData = { type, name: uniqueId, data: { attachments: [] } };
+      case 'video':
+        componentData = { type, data: { url: '' } };
         break;
-      case 'fileAttachments':
-        componentData = {
-          type,
-          name: uniqueId,
-          data: {
-            attachments: [
-              {
-                name: 'test.pdf',
-                url:
-                  'https://pandai-admin-portal.s3-ap-southeast-1.amazonaws.com/portal/flows/If%20You%20Suspect%20That%20You%20Are%20Infected%20With%20Covid-19%20%28210124TEH%29%20%281%29.pdf',
-                uid: 1,
-              },
-            ],
-          },
-        };
+      case 'genericTemplate':
+        componentData = { type, data: { elements: [{ imageUrl: '', title: {}, subtitle: {}, buttons: [] } ] } };
         break;
-      case 'genericTemplates':
-        componentData = {
-          type,
-          name: uniqueId,
-          data: {
-            templates: [
-              {
-                attachments: [
-                  {
-                    name: 'test.png',
-                    url: 'https://sitechecker.pro/wp-content/uploads/2017/12/URL-meaning.png',
-                    uid: 1,
-                  },
-                ],
-                title: 'a',
-                subtitle: 'b',
-                buttons: [
-                  {
-                    text: 'button text1',
-                    type: 'url',
-                    content: 'www.apple.com',
-                  },
-                  {
-                    text: 'button text2',
-                    type: 'flow',
-                    content: '5e315217a38e6703b4d3f81d',
-                  },
-                ],
-              },
-              {
-                title: 'c1',
-                subtitle: 'd',
-                buttons: [
-                  {
-                    text: 'button text1',
-                    type: 'url',
-                    content: 'www.firefox.com',
-                  },
-                  {
-                    text: 'button text',
-                    type: 'flow',
-                    content: '5e315217a38e6703b4d3f81d',
-                  },
-                ],
-              },
-            ],
-          },
-        };
+      case 'buttonTemplate':
+        componentData = { type, data: { text: {}, buttons: [] } };
         break;
-      case 'buttonTemplates':
-        componentData = {
-          type,
-          name: uniqueId,
-          data: {
-            textField: 'test',
-            buttons: [
-              {
-                text: 'button text1',
-                type: 'url',
-                content: 'www.firefox.com',
-              },
-              {
-                text: 'button text',
-                type: 'flow',
-                content: '5e315217a38e6703b4d3f81d',
-              },
-            ],
-          },
-        };
+      case 'file':
+        componentData = { type, data: { url: '' } };
         break;
       case 'flow':
-        componentData = {
-          type,
-          name: uniqueId,
-          data: { flowId: '5e315217a38e6703b4d3f81d', params: [] },
-        };
+        componentData = { type, data: { flowId: '', params: [] } };
         break;
-      case 'quickReply':
-        componentData = {
-          type,
-          name: uniqueId,
-          data: {
-            buttons: [
-              {
-                text: 'button text1',
-                type: 'url',
-                content: 'www.firefox.com',
-              },
-              {
-                text: 'button text',
-                type: 'flow',
-                content: '5e315217a38e6703b4d3f81d',
-              },
-            ],
-          },
-        };
+      case 'quickReplies':
+        componentData = { type, data: { quickReplies: []}};
         break;
       default:
-        componentData = {
-          type,
-          name: uniqueId,
-          data: {},
-        };
+        componentData = { type, data: {} };
     }
     const entry = {
       title: name,
       key: uniqueId,
       id: uniqueId,
-      componentData,
+      ...componentData
     };
+    console.log(entry)
 
     setNewComponentsList((prevState) => [...prevState, entry]);
   };

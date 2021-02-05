@@ -1,5 +1,5 @@
 import React, { FC } from 'react';
-import { Space, Drawer, Tag } from 'antd';
+import { Space, Drawer, Tag, Tooltip, Progress } from 'antd';
 
 import { BroadcastHistoryItem } from '../data';
 import ProDescriptions, { ProDescriptionsItemProps } from '@ant-design/pro-descriptions';
@@ -37,12 +37,12 @@ const BroadcastHistoryDrawer: FC<OperationDrawerProps> = (props) => {
           <ImageDisplayComponent componentKey={index} componentData={component.data} />
         );
         break;
-      case 'generic_template':
+      case 'genericTemplate':
         renderedComponent = (
           <GenericTemplateDisplayComponent componentKey={index} componentData={component.data} />
         );
         break;
-      case 'button_template':
+      case 'buttonTemplate':
         renderedComponent = (
           <ButtonTemplateDisplayComponent componentKey={index} componentData={component.data} />
         );
@@ -51,7 +51,7 @@ const BroadcastHistoryDrawer: FC<OperationDrawerProps> = (props) => {
         renderedComponent = <div key={index}>Cannot render {component}</div>;
     }
 
-    if (component.data.quick_replies) {
+    if (component.data.quickReplies) {
       return [
         renderedComponent,
         <QuickReplyDisplayComponent componentKey={index} componentData={component.data} />,
@@ -111,6 +111,18 @@ const BroadcastHistoryDrawer: FC<OperationDrawerProps> = (props) => {
       dataIndex: 'total',
       hideInSearch: true,
       sorter: true,
+      render: (_, object) => (
+        <>
+          <Tooltip
+            title={object.sent + ' Sent / ' + (object.processed - object.sent) + ' Failed / ' + (object.total - object.processed) + ' Pending'}
+          >
+            {(object.total === object.processed || object.processed === 0) ? <> {object.sent} / {object.total} </> :
+            <Progress type="dashboard" percent={(object.processed * 100) / object.total} status="active"
+              success={{percent: (object.sent * 100) / object.total}}
+            />}
+          </Tooltip>
+        </>
+      ),
     },
     {
       title: <FormattedMessage id="pages.searchTable.titleTags" defaultMessage="Tags" />,
