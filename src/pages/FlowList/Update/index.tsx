@@ -20,6 +20,8 @@ import {
 import { FlowList } from '@/pages/FlowList/data';
 import { FooterToolbar } from '@ant-design/pro-layout';
 import { CloseCircleOutlined } from '@ant-design/icons';
+import { Link } from '@umijs/preset-dumi/lib/theme';
+import moment from 'moment';
 
 changeLanguage('en-US');
 
@@ -131,7 +133,7 @@ const NewFlow: React.FC = () => {
     <div className={styles.componentsList}>
       <ProCard
         title="New Flow"
-        extra="2019年9月28日"
+        extra={moment().format('DD MMM, YYYY HH:mm')}
         split="vertical"
         tooltip="Start by clicking an item in the Components section"
         bordered
@@ -158,7 +160,9 @@ const NewFlow: React.FC = () => {
             <FooterToolbar>
               {getErrorInfo(error)}
               {/*<Button type="primary" onClick={() => form?.submit()} loading={submitting}>*/}
-              <Button key="3">Cancel</Button>
+              <Link to="/flows">
+                <Button key="3">Cancel</Button>
+              </Link>
               <Button type="primary" onClick={() => form?.submit()} loading={false}>
                 Submit
               </Button>
@@ -168,7 +172,9 @@ const NewFlow: React.FC = () => {
             <div style={{ height: 360 }}>Add a flow to see the contents here</div>
           )}
         </ProCard>
-        <ProCard title="Placeholder" colSpan={{ xs: 4, sm: 4, md: 10, lg: 10, xl: 8 }}></ProCard>
+        <ProCard title="Placeholder" colSpan={{ xs: 4, sm: 4, md: 10, lg: 10, xl: 8 }}>
+          <img src="https://pandai-admin-portal.s3-ap-southeast-1.amazonaws.com/portal/flows/Screenshot%202021-02-05%20at%201.39.37%20PM.png" />
+        </ProCard>
       </ProCard>
     </div>
   );
