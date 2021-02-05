@@ -80,7 +80,7 @@ const NewFlow: FC = (props) => {
         renderedComponent = <ImageComponent componentKey={index} componentData={data}  onChange={setComponentList} />
         break;
       case 'genericTemplate':
-        renderedComponent = <GenericTemplateComponent componentKey={index} componentData={data} onChange={setComponentList} current={componentList}/>
+        renderedComponent = <GenericTemplateComponent componentKey={index} componentData={data} onChange={setComponentList} />
         break;
       case 'buttonTemplate':
         renderedComponent = <ButtonTemplateComponent componentKey={index} componentData={data} onChange={setComponentList} />
@@ -92,10 +92,10 @@ const NewFlow: FC = (props) => {
         renderedComponent = <FileComponent componentKey={index} componentData={data}  onChange={setComponentList} />
         break;
       case 'flow':
-        renderedComponent = <FlowComponent index={index} componentData={data} />;
+        renderedComponent = <FlowComponent componentKey={index} componentData={data}  onChange={setComponentList} />
         break;
       case 'quickReplies':
-        renderedComponent = <QuickReplyComponent componentKey={index} componentData={data}  onChange={setComponentList} />;
+        renderedComponent = <QuickReplyComponent componentKey={index} componentData={data}  onChange={setComponentList} />
         break;
       default:
         renderedComponent = <div>Cannot render {type}</div>;

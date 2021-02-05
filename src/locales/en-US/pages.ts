@@ -84,6 +84,7 @@ export default {
   'pages.searchTable.titleCreatedAt': 'Created At',
   'pages.searchTable.titleSchedule': 'Schedule',
   'pages.searchTable.titleTags': 'Tags',
+  'pages.broadcast.history': 'Broadcast History',
   'pages.broadcast.status.completed': 'Completed',
   'pages.broadcast.status.sending': 'Sending',
   'pages.broadcast.status.scheduled': 'Scheduled',

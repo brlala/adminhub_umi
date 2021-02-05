@@ -1,4 +1,4 @@
-import { Card, Form, Tag, Tooltip, Progress } from 'antd';
+import { Card, Form, Tag, Tooltip, Progress, Row, Switch, Col } from 'antd';
 import React, { FC, useState } from 'react';
 import { useIntl, useRequest, FormattedMessage } from 'umi';
 
@@ -59,6 +59,7 @@ const BroadcastHistory: FC = () => {
       ),
       dataIndex: 'sendAt',
       valueType: 'dateTimeRange',
+      hideInSearch: true,
       sorter: (a, b) => a.total - b.total,
       render: (_, object) => {
         return moment(object.sendAt).format('yyyy-MM-DD HH:mm');
@@ -150,9 +151,6 @@ const BroadcastHistory: FC = () => {
     },
   ];
 
-  console.log(columns);
-  console.log(list);
-
   return (
     <PageContainer>
       <div className={styles.coverCardList}>
@@ -165,43 +163,51 @@ const BroadcastHistory: FC = () => {
             }}
           >
             <StandardFormRow title="Tags" block style={{ paddingBottom: 11 }}>
-              <FormItem name="tags">
-                <TagSelect>
-                  <TagSelect.Option value="Pandai">Pandai</TagSelect.Option>
-                  <TagSelect.Option value="BBL">BBL</TagSelect.Option>
-                  <TagSelect.Option value="RMs">RMs</TagSelect.Option>
-                </TagSelect>
-              </FormItem>
+              <Row>
+                <Col span={2}>
+                  <FormItem name="intersect">
+                    <Switch checkedChildren="ALL" unCheckedChildren="OR" />
+                  </FormItem>
+                </Col>
+                <FormItem name="tags">
+                    <TagSelect hideCheckAll>
+                      <TagSelect.Option value="Pandai">Pandai</TagSelect.Option>
+                      <TagSelect.Option value="Testers">Testers</TagSelect.Option>
+                      <TagSelect.Option value="BBL">BBL</TagSelect.Option>
+                      <TagSelect.Option value="RMs">RMs</TagSelect.Option>
+                    </TagSelect>
+                  </FormItem>
+              </Row>
             </StandardFormRow>
-            <StandardFormRow title="Status" block style={{ paddingBottom: 11 }}>
-              <FormItem name="status">
-                <TagSelect>
-                  <TagSelect.Option value="completed">Completed</TagSelect.Option>
-                  <TagSelect.Option value="sending">Sending</TagSelect.Option>
-                  <TagSelect.Option value="scheduled">Scheduled</TagSelect.Option>
-                  <TagSelect.Option value="failed">Failed</TagSelect.Option>
-                </TagSelect>
-              </FormItem>
+            <StandardFormRow title="Status"  style={{ marginBottom: -16, borderBottom: 0 }}>
+              <Row>
+                <FormItem name="status">
+                  <TagSelect hideCheckAll singleOption>
+                    <TagSelect.Option value="completed">Completed</TagSelect.Option>
+                    <TagSelect.Option value="sending">Sending</TagSelect.Option>
+                    <TagSelect.Option value="scheduled">Scheduled</TagSelect.Option>
+                    <TagSelect.Option value="failed">Failed</TagSelect.Option>
+                  </TagSelect>
+                </FormItem>
+              </Row>
             </StandardFormRow>
           </Form>
         </Card>
-
+      </div>
         <ProTable<BroadcastHistoryListItem>
           headerTitle={intl.formatMessage({
-            id: 'pages.searchTable.title',
-            defaultMessage: '查询表格',
+            id: 'pages.broadcast.history',
+            defaultMessage: 'Broadcast History',
           })}
           rowKey="id"
-          search={{
-            labelWidth: 120,
-          }}
+          search={false}
           loading={loading}
           dataSource={list}
           columns={columns}
         />
 
         <BroadcastHistoryDrawer visible={visible} current={current} onClose={onClose} />
-      </div>
+      
     </PageContainer>
   );
 };

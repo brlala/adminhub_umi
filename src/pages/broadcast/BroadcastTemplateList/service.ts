@@ -30,6 +30,7 @@ export async function addBroadcastTemplate(
 export async function updateBroadcastTemplate(
   data: BroadcastTemplateListItem,
 ): Promise<{}> {
+  console.log(data)
   return request(`http://localhost:5000/broadcasts/templates/${data.id}`, {
     method: 'put',
     data: data,

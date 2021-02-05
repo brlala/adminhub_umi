@@ -37,6 +37,7 @@ export interface BroadcastHistoryListItem {
 }
 
 export interface BroadcastHistoryItem {
+  processed: number;
   id: string;
   flow: FlowItem[];
   status: string;

@@ -7,7 +7,7 @@ import { getTags, queryBroadcastTemplate, sendBroadcast } from './service';
 import styles from './style.less';
 import ProCard from '@ant-design/pro-card';
 import { PageContainer } from '@ant-design/pro-layout';
-import { TextComponent, ImageComponent, VideoAttachmentComponent, GenericTemplateComponent, ButtonTemplateComponent, FlowComponent } from '@/components/FlowItems/UpdateFlow';
+import { TextComponent, ImageComponent, VideoAttachmentComponent, GenericTemplateComponent, ButtonTemplateComponent, FlowComponent, VideoComponent } from '@/components/FlowItems/UpdateFlow';
 import { NewBroadcastEntry } from '../../data';
 
 const FormItem = Form.Item;
@@ -40,8 +40,7 @@ const NewBroadcast: FC = () => {
       manual: true,
       onSuccess: (result) => {
         console.log(result)
-        // message.success('Success');
-        // run({}).catch();
+        setRedirect(true) 
       },
       throwOnError: true
     }
@@ -64,14 +63,8 @@ const NewBroadcast: FC = () => {
       case 'buttonTemplate':
         componentData = { type: component, data: { text: {}, buttons: [] } };
         break;
-      case 'videos':
-        componentData = { type: component, data: { attachments: [] } };
-        break;
-      case 'files':
-        componentData = { type: component, data: { attachments: [] }};
-        break;
-      case 'flow':
-        componentData = { type: component, data: { flowId: null, params: [] } };
+      case 'video':
+        componentData = { type: component, data: { url: '' } };
         break;
       default:
         componentData = { type: component, data: {} };
@@ -94,6 +87,12 @@ const NewBroadcast: FC = () => {
           componentData={{ url: '' }} 
           onChange={setComponentList} />;
         break;
+        case 'video':
+          renderedComponent = <VideoComponent
+            componentKey={index} 
+            componentData={{ url: '' }} 
+            onChange={setComponentList} />;
+          break;
       case 'genericTemplate':
         renderedComponent = <GenericTemplateComponent 
           componentKey={index} 
@@ -105,12 +104,6 @@ const NewBroadcast: FC = () => {
           componentKey={index} 
           componentData={{ text: {}, buttons: [] }} 
           onChange={setComponentList} />;
-        break;
-      case 'flow':
-        renderedComponent = <FlowComponent 
-        componentKey={index} 
-        componentData={{ flowId:'' }} 
-        onChange={setComponentList} />;
         break;
       default:
         renderedComponent = <div key={index} >Cannot render {component}</div>;
@@ -125,7 +118,7 @@ const NewBroadcast: FC = () => {
     console.log('Values:', values);
     console.log('componentList:', componentList);
     postRun({ tags: values.tags, exclude: values.exclude, sendToAll: values.sendToAll, flow: componentList, platforms: ["line"] } as NewBroadcastEntry)
-    setRedirect(true) 
+    
   };
 
   const { data: tags, loading: tagsLoading, run: tagsRun, cancel: tagsCancel } = useRequest(getTags, {

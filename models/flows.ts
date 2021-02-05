@@ -25,7 +25,7 @@ export type FlowNew = {
 export type FlowItem = {
   data: FlowItemData;
   type: 
-    | 'text'
+    | 'message'
     | 'image'
     | 'video'
     | 'file'
@@ -39,7 +39,7 @@ export type FlowItemData = {
   buttons?: ButtonData[];
   text?: StringObject;
   url?: string;
-  image_url?: string;
+  imageUrl?: string;
   title?: StringObject;
   subtitle?: StringObject;
   elements?: FlowItemData[];

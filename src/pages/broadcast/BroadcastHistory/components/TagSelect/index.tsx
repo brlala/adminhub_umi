@@ -42,12 +42,13 @@ export interface TagSelectProps {
     selectAllText?: React.ReactNode;
   };
   className?: string;
+  singleOption?: boolean;
   Option?: TagSelectOptionProps;
   children?: TagSelectOptionElement | TagSelectOptionElement[];
 }
 
 const TagSelect: FC<TagSelectProps> & { Option: typeof TagSelectOption } = (props) => {
-  const { children, hideCheckAll = false, className, style, expandable, actionsText = {} } = props;
+  const { children, hideCheckAll = false, singleOption = false, className, style, expandable, actionsText = {} } = props;
 
   const [expand, { toggle }] = useBoolean();
 
@@ -76,14 +77,21 @@ const TagSelect: FC<TagSelectProps> & { Option: typeof TagSelectOption } = (prop
 
   const handleTagChange = (tag: string | number, checked: boolean) => {
     const checkedTags: (string | number)[] = [...(value || [])];
-
-    const index = checkedTags.indexOf(tag);
-    if (checked && index === -1) {
-      checkedTags.push(tag);
-    } else if (!checked && index > -1) {
-      checkedTags.splice(index, 1);
-    }
-    setValue(checkedTags);
+    if (singleOption) { 
+      if (checked) {
+        setValue([tag])
+      } else {
+        setValue([])
+      }
+    } 
+    else{
+      const index = checkedTags.indexOf(tag);
+      if (checked && index === -1) {
+        checkedTags.push(tag);
+      } else if (!checked && index > -1) {
+        checkedTags.splice(index, 1);
+      }
+      setValue(checkedTags);}
   };
 
   const checkedAll = getAllTags().length === value?.length;

@@ -15,7 +15,7 @@ export const QuickReplyDisplayComponent: FC<DisplayComponentProps> = (props) => 
   return (
     <Space>
       {componentData &&
-        componentData.quick_replies?.map((element, index) => (
+        componentData.quickReplies?.map((element, index) => (
           <Button key={componentKey + 'qr' + index} type="default" style={{ borderRadius: 20 }}>
             {element.text.EN}
           </Button>
@@ -51,8 +51,6 @@ export const ImageDisplayComponent: FC<DisplayComponentProps> = (props) => {
 
 export const GenericTemplateDisplayComponent: FC<DisplayComponentProps> = (props) => {
   const { componentKey, componentData } = props;
-  console.log('Here', componentData);
-
   const CarouselButtonGroup = (total: number, current: number) => {
     const items = [];
     for (let x = 0; x < total; x++) {
@@ -122,7 +120,7 @@ export const GenericTemplateDisplayComponent: FC<DisplayComponentProps> = (props
               key={index}
               style={{ borderRadius: 10, background: '#F6F6F6' }}
               size="small"
-              cover={<img src={element ? element.image_url : ''} />}
+              cover={<img src={element ? element.imageUrl : ''} />}
             >
               <Meta title={element.title?.EN} description={element.subtitle?.EN} />
               {element.buttons?.map((button, buttonIdex) => (

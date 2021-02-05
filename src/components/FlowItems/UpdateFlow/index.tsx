@@ -256,15 +256,13 @@ export type GenericTemplateComponentDataProps = {
   componentKey: number;
   componentData: { elements: Templates[] };
   onChange: (prevState: any) => void;
-  current: FlowEditableComponent[];
 };
 
 export const GenericTemplateComponent: FC<GenericTemplateComponentDataProps> = (props) => {
-  const { componentKey, componentData, onChange, current } = props
+  const { componentKey, componentData, onChange } = props
   const [activeKey, setActiveKey] = useState<number>(0);
   const [panes, setPanes] = useState(componentData.elements)
   
-  console.log(panes, current)
   const onEdit = (targetKey: any, action: string) => {
     if (action === 'add') {
       add();
@@ -775,24 +773,20 @@ export const FlowComponent: FC<FlowComponentDataProps> = (props) => {
       <Divider style={{ marginTop: -6 }} orientation="left">
         Flow
       </Divider>
-      <Select
-        allowClear
-        style={{ width: '100%' }}
-        placeholder="Please select"
-        onSearch={run}
-        onFocus={run}
-        onBlur={cancel}
-        loading={loading}
-        // onChange={handleChange}
-      >
-        {data && data.map(i => {
-          return <Option key={i}>{i}</Option>
-        })}
-      </Select>
       <ProFormSelect
         width="xl"
         name="flowResponse"
         showSearch
+        fieldProps={{ onSelect: (e) => {
+          console.log(e);
+          onChange((prevState: any) =>
+            [...prevState].map((item, index) => {
+              if (index === componentKey) {
+                return {...item, data: {...item.data, flowId: e } };
+              } else return item;
+            }),
+          );
+        }}}
         request={async () => {
           return await queryFlowsFilter('name,params');
         }}
