@@ -45,9 +45,21 @@ export const TextDisplayComponent: FC<DisplayComponentProps> = (props) => {
 export const ImageDisplayComponent: FC<DisplayComponentProps> = (props) => {
   const { componentKey, componentData } = props;
   if (componentData) {
-    return <Image style={{maxWidth: 300, maxHeight: 200}} key={componentKey} src={componentData.url} />;
+    return (
+      <Image
+        style={{ maxWidth: 300, maxHeight: 200, display: 'block', width: 'auto', height: 'auto' }}
+        key={componentKey}
+        src={componentData.url}
+      />
+    );
   }
-  return <Image style={{maxWidth: 300, maxHeight: 200}}key={componentKey} src="https://placekitten.com/300/150" />;
+  return (
+    <Image
+      style={{ maxWidth: 300, maxHeight: 200, display: 'block', width: 'auto', height: 'auto' }}
+      key={componentKey}
+      src="https://placekitten.com/300/150"
+    />
+  );
 };
 
 export const GenericTemplateDisplayComponent: FC<DisplayComponentProps> = (props) => {
@@ -79,7 +91,8 @@ export const GenericTemplateDisplayComponent: FC<DisplayComponentProps> = (props
         }}
         onClick={onClick}
       >
-      <RightOutlined /></div>
+        <RightOutlined />
+      </div>
     );
   };
 
@@ -96,7 +109,8 @@ export const GenericTemplateDisplayComponent: FC<DisplayComponentProps> = (props
         }}
         onClick={onClick}
       >
-      <LeftOutlined /></div>
+        <LeftOutlined />
+      </div>
     );
   };
 
