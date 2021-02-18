@@ -23,6 +23,7 @@ export default {
   'menu.form.advanced-form': 'Advanced Form',
   'menu.list': 'List',
   'menu.list.question-list': 'Questions',
+  'menu.list.conversation': 'Conversations',
   'menu.list.flow-list': 'Flows',
   'menu.form.new-flow': 'New Flow',
   'menu.list.broadcast': 'Broadcasts',

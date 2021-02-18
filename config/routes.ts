@@ -43,6 +43,12 @@
     component: './QuestionList',
   },
   {
+    name: 'list.conversation',
+    icon: 'table',
+    path: '/conversations',
+    component: './ConversationList',
+  },
+  {
     name: 'list.flow-list',
     icon: 'ApartmentOutlined',
     path: '/flows',
