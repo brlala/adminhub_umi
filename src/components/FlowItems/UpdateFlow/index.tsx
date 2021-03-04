@@ -1,33 +1,28 @@
-import React, { useEffect, useState, FC } from 'react';
+import React, { useState, FC } from 'react';
 import { ProFormSelect, ProFormTextArea } from '@ant-design/pro-form';
-import { Button, Divider, Form, Input, message, Progress, Radio, Card, Space } from 'antd';
+import { Button, Divider, Form, Input, message, Radio, Card, Space } from 'antd';
 import { queryFlowsFilter } from '@/pages/QuestionList/service';
 import { FormattedMessage } from '@@/plugin-locale/localeExports';
-import { Upload, Modal } from 'antd';
+import { Modal } from 'antd';
 const { TextArea } = Input;
-import { DeleteOutlined, FileAddOutlined, LoadingOutlined, PaperClipOutlined, PlusOutlined, UploadOutlined, VideoCameraAddOutlined } from '@ant-design/icons';
-import axios from 'axios';
+import { DeleteOutlined, FileAddOutlined, FunctionOutlined, LoadingOutlined, PaperClipOutlined, PlusOutlined, VideoCameraAddOutlined } from '@ant-design/icons';
 import { ImageDisplayComponent } from '../ReadFlow';
-import { StringObject } from 'models/flows';
 import ImgCrop from 'antd-img-crop';
 import { Tabs } from 'antd';
 import './index.less';
 import { DropdownProps } from '@/pages/QuestionList/data';
 import Dragger from 'antd/lib/upload/Dragger'
+import { AttachmentComponentDataProps, TextComponentDataProps, GenericTemplateComponentDataProps, TemplateComponentDataProps, ButtonTemplateComponentDataProps, FlowComponentDataProps,QuickReplyComponentDataProps, Buttons, CustomComponentDataProps } from './data';
 
-export type TextComponentDataProps = {
-  componentKey: number;
-  componentData?: { text: StringObject };
-  onChange: (prevState: any) => void;
-};
+const { TabPane } = Tabs;
 
 export const TextComponent: FC<TextComponentDataProps> = (props) => {
   const { componentKey, componentData, onChange } = props
   return (
-    <>
-      <Divider style={{ marginTop: -6 }} orientation="left">
+    <Card title='Text' size='small' style={{background: 'transparent'}} bordered={false}>
+      {/* <Divider orientation="left">
         Text
-      </Divider>
+      </Divider> */}
       <Form.Item
         key={'component' + componentKey.toString() + 'text'}
         name={'component' + componentKey.toString() + 'text'}
@@ -48,14 +43,40 @@ export const TextComponent: FC<TextComponentDataProps> = (props) => {
           }}
         />
       </Form.Item>
-    </>
+    </Card>
   );
 };
 
-export type AttachmentComponentDataProps = {
-  componentKey: number;
-  componentData:{ url: string, fileName?: string };
-  onChange: (prevState: any) => void;
+
+export const CustomComponent: FC<CustomComponentDataProps> = (props) => {
+  const { componentKey, componentData, onChange } = props
+  return (
+    <>
+      <Divider orientation="left">
+        Custom
+      </Divider>
+      <Form.Item
+        key={'component' + componentKey.toString() + 'function'}
+        name={'component' + componentKey.toString() + 'function'}
+        initialValue={componentData?.function}
+        rules={[{ required: true, message: 'Field is required' }]}
+      >
+        <Input
+          prefix={<FunctionOutlined />}
+          placeholder="Please input"
+          onChange={(e) => {
+            onChange((prevState: any) =>
+              [...prevState].map((item, index) => {
+                if (index === componentKey) {
+                  return {...item, data: { function: e.target.value } };
+                } else return item;
+              }),
+            );
+          }}
+        />
+      </Form.Item>
+    </>
+  );
 };
 
 export const ImageComponent: FC<AttachmentComponentDataProps> = (props) => {
@@ -91,7 +112,7 @@ export const ImageComponent: FC<AttachmentComponentDataProps> = (props) => {
 
   return (
         <>
-          <Divider style={{ marginTop: -6 }} orientation="left">
+          <Divider orientation="left">
             Image
           </Divider>
           <Form.Item
@@ -102,7 +123,7 @@ export const ImageComponent: FC<AttachmentComponentDataProps> = (props) => {
           >
             {previewImage? 
               <Space>
-                <ImageDisplayComponent componentKey={componentKey} componentData={{url: previewImage}}/>
+                <ImageDisplayComponent componentKey={componentKey.toString()} componentData={{url: previewImage}}/>
                 <Button shape="round" onClick={() => setPreviewImage('')}><DeleteOutlined/></Button>
               </Space>
               : 
@@ -149,7 +170,7 @@ export const VideoComponent: FC<AttachmentComponentDataProps> = (props) => {
 
   return (
         <>
-          <Divider style={{ marginTop: -6 }} orientation="left">
+          <Divider orientation="left">
             Video
           </Divider>
           <Form.Item
@@ -205,7 +226,7 @@ export const FileComponent: FC<AttachmentComponentDataProps> = (props) => {
 
   return (
         <>
-          <Divider style={{ marginTop: -6 }} orientation="left">
+          <Divider orientation="left">
             File
           </Divider>
           <Form.Item
@@ -228,29 +249,6 @@ export const FileComponent: FC<AttachmentComponentDataProps> = (props) => {
           </Form.Item>
       </>
   );
-};
-
-export type Buttons = {
-  title: StringObject;
-  type: string;
-  url?: string;
-  flowId?: string;
-};
-
-export type Templates = {
-  imageUrl?: {};
-  fileName?: string;
-  title?: StringObject;
-  subtitle?: StringObject;
-  buttons?: Buttons[];
-  closable?: boolean;
-};
-
-export type GenericTemplateComponentDataProps = {
-  componentKey: number;
-  componentData: { elements: Templates[] };
-  onChange: (prevState: any) => void;
-  current: any;
 };
 
 export const GenericTemplateComponent: FC<GenericTemplateComponentDataProps> = (props) => {
@@ -294,36 +292,27 @@ export const GenericTemplateComponent: FC<GenericTemplateComponentDataProps> = (
   };
 
   return (
-    <>
-      <Divider style={{ marginTop: -6 }} orientation="left">
-        Step : Generic Template
-      </Divider>
-      <Tabs
-        type="editable-card"
-        onChange={(activeKey: string) => {setActiveKey(parseInt(activeKey))}}
-        activeKey={activeKey?.toString()}
-        onEdit={onEdit}
-        hideAdd={!(panes.length < 10)} >
-        {panes.map((pane, index: number) => {
-          return (
-            <TabPane tab={index + 1} key={index.toString()} closable={panes.length !== 1} forceRender>
-              <TemplateComponent componentKey={index} componentData={pane} onChange={onChange} parentKey={componentKey} />
-            </TabPane>
-          );
-        })}
-      </Tabs>
-    </>
+    <Card title='Generic Template' size='small' style={{background: 'transparent'}}>
+      <div className="card-container">
+        <Tabs
+          type="editable-card"
+          size='small'
+          onChange={(activeKey: string) => {setActiveKey(parseInt(activeKey))}}
+          activeKey={activeKey?.toString()}
+          onEdit={onEdit}
+          hideAdd={!(panes.length < 10)} >
+          {panes.map((pane, index: number) => {
+            return (
+              <TabPane tab={index + 1} key={index.toString()} closable={panes.length !== 1} forceRender>
+                <TemplateComponent componentKey={index} componentData={pane} onChange={onChange} parentKey={componentKey} />
+              </TabPane>
+            );
+          })}
+        </Tabs>
+      </div>
+    </Card>
   );
 };
-
-export type TemplateComponentDataProps = {
-  componentKey: number;
-  componentData: Templates;
-  onChange: (prevState: any) => void;
-  parentKey: number;
-};
-
-const { TabPane } = Tabs;
 
 export const TemplateComponent: FC<TemplateComponentDataProps> = (props) => {
   const { componentKey, componentData, onChange, parentKey } = props
@@ -331,9 +320,8 @@ export const TemplateComponent: FC<TemplateComponentDataProps> = (props) => {
   const [uploading, setUploading] = useState(componentData.imageUrl?true:false);
   const [previewVisible, setPreviewVisible] = useState(false);
   const [previewTitle, setPreviewTitle] = useState(false);
-  const [selectRow, setSelectRow] = useState(null);
-  const [responseType, setResponseType] = useState('flow');
-  const [flows, setFlows] = useState<DropdownProps[]>([]);
+  const [selectedButton, setSelectedButton] = useState<Partial<Buttons>>();
+  const [selectedButtonIndex, setSelectedButtonIndex] = useState<number>();
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [buttons, setButtons] = useState(componentData.buttons)
 
@@ -350,32 +338,6 @@ export const TemplateComponent: FC<TemplateComponentDataProps> = (props) => {
     setIsModalVisible(false);
   };
   const handleCancel = () => setPreviewVisible(false);
-
-  let responseArea;
-  if (responseType === 'url') {
-    responseArea = (
-      <ProFormTextArea
-        name="url"
-        label="URL"
-        placeholder="Link to URL"
-      />
-    );
-  } else {
-    responseArea = (
-      <ProFormSelect
-        name="flowId"
-        label="Flow Response"
-        initialValue={selectRow?.type === 'flow' ? selectRow?.content : null}
-        showSearch
-        // @ts-ignore
-        request={async () => {
-          const flowsRequest = await queryFlowsFilter('name,params');
-          setFlows(flowsRequest);
-        }}
-        options={flows}
-      />
-    );
-  }
 
   const draggerProps = {
     key: "Component" + parentKey.toString() + "Image"+ componentKey?.toString(),
@@ -412,60 +374,53 @@ export const TemplateComponent: FC<TemplateComponentDataProps> = (props) => {
 
   return (
     <div>
-      <Form.Item>
-        <Card
-          size="small"
-          title={
-            <>
-              <div className="GenericTemplate">
-              {previewImage? 
-                <Space>
-                  <ImageDisplayComponent componentKey={componentKey} componentData={{url: previewImage}}/>
-                  <Button shape="round" onClick={() => setPreviewImage('')}><DeleteOutlined/></Button>
-                </Space>
-                : 
-                <ImgCrop rotate aspect={1.91}>
-                  <Dragger  {...draggerProps}>
-                    <p style={{marginBottom: 12}}> {uploading ? <LoadingOutlined /> : <PlusOutlined />} </p>
-                    <p className="ant-upload-hint">{uploading ? "Uploading" : "Click or drag image here to upload"}</p>
-                  </Dragger>
-                </ImgCrop>
-                }
-              </div>
-              
-              <Modal
-                visible={previewVisible}
-                title={previewTitle}
-                footer={null}
-                onCancel={handleCancel}
-              >
-                <img alt="image-preview" style={{ width: '100%' }} src={previewImage} />
-              </Modal>
-              <Input 
-                placeholder="Title" 
-                defaultValue={componentData?.title?.EN} 
-                onChange={(e) => {
-                  onChange((prevState: any) => [...prevState].map((item, index) => {
-                    if (index === parentKey) {
-                      return { ...item, data: {elements: 
-                        item.data.elements.map((pane: any, paneIndex: number) => {
-                          if (paneIndex === componentKey) {
-                            return { ...pane, title: { EN: e.target.value }}
-                          }
-                          else return pane;})
-                      }}
-                    }
-                    else return item;
-                  }))
-                }}
-              />
-            </>
-          }
-          style={{ width: 300 }}
-        >
-          <Input 
-            placeholder="Subtitle" 
-            defaultValue={componentData?.subtitle?.EN} 
+      <Form 
+      initialValues={{
+        Title: componentData?.title?.EN? componentData.title.EN : "",
+        Subtitle: componentData?.subtitle?.EN? componentData.subtitle.EN: ""}}>
+        <Card size="small" bordered={false}>
+          <div className="GenericTemplate">
+            {previewImage? 
+              <Space>
+                <ImageDisplayComponent componentKey={componentKey.toString()} componentData={{url: previewImage}}/>
+                {/* <Button shape="round" onClick={() => setPreviewImage('')}><DeleteOutlined/></Button> */}
+              </Space>
+              : 
+              <ImgCrop rotate aspect={1.91}>
+                <Dragger  {...draggerProps}>
+                  <p style={{marginBottom: 12}}> {uploading ? <LoadingOutlined /> : <PlusOutlined />} </p>
+                  <p className="ant-upload-hint">{uploading ? "Uploading" : "Click or drag image here to upload"}</p>
+                </Dragger>
+              </ImgCrop>}
+          </div>
+          <Modal
+            visible={previewVisible}
+            title={previewTitle}
+            footer={null}
+            onCancel={handleCancel}>
+            <img alt="image-preview" style={{ width: '100%' }} src={previewImage} />
+          </Modal>
+          <Form.Item name='Title' rules={[{ required: true, message: 'Title is required' }]}>
+            <Input
+              allowClear
+              placeholder="Title"
+              onChange={(e) => {
+                onChange((prevState: any) => [...prevState].map((item, index) => {
+                  if (index === parentKey) {
+                    return { ...item, data: {elements: 
+                      item.data.elements.map((pane: any, paneIndex: number) => {
+                        if (paneIndex === componentKey) {
+                          return { ...pane, title: { EN: e.target.value }}
+                        }
+                        else return pane;})}}}
+                  else return item;}))
+              }}
+            />
+          </Form.Item>
+          <Form.Item name='Subtitle'>
+          <TextArea 
+            allowClear
+            placeholder="Subtitle (Optional)"
             onChange={(e) => {
               onChange((prevState: any) => [...prevState].map((item, index) => {
                 if (index === parentKey) {
@@ -474,33 +429,32 @@ export const TemplateComponent: FC<TemplateComponentDataProps> = (props) => {
                       if (paneIndex === componentKey) {
                         return { ...pane, subtitle: { EN: e.target.value }}
                       }
-                      else return pane;})
-                  }}
-                }
-                else return item;
-              }))
+                      else return pane;})}}}
+                else return item;}))
             }}
           />
-          {buttons.map((button, buttonIndex) => (
+        </Form.Item>
+          {buttons&&buttons.map((button, buttonIndex) => (
             <Button
               key={"component" + parentKey + "pane" + componentKey + "button" + buttonIndex}
               block
               onClick={() => {
                 console.log({ row: button });
-                setSelectRow(button);
-                setResponseType(button.type);
+                setSelectedButton(button);
+                setSelectedButtonIndex(buttonIndex)
                 showModal();
               }}
             >
               {button.title.EN}
             </Button>
           ))}
-          {buttons.length < 3 && (
+          {buttons&&buttons.length < 3 && (
             <Button
               key={"component" + parentKey + "pane" + componentKey + "buttonNew"}
               onClick={() => {
                 showModal();
-                setSelectRow(null);
+                setSelectedButtonIndex(buttons.length)
+                setSelectedButton({type: 'flow', title: {EN: ''}});
               }}
               type="dashed"
               block
@@ -530,23 +484,44 @@ export const TemplateComponent: FC<TemplateComponentDataProps> = (props) => {
                 console.log('button', values)
                 onChange((prevState: any) => [...prevState].map((item, index) => {
                   if (index === parentKey) {
+                    let updatedButton: Buttons;
+                    if (values.type === 'flow')
+                      {updatedButton = {...values, title: {EN: values.title}, payload: {flowId: values.flowId}}}
+                    else {updatedButton = {...values, title: {EN: values.title}}}
                     return { ...item, data: {elements: 
                       item.data.elements.map((pane: any, paneIndex: number) => {
                         if (paneIndex === componentKey) {
-                          setButtons((prevButtons: any) => [...prevButtons, {...values, title: {EN: values.title}}])
-                          return { ...pane, buttons: [...pane.buttons, {...values, title: {EN: values.title}}]}
+                          if (selectedButtonIndex === pane.buttons.length) {
+                            setButtons((prevButtons: any) => [...prevButtons, updatedButton])
+                            return { ...pane, buttons: [...pane.buttons, updatedButton]}
+                          }
+                          else{
+                            setButtons((prevButtons: any) => prevButtons.map((button: Buttons, buttonIndex: number) => {
+                              if (buttonIndex === selectedButtonIndex)
+                                return updatedButton
+                              return button 
+                            }))
+                            return { ...pane, buttons: pane.buttons.map((button: Buttons, buttonIndex: number) => {
+                              if (buttonIndex === selectedButtonIndex)
+                                return updatedButton
+                              return button 
+                            })}
+                          }
                         }
                         else return pane;})
                     }}
+
+
+
                   }
                   else return item;
                 }))
                 message.success('Button added');
               }}
               initialValues={{
-                // text: selectRow?.text,
-                // content: selectRow?.type,
-                url: selectRow?.type === 'url' ? selectRow?.content : null,
+                title: selectedButton?.title.EN,
+                content: selectedButton?.type,
+                url: selectedButton?.type === 'url' ? selectedButton?.url : null,
               }}
               labelCol={{ span: 7 }}
               wrapperCol={{ span: 16 }}
@@ -555,49 +530,54 @@ export const TemplateComponent: FC<TemplateComponentDataProps> = (props) => {
                 label="Display Text"
                 name="title"
                 rules={[{ required: true, message: 'Please input display text' }]}
-                initialValue={selectRow?.title.EN}
+                initialValue={selectedButton?.title.EN}
               >
                 <Input />
               </Form.Item>
-              {/*<ProFormText name="text" label="Display Text" initialValue={selectRow?.text} />*/}
-              {/*{selectRow?.text}*/}
               <Form.Item
                 label="Type"
                 name="type"
-                initialValue={selectRow ? selectRow.type : 'flow'}
+                initialValue={selectedButton ? selectedButton.type : 'flow'}
               >
                 <Radio.Group
                   onChange={(event) => {
-                    console.log(event.target.value);
-                    setResponseType(event.target.value);
+                    setSelectedButton({...selectedButton, type: event.target.value})
                   }}
                 >
                   <Radio.Button value="flow">Flow</Radio.Button>
                   <Radio.Button value="url">URL</Radio.Button>
                 </Radio.Group>
               </Form.Item>
-              {responseArea}
+              {selectedButton?.type === 'url'? (
+                  <ProFormTextArea
+                    name="url"
+                    label="URL"
+                    placeholder="Link to URL"
+                  />
+                ):(
+                  <ProFormSelect
+                    name="flowId"
+                    label="Flow Response"
+                    initialValue={selectedButton?.type === 'flow' ? selectedButton?.payload?.flowId : null}
+                    showSearch
+                    // @ts-ignore
+                    request={async () => {
+                      return await queryFlowsFilter('name,params');
+                    }}
+                  />)
+              }
             </Form>
           </Modal>
         </Card>
-      </Form.Item>
+      </Form>
     </div>
   );
 };
 
-export type ButtonTemplateComponentDataProps = {
-  componentKey: number;
-  componentData: {
-    text: StringObject;
-    buttons: Buttons[];
-  };
-  onChange: (prevState: any) => void;
-};
-
 export const ButtonTemplateComponent: FC<ButtonTemplateComponentDataProps> = (props) => {
-  const { componentKey, componentData, onChange } = props
-  const [responseType, setResponseType] = useState<string>('flow');
-  const [selectRow, setSelectRow] = useState(null);
+  const { componentKey, componentData, onChange } = props;
+  const [selectedButton, setSelectedButton] = useState<Partial<Buttons>>();
+  const [selectedButtonIndex, setSelectedButtonIndex] = useState<number>();
   const [isModalVisible, setIsModalVisible] = useState(false);
 
   console.log(componentData);
@@ -613,40 +593,19 @@ export const ButtonTemplateComponent: FC<ButtonTemplateComponentDataProps> = (pr
   const handleCancelModal = () => {
     setIsModalVisible(false);
   };
-  let responseArea;
-  if (responseType === 'url') {
-    responseArea = (
-      <ProFormTextArea
-        name="url"
-        label="URL"
-        placeholder="Link to URL"
-      />
-    );
-  } else {
-    responseArea = (
-      <ProFormSelect
-        name="flowId"
-        label="Flow Response"
-        initialValue={selectRow?.type === 'flow' ? selectRow?.content : null}
-        showSearch
-        // @ts-ignore
-        request={async () => {
-          return await queryFlowsFilter('name,params');
-        }}
-      />
-    );
-  }
 
   return (
     <>
-      <Divider style={{ marginTop: -6 }} orientation="left">
+      <Divider orientation="left">
         Button Template
       </Divider>
+
+      <Card size="small">
       <Form.Item
         key={componentKey.toString()}
-        rules={[{ required: true, message: 'Field is required' }]}
-      >
+        rules={[{ required: true, message: 'Field is required' }]}>
         <TextArea
+          allowClear
           rows={4}
           placeholder="Please input"
           defaultValue={componentData?.text?.EN}
@@ -660,14 +619,15 @@ export const ButtonTemplateComponent: FC<ButtonTemplateComponentDataProps> = (pr
             );
           }}
         />
+        </Form.Item>
           {componentData?.buttons.map((button, buttonIndex) => (
             <Button
               key={"component" + componentKey + "button" + buttonIndex}
               block
               onClick={() => {
                 console.log({ row: button });
-                setSelectRow(button);
-                setResponseType(button.type);
+                setSelectedButton(button);
+                setSelectedButtonIndex(buttonIndex)
                 showModal();
               }}
             >
@@ -679,7 +639,8 @@ export const ButtonTemplateComponent: FC<ButtonTemplateComponentDataProps> = (pr
               key={"component" + componentKey + "buttonNew"}
               onClick={() => {
                 showModal();
-                setSelectRow(null);
+                setSelectedButtonIndex(componentData?.buttons.length)
+                setSelectedButton({type: 'flow', title: {EN: ''}});
               }}
               type="dashed"
               block
@@ -701,14 +662,24 @@ export const ButtonTemplateComponent: FC<ButtonTemplateComponentDataProps> = (pr
             <Button type="primary" htmlType="submit" onClick={handleOkModal} form="my-form">
               Submit
             </Button>,
-          ]}
-        >
+          ]}>
           <Form
             id="my-form"
-            onFinish={async (values) => {
+            onFinish={(values) => {
+              console.log('values', values)
               onChange((prevState: any) => [...prevState].map((item, index) => {
                 if (index === componentKey) {
-                  return { ...item, data: {...item.data, buttons: [...item.data.buttons, {...values, title: {EN: values.title}}]}}
+                  let updatedButton: Buttons;
+                  if (values.type === 'flow')
+                    {updatedButton = {...values, title: {EN: values.title}, payload: {flowId: values.flowId}}}
+                  else {updatedButton = {...values, title: {EN: values.title}}}
+                  if (selectedButtonIndex === item.data.buttons.length) 
+                    return { ...item, data: {...item.data, buttons: [...item.data.buttons, updatedButton]}}
+                  return { ...item, data: {...item.data, buttons: [item.data.buttons.map((button: Buttons, buttonIndex: number) => {
+                    if (buttonIndex === selectedButtonIndex)
+                      return updatedButton
+                    return button 
+                  })]}}
                 }
                 else return item;
               }))
@@ -717,7 +688,7 @@ export const ButtonTemplateComponent: FC<ButtonTemplateComponentDataProps> = (pr
             initialValues={{
               // text: selectRow?.text,
               // content: selectRow?.type,
-              urlResponse: selectRow?.type === 'url' ? selectRow?.content : null,
+              url: selectedButton?.type === 'url' ? selectedButton?.url : null,
             }}
             labelCol={{ span: 7 }}
             wrapperCol={{ span: 16 }}
@@ -726,39 +697,46 @@ export const ButtonTemplateComponent: FC<ButtonTemplateComponentDataProps> = (pr
               label="Display Text"
               name="title"
               rules={[{ required: true, message: 'Please input display text' }]}
-              initialValue={selectRow?.title.EN}
+              initialValue={selectedButton?.title.EN}
             >
               <Input />
             </Form.Item>
             <Form.Item
               label="Type"
               name="type"
-              initialValue={selectRow ? selectRow.type : 'flow'}
+              initialValue={selectedButton ? selectedButton.type : 'flow'}
             >
               <Radio.Group
                 onChange={(event) => {
-                  console.log(event.target.value);
-                  setResponseType(event.target.value);
-                }}
-              >
+                  setSelectedButton({...selectedButton, type: event.target.value})
+                }}>
                 <Radio.Button value="flow">Flow</Radio.Button>
                 <Radio.Button value="url">URL</Radio.Button>
               </Radio.Group>
             </Form.Item>
-            {responseArea}
+            {selectedButton?.type === 'url'? (
+                <ProFormTextArea
+                  name="url"
+                  label="URL"
+                  placeholder="Link to URL"
+                />
+              ):(
+                <ProFormSelect
+                  name="flowId"
+                  label="Flow Response"
+                  initialValue={selectedButton?.type === 'flow' ? selectedButton?.payload?.flowId : null}
+                  showSearch
+                  // @ts-ignore
+                  request={async () => {
+                    return await queryFlowsFilter('name,params');
+                  }}
+                />)
+            }
           </Form>
         </Modal>
-      </Form.Item>
+      </Card>
     </>
   );
-};
-
-export type FlowComponentDataProps = {
-  componentKey: number;
-  componentData: {
-    flowId: string
-  };
-  onChange: (prevState: any) => void;
 };
 
 export const FlowComponent: FC<FlowComponentDataProps> = (props) => {
@@ -766,11 +744,10 @@ export const FlowComponent: FC<FlowComponentDataProps> = (props) => {
 
   return (
     <>
-      <Divider style={{ marginTop: -6 }} orientation="left">
+      <Divider orientation="left">
         Flow
       </Divider>
       <ProFormSelect
-        width="xl"
         name={componentData.name}
         showSearch
         fieldProps={{ onSelect: (e) => {
@@ -786,7 +763,6 @@ export const FlowComponent: FC<FlowComponentDataProps> = (props) => {
         request={async () => {
           return await queryFlowsFilter('name,params');
         }}
-        fieldProps={{ onSelect: (e) => console.log(e) }}
         rules={[
           {
             required: true,
@@ -801,17 +777,6 @@ export const FlowComponent: FC<FlowComponentDataProps> = (props) => {
       />
     </>
   );
-};
-
-export type QrButtons = {
-  text: StringObject;
-  flowId?: string;
-};
-
-export type QuickReplyComponentDataProps = {
-  componentKey: number;
-  componentData: { quickReplies: QrButtons[] };
-  onChange: (prevState: any) => void;
 };
 
 export const QuickReplyComponent: React.FC<QuickReplyComponentDataProps> = (props) => {
@@ -915,209 +880,6 @@ export const QuickReplyComponent: React.FC<QuickReplyComponentDataProps> = (prop
             />
           </Form>
         </Modal>
-      </Form.Item>
-    </>
-  );
-};
-
-
-//  ARCHIVES
-export type Attachments = {
-  name: string;
-  url?: string;
-  uid: string;
-  response?: { url: string };
-};
-export type AttachmentsComponentData = {
-  type: string;
-  name: string;
-  data: { attachments: Attachments[] };
-};
-export type AttachmentsComponentDataProps = {
-  componentData: AttachmentsComponentData;
-  index: Number;
-};
-function getBase64(file) {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.onload = () => resolve(reader.result);
-    reader.onerror = (error) => reject(error);
-  });
-}
-export const ImageAttachmentComponent: React.FC<AttachmentsComponentDataProps> = ({
-  componentData,
-}) => {
-  const [previewVisible, setPreviewVisible] = useState(false);
-  const [previewImage, setPreviewImage] = useState(null);
-  const [previewTitle, setPreviewTitle] = useState(false);
-  const [progress, setProgress] = useState(0);
-  const [fileList, setFileList] = useState(componentData.data.attachments); // old items is in "url", new items is in "response" key
-
-  const uploadImage = async (options) => {
-    const { onSuccess, onError, file, onProgress } = options;
-
-    const formData = new FormData();
-    const config = {
-      headers: { 'content-type': 'multipart/form-data' },
-      onUploadProgress: (event) => {
-        const percent = Math.floor((event.loaded / event.total) * 100);
-        setProgress(percent);
-        if (percent === 100) {
-          setTimeout(() => setProgress(0), 1000);
-        }
-        onProgress({ percent: (event.loaded / event.total) * 100 });
-      },
-    };
-    formData.append('file', file);
-    try {
-      const res = await axios.post('http://localhost:5000/upload', formData, config);
-      onSuccess({ url: res.data.url });
-      console.log('server res: ', res);
-    } catch (err) {
-      console.log('Error: ', err);
-      const error = new Error('Some error');
-      onError({ err });
-    }
-  };
-
-  const handleCancel = () => setPreviewVisible(false);
-
-  const handlePreview = async (file) => {
-    if (!file.url && !file.preview) {
-      file.preview = await getBase64(file.originFileObj);
-    }
-
-    setPreviewImage(file.url || file.preview);
-    setPreviewVisible(true);
-    setPreviewTitle(file.name || file.url.substring(file.url.lastIndexOf('/') + 1));
-  };
-  const handleChange = ({ fileList }) => {
-    setFileList(fileList);
-  };
-
-  const uploadButton = (
-    <div>
-      <PlusOutlined />
-      <div style={{ marginTop: 8 }}>Upload</div>
-    </div>
-  );
-  return (
-    <>
-      <Divider style={{ marginTop: -6 }} orientation="left">
-        Image
-      </Divider>
-      <Form.Item>
-        <Form.Item noStyle rules={[{ required: true, message: 'Image is required' }]}>
-          <Upload
-            customRequest={uploadImage}
-            onChange={handleChange}
-            accept="image/*"
-            listType="picture-card"
-            fileList={fileList}
-            onPreview={handlePreview}
-          >
-            {fileList.length >= 8 ? null : uploadButton}
-          </Upload>
-          <Modal
-            visible={previewVisible}
-            title={previewTitle}
-            footer={null}
-            onCancel={handleCancel}
-          >
-            <img alt="image-preview" style={{ width: '100%' }} src={previewImage} />
-          </Modal>
-        </Form.Item>
-        {progress > 0 ? <Progress percent={progress} /> : null}
-      </Form.Item>
-    </>
-  );
-};
-
-export const VideoAttachmentComponent: React.FC<AttachmentsComponentDataProps> = ({
-  componentData,
-}) => {
-  const [progress, setProgress] = useState(0);
-  const [url, setUrl] = useState(null);
-  const [fileList, setFileList] = useState(componentData.data.attachments);
-
-  useEffect(() => {
-    if (componentData.data.attachments.length > 0) {
-      setUrl(componentData.data.attachments[0].url);
-    }
-  }, [componentData]);
-  const uploadVideo = async (options) => {
-    const { onSuccess, onError, file, onProgress } = options;
-
-    const formData = new FormData();
-    const config = {
-      headers: { 'content-type': 'multipart/form-data' },
-      onUploadProgress: (event) => {
-        const percent = Math.floor((event.loaded / event.total) * 100);
-        setProgress(percent);
-        if (percent === 100) {
-          setTimeout(() => setProgress(0), 1000);
-        }
-        onProgress({ percent: (event.loaded / event.total) * 100 });
-      },
-    };
-    formData.append('file', file);
-    try {
-      const res = await axios.post('http://localhost:5000/upload', formData, config);
-      onSuccess({ url: res.data.url });
-      setUrl(res.data.url);
-      console.log('server res: ', res);
-    } catch (err) {
-      console.log('Error: ', err);
-      const error = new Error('Some error');
-      onError({ err });
-    }
-  };
-  const handleChange = ({ fileList }) => {
-    setFileList(fileList);
-  };
-
-  return (
-    <>
-      <Form.Item>
-        <Divider style={{ marginTop: -6 }} orientation="left">
-          Video
-        </Divider>
-        {url && <video controls style={{ width: '100%' }} src={url} />}
-        <Upload
-          customRequest={uploadVideo}
-          accept="video/mp4"
-          onChange={handleChange}
-          fileList={fileList}
-          onRemove={() => setUrl(null)}
-          action="http://localhost:5000/upload"
-          listType="picture"
-          maxCount={1}
-        >
-          <Button icon={<UploadOutlined />}>Upload (Max: 1)</Button>
-        </Upload>
-        {/*{progress > 0 ? <Progress percent={progress} /> : null}*/}
-      </Form.Item>
-    </>
-  );
-};
-
-export const FileAttachmentComponent: React.FC<AttachmentsComponentDataProps> = ({
-  componentData,
-}) => {
-  const [fileList, setFileList] = useState(componentData.data.attachments);
-  const handleChange = ({ fileList: newFileList }) => {
-    setFileList(newFileList);
-  };
-  return (
-    <>
-      <Form.Item>
-        <Divider style={{ marginTop: -6 }} orientation="left">
-          File
-        </Divider>
-        <Upload onChange={handleChange} action={'http://localhost:5000/upload'} fileList={fileList}>
-          <Button icon={<UploadOutlined />}>Upload</Button>
-        </Upload>
       </Form.Item>
     </>
   );

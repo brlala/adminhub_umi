@@ -17,17 +17,29 @@
 //  justify-content: center;
 //}
 
+.GenericTemplate {
+  margin-bottom: 6px;
+}
+
 .GenericTemplate .ant-upload {
-  width: 273px;
-  height: 142.93px;
+  height: 150px;
 }
 .GenericTemplate .ant-upload-list-item {
   width: 270px;
   height: 142.93px;
 }
-.GenericTemplate .ant-progress-bg {
+
+.GenericTemplate .ant-upload-list-item {
   width: 270px;
   height: 142.93px;
+}
+
+.ant-form-item {
+  margin-bottom: 6px;
+}
+
+.ant-tabs-top  > .ant-tabs-nav {
+  margin-bottom: 0px;
 }
 
 .GenericTemplate .ant-upload-list-picture-card-container {
@@ -55,6 +67,59 @@
 
 .ant-upload.ant-upload-drag {
   height: 150px;
-  margin-bottom: 24px;
 }
 
+.list-sort-demo-wrapper {
+  position: relative;
+  overflow: hidden;
+}
+
+.list-sort-demo {
+  margin: 10px auto;
+  position: relative;
+}
+.list-sort-demo > div{
+  overflow: hidden;
+}
+
+.list-sort-demo-list {
+  background: #F0F2F5;
+  border-radius: 6px;
+  width: 90%;
+  margin: 10px auto;
+  padding: 10px;
+  transition:  box-shadow .5s, transform .5s;
+}
+
+.list-sort-demo-list.list-drag-selected{
+  box-shadow: 0 8px 20px #E6E6E6;
+  transform: scale(1.1) !important;
+}
+
+.list-sort-demo-icon {
+  width: 20%;
+  display: inline-block;
+  text-align: center;
+  font-size: 24px;
+  line-height: 50px;
+  vertical-align: top;
+}
+.list-sort-demo-text{
+  width: 80%;
+  display: inline-block;
+}
+
+.list-sort-demo-text h1 {
+  font-size: 18px;
+}
+
+.list-sort-demo-text p{
+  font-size: 12px;
+}
+
+@media screen and (max-width: 320px) {
+  .list-sort-demo-text h1 {
+    font-size: 14px;
+    line-height: 28px;
+  }
+}

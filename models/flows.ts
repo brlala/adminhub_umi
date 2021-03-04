@@ -32,6 +32,8 @@ export type FlowItem = {
     | 'genericTemplate'
     | 'buttonTemplate'
     | 'flow'
+    | 'custom'
+    | 'input'
     | 'quickReplies';
 };
 
@@ -40,6 +42,7 @@ export type FlowItemData = {
   text?: StringObject;
   url?: string;
   imageUrl?: string;
+  function?: string;
   title?: StringObject;
   subtitle?: StringObject;
   elements?: FlowItemData[];
@@ -50,7 +53,7 @@ export type FlowItemData = {
 export type FlowEditableComponent = {
   title: string;
   key: string;
-  id: string;
+  id?: string;
   type: 
     | 'text'
     | 'image'
@@ -59,6 +62,8 @@ export type FlowEditableComponent = {
     | 'genericTemplate'
     | 'buttonTemplate'
     | 'flow'
+    | 'custom'
+    | 'input'
     | 'quickReplies';
   data: {
     buttons?: ButtonData[];
@@ -77,7 +82,7 @@ export type ButtonData = {
   type: string;
   title: StringObject;
   url?: string;
-  payload?: string;
+  payload?: {flowId?: string;}
 };
 
 export type QrButtonData = {

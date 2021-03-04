@@ -55,6 +55,13 @@
     component: './FlowList/Update',
     hideInMenu: true,
   },
+  {
+    name: 'form.update-flow',
+    icon: 'ApartmentOutlined',
+    path: '/flows/:flowId',
+    component: './FlowList/Update',
+    hideInMenu: true,
+  },
   // {
   //   name: 'list.broadcast-list',
   //   icon: 'NotificationOutlined',
@@ -85,7 +92,14 @@
         icon: 'NotificationOutlined',
         hideInMenu: true,
         path: '/broadcasts/broadcast-templates/:templateId',
-        component: './broadcast/BroadcastTemplateList/components/NewBroadcast',
+        component: './broadcast/NewBroadcast',
+      },
+      {
+        name: 'broadcast-retarget',
+        icon: 'NotificationOutlined',
+        hideInMenu: true,
+        path: '/broadcasts/history/:broadcastId',
+        component: './broadcast/ReBroadcast',
       },
       {
         name: 'broadcast-history',

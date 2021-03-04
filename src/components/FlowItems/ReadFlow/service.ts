@@ -1,3 +1,4 @@
+import { FlowItem } from 'models/flows';
 import { request } from 'umi';
 import type { FlowListParams, newQuestionItem, DropdownProps } from './data.d';
 
@@ -67,4 +68,10 @@ export async function updateRule(params: QuestionListParams) {
       method: 'update',
     },
   });
+}
+
+export async function queryFlow(
+  id: string
+): Promise<{ flow: FlowItem[] }> {
+  return request(`http://localhost:5000/flows/${id}`);
 }

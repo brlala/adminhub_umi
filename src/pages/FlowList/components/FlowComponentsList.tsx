@@ -17,6 +17,7 @@ const FlowComponentsList: React.FC<UpdateComponentsListProps> = ({ setNewCompone
     { name: 'Generic Template', type: 'genericTemplate' },
     { name: 'Button Template', type: 'buttonTemplate' },
     { name: 'Flow', type: 'flow' },
+    { name: 'Custom', type: 'custom' },
     { name: 'Quick Replies', type: 'quickReplies' },
   ];
 
@@ -46,6 +47,9 @@ const FlowComponentsList: React.FC<UpdateComponentsListProps> = ({ setNewCompone
       case 'flow':
         componentData = { type, data: { flowId: '', params: [] } };
         break;
+      case 'custom':
+        componentData = { type, data: { function: '' } };
+        break;
       case 'quickReplies':
         componentData = { type, data: { quickReplies: []}};
         break;
@@ -59,7 +63,6 @@ const FlowComponentsList: React.FC<UpdateComponentsListProps> = ({ setNewCompone
       ...componentData
     };
     console.log(entry)
-
     setNewComponentsList((prevState) => [...prevState, entry]);
   };
 
@@ -69,9 +72,6 @@ const FlowComponentsList: React.FC<UpdateComponentsListProps> = ({ setNewCompone
         return (
           <>
             <Row gutter={32}>
-              <Col className="gutter-row" span={18}>
-                {item.name}
-              </Col>
               <Col className="gutter-row" span={6}>
                 <Button
                   size="small"
@@ -81,10 +81,9 @@ const FlowComponentsList: React.FC<UpdateComponentsListProps> = ({ setNewCompone
                   value={item.type}
                   onClick={() => addComponent(item)}
                 >
-                  <PlusOutlined /> Add
+                  <PlusOutlined /> {item.name}
                 </Button>
               </Col>
-              <br />
             </Row>
           </>
         );
