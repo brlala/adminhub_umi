@@ -47,6 +47,11 @@ export type FlowItemData = {
   subtitle?: StringObject;
   elements?: FlowItemData[];
   flow?: FlowData;
+  inputName?: string;
+  inputType?: string;
+  customRegex?: string;
+  isTemporary?: boolean;
+  invalidMessage?: string;
   quickReplies?: QrButtonData[];
 };
 
@@ -92,7 +97,7 @@ export type QrButtonData = {
 
 export type FlowData = {
   name: string;
-  flow_id: string
+  flowId: string
   params: string[];
 };
 

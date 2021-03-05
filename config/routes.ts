@@ -46,6 +46,7 @@
     name: 'list.flow-list',
     icon: 'ApartmentOutlined',
     path: '/flows',
+    hideInBreadcrumb: true,
     component: './FlowList',
   },
   {

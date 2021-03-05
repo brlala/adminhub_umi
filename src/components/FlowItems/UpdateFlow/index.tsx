@@ -1,34 +1,38 @@
 import React, { useState, FC } from 'react';
 import { ProFormSelect, ProFormTextArea } from '@ant-design/pro-form';
-import { Button, Divider, Form, Input, message, Radio, Card, Space } from 'antd';
+import { Button, Form, Input, message, Radio, Card, Space, Image } from 'antd';
 import { queryFlowsFilter } from '@/pages/QuestionList/service';
 import { FormattedMessage } from '@@/plugin-locale/localeExports';
 import { Modal } from 'antd';
 const { TextArea } = Input;
 import { DeleteOutlined, FileAddOutlined, FunctionOutlined, LoadingOutlined, PaperClipOutlined, PlusOutlined, VideoCameraAddOutlined } from '@ant-design/icons';
-import { ImageDisplayComponent } from '../ReadFlow';
+import { VideoDisplayComponent } from '../ReadFlow';
 import ImgCrop from 'antd-img-crop';
 import { Tabs } from 'antd';
 import './index.less';
 import { DropdownProps } from '@/pages/QuestionList/data';
 import Dragger from 'antd/lib/upload/Dragger'
-import { AttachmentComponentDataProps, TextComponentDataProps, GenericTemplateComponentDataProps, TemplateComponentDataProps, ButtonTemplateComponentDataProps, FlowComponentDataProps,QuickReplyComponentDataProps, Buttons, CustomComponentDataProps } from './data';
+import { AttachmentComponentDataProps, TextComponentDataProps, GenericTemplateComponentDataProps, TemplateComponentDataProps, ButtonTemplateComponentDataProps, FlowComponentDataProps,QuickReplyComponentDataProps, Buttons, CustomComponentDataProps, InputComponentDataProps, QrButtons } from './data';
 
 const { TabPane } = Tabs;
+
+export const handleDelete = (componentKey: number, onChange: any) => {
+  onChange((prevState: any[]) => {
+    const newArr = prevState.filter((_, index) => index !== componentKey);
+    return newArr
+  })
+};
 
 export const TextComponent: FC<TextComponentDataProps> = (props) => {
   const { componentKey, componentData, onChange } = props
   return (
-    <Card title='Text' size='small' style={{background: 'transparent'}} bordered={false}>
-      {/* <Divider orientation="left">
-        Text
-      </Divider> */}
+    <Card title='Text' size='small' style={{background: 'transparent'}} bordered={false} 
+      extra={<Button shape="circle" onClick={() => handleDelete(componentKey, onChange)}><DeleteOutlined /></Button>}>
       <Form.Item
         key={'component' + componentKey.toString() + 'text'}
         name={'component' + componentKey.toString() + 'text'}
         initialValue={componentData?.text?.EN}
-        rules={[{ required: true, message: 'Field is required' }]}
-      >
+        rules={[{ required: true, message: 'Field is required' }]}>
         <TextArea
           rows={4}
           placeholder="Please input"
@@ -47,14 +51,11 @@ export const TextComponent: FC<TextComponentDataProps> = (props) => {
   );
 };
 
-
 export const CustomComponent: FC<CustomComponentDataProps> = (props) => {
-  const { componentKey, componentData, onChange } = props
+  const { componentKey, componentData, onChange, disabled } = props
   return (
-    <>
-      <Divider orientation="left">
-        Custom
-      </Divider>
+    <Card title='Custom' size='small' style={{background: 'transparent'}} bordered={false} 
+      extra={<Button shape="circle" onClick={() => handleDelete(componentKey, onChange)}><DeleteOutlined /></Button>}>
       <Form.Item
         key={'component' + componentKey.toString() + 'function'}
         name={'component' + componentKey.toString() + 'function'}
@@ -64,6 +65,7 @@ export const CustomComponent: FC<CustomComponentDataProps> = (props) => {
         <Input
           prefix={<FunctionOutlined />}
           placeholder="Please input"
+          disabled={disabled}
           onChange={(e) => {
             onChange((prevState: any) =>
               [...prevState].map((item, index) => {
@@ -75,7 +77,34 @@ export const CustomComponent: FC<CustomComponentDataProps> = (props) => {
           }}
         />
       </Form.Item>
-    </>
+    </Card>
+  );
+};
+
+export const InputComponent: FC<InputComponentDataProps> = (props) => {
+  const { componentKey, componentData, onChange } = props
+  return (
+    <Card title='Input' size='small' style={{background: 'transparent'}} bordered={false} 
+      extra={<Button shape="circle" onClick={() => handleDelete(componentKey, onChange)}><DeleteOutlined /></Button>}>
+      <Form.Item
+        key={'component' + componentKey.toString() + 'function'}
+        name={'component' + componentKey.toString() + 'function'}
+        initialValue={componentData?.inputName}
+        rules={[{ required: true, message: 'Field is required' }]}>
+        <Input
+          placeholder="Input Name"
+          onChange={(e) => {
+            onChange((prevState: any) =>
+              [...prevState].map((item, index) => {
+                if (index === componentKey) {
+                  return {...item, data: { inputName: e.target.value } };
+                } else return item;
+              }),
+            );
+          }}
+        />
+      </Form.Item>
+    </Card>
   );
 };
 
@@ -111,29 +140,27 @@ export const ImageComponent: FC<AttachmentComponentDataProps> = (props) => {
   };
 
   return (
-        <>
-          <Divider orientation="left">
-            Image
-          </Divider>
-          <Form.Item
-            key={'component' + componentKey.toString() + 'image'}
-            name={'component' + componentKey.toString() + 'image'}
-            initialValue={previewImage}
-            rules={[{ required: true, message: 'Image is required' }]}
-          >
-            {previewImage? 
-              <Space>
-                <ImageDisplayComponent componentKey={componentKey.toString()} componentData={{url: previewImage}}/>
-                <Button shape="round" onClick={() => setPreviewImage('')}><DeleteOutlined/></Button>
-              </Space>
-              : 
-              <Dragger {...draggerProps}>
-                <p style={{marginBottom: 12}}> {uploading ? <LoadingOutlined /> : <PlusOutlined style={{ fontSize: '40px'}} />} </p>
-                <p className="ant-upload-hint">{uploading ? "Uploading" : "Click or drag image here to upload"}</p>
-              </Dragger>
-              }
-          </Form.Item>
-      </>
+    <Card title='Image' size='small' style={{background: 'transparent'}} bordered={false} 
+      extra={<Button shape="circle" onClick={() => handleDelete(componentKey, onChange)}><DeleteOutlined /></Button>}>
+      <Form.Item
+        key={'component' + componentKey.toString() + 'image'}
+        name={'component' + componentKey.toString() + 'image'}
+        initialValue={previewImage}
+        rules={[{ required: true, message: 'Image is required' }]}
+      >
+        {previewImage? 
+          <Space>
+            <Image className='ImageComponent' key={componentKey} src={previewImage} 
+              preview={{mask: <Button className='image-mask' shape="circle" size='large' onClick={() => setPreviewImage('')}><DeleteOutlined/></Button>}}/>
+          </Space>
+          : 
+          <Dragger {...draggerProps}>
+            <p style={{marginBottom: 12}}> {uploading ? <LoadingOutlined /> : <PlusOutlined style={{ fontSize: '40px'}} />} </p>
+            <p className="ant-upload-hint">{uploading ? "Uploading" : "Click or drag image here to upload"}</p>
+          </Dragger>
+          }
+      </Form.Item>
+    </Card>
   );
 };
 
@@ -142,7 +169,7 @@ export const VideoComponent: FC<AttachmentComponentDataProps> = (props) => {
   const [previewImage, setPreviewImage] = useState(componentData.url);
   const [uploading, setUploading] = useState(componentData.url?true:false);
   const draggerProps = {
-    key: 'image' + componentKey.toString(),
+    key: 'video' + componentKey.toString(),
     accept: "video/*",
     multiple: false,
     showUploadList: false,
@@ -169,29 +196,27 @@ export const VideoComponent: FC<AttachmentComponentDataProps> = (props) => {
   };
 
   return (
-        <>
-          <Divider orientation="left">
-            Video
-          </Divider>
-          <Form.Item
-            key={'component' + componentKey.toString() + 'image'}
-            name={'component' + componentKey.toString() + 'image'}
-            initialValue={previewImage}
-            rules={[{ required: true, message: 'Image is required' }]}
-          >
-            {previewImage? 
-              <Space>
-                <video key={componentKey} controls style={{ width: '100%' }} src={previewImage} />
-                <Button shape="round" onClick={() => setPreviewImage('')}><DeleteOutlined/></Button>
-              </Space>
-              : 
-              <Dragger {...draggerProps}>
-                <p style={{marginBottom: 12}}> {uploading ? <LoadingOutlined /> : <VideoCameraAddOutlined style={{ fontSize: '40px'}} />} </p>
-                <p className="ant-upload-hint">{uploading ? "Uploading" : "Click or drag video here to upload"}</p>
-              </Dragger>
-              }
-          </Form.Item>
-      </>
+    <Card title='Video' size='small' style={{background: 'transparent'}} bordered={false} 
+      extra={<Button shape="circle" onClick={() => handleDelete(componentKey, onChange)}><DeleteOutlined /></Button>}>
+      <Form.Item
+        key={'component' + componentKey.toString() + 'image'}
+        name={'component' + componentKey.toString() + 'image'}
+        initialValue={previewImage}
+        rules={[{ required: true, message: 'Image is required' }]}
+      >
+        {previewImage? 
+          <Space>
+            <VideoDisplayComponent componentKey={componentKey.toString()} componentData={{url: previewImage}}/>
+            <Button shape="round" onClick={() => setPreviewImage('')}><DeleteOutlined/></Button>
+          </Space>
+          : 
+          <Dragger {...draggerProps}>
+            <p style={{marginBottom: 12}}> {uploading ? <LoadingOutlined /> : <VideoCameraAddOutlined style={{ fontSize: '40px'}} />} </p>
+            <p className="ant-upload-hint">{uploading ? "Uploading" : "Click or drag video here to upload"}</p>
+          </Dragger>
+          }
+      </Form.Item>
+    </Card>
   );
 };
 
@@ -225,29 +250,27 @@ export const FileComponent: FC<AttachmentComponentDataProps> = (props) => {
   };
 
   return (
-        <>
-          <Divider orientation="left">
-            File
-          </Divider>
-          <Form.Item
-            key={'component' + componentKey.toString() + 'image'}
-            name={'component' + componentKey.toString() + 'image'}
-            initialValue={fileName}
-            rules={[{ required: true, message: 'Image is required' }]}
-          >
-            {fileName? 
-              <Space>
-                <PaperClipOutlined /> {fileName}
-                <Button shape="round" onClick={() => setFileName('')}><DeleteOutlined/></Button>
-              </Space>
-              : 
-              <Dragger {...draggerProps}>
-                <p style={{marginBottom: 12}}> {uploading ? <LoadingOutlined /> : <FileAddOutlined style={{ fontSize: '40px'}} />} </p>
-                <p className="ant-upload-hint">{uploading ? "Uploading" : "Click or drag file here to upload"}</p>
-              </Dragger>
-            }
-          </Form.Item>
-      </>
+    <Card title='File' size='small' style={{background: 'transparent'}} bordered={false} 
+      extra={<Button shape="circle" onClick={() => handleDelete(componentKey, onChange)}><DeleteOutlined /></Button>}>
+      <Form.Item
+        key={'component' + componentKey.toString() + 'image'}
+        name={'component' + componentKey.toString() + 'image'}
+        initialValue={fileName}
+        rules={[{ required: true, message: 'Image is required' }]}
+      >
+        {fileName? 
+          <Space>
+            <PaperClipOutlined /> {fileName}
+            <Button shape="round" onClick={() => setFileName('')}><DeleteOutlined/></Button>
+          </Space>
+          : 
+          <Dragger {...draggerProps}>
+            <p style={{marginBottom: 12}}> {uploading ? <LoadingOutlined /> : <FileAddOutlined style={{ fontSize: '40px'}} />} </p>
+            <p className="ant-upload-hint">{uploading ? "Uploading" : "Click or drag file here to upload"}</p>
+          </Dragger>
+        }
+      </Form.Item>
+    </Card>
   );
 };
 
@@ -283,7 +306,6 @@ export const GenericTemplateComponent: FC<GenericTemplateComponentDataProps> = (
       if (index === componentKey) {
         const newPanes = item.data.elements
         newPanes.splice(idx, 1)
-        console.log('current panes:', newPanes)
         setPanes(newPanes)
         return { ...item, data: { elements: newPanes }}
       } 
@@ -292,7 +314,8 @@ export const GenericTemplateComponent: FC<GenericTemplateComponentDataProps> = (
   };
 
   return (
-    <Card title='Generic Template' size='small' style={{background: 'transparent'}}>
+    <Card title='Generic Template' size='small' bordered={false} style={{background: 'transparent'}}
+      extra={<Button shape="circle" onClick={() => handleDelete(componentKey, onChange)}><DeleteOutlined /></Button>}>
       <div className="card-container">
         <Tabs
           type="editable-card"
@@ -337,7 +360,6 @@ export const TemplateComponent: FC<TemplateComponentDataProps> = (props) => {
   const handleCancelModal = () => {
     setIsModalVisible(false);
   };
-  const handleCancel = () => setPreviewVisible(false);
 
   const draggerProps = {
     key: "Component" + parentKey.toString() + "Image"+ componentKey?.toString(),
@@ -382,8 +404,8 @@ export const TemplateComponent: FC<TemplateComponentDataProps> = (props) => {
           <div className="GenericTemplate">
             {previewImage? 
               <Space>
-                <ImageDisplayComponent componentKey={componentKey.toString()} componentData={{url: previewImage}}/>
-                {/* <Button shape="round" onClick={() => setPreviewImage('')}><DeleteOutlined/></Button> */}
+                <Image className='ImageComponent' key={componentKey} src={previewImage} 
+                  preview={{mask: <Button className='image-mask' shape="circle" size='large' onClick={() => setPreviewImage('')}><DeleteOutlined/></Button>}}/>
               </Space>
               : 
               <ImgCrop rotate aspect={1.91}>
@@ -393,15 +415,10 @@ export const TemplateComponent: FC<TemplateComponentDataProps> = (props) => {
                 </Dragger>
               </ImgCrop>}
           </div>
-          <Modal
-            visible={previewVisible}
-            title={previewTitle}
-            footer={null}
-            onCancel={handleCancel}>
-            <img alt="image-preview" style={{ width: '100%' }} src={previewImage} />
-          </Modal>
-          <Form.Item name='Title' rules={[{ required: true, message: 'Title is required' }]}>
-            <Input
+          <Form.Item name='Title' rules={[{ required: true, message: 'Title is required' }, { max: 80, message: 'Title cannot be longer than 80 characters' }]}>
+            <TextArea
+              maxLength={81}
+              autoSize={{ minRows: 1 }}
               allowClear
               placeholder="Title"
               onChange={(e) => {
@@ -417,8 +434,10 @@ export const TemplateComponent: FC<TemplateComponentDataProps> = (props) => {
               }}
             />
           </Form.Item>
-          <Form.Item name='Subtitle'>
+          <Form.Item name='Subtitle' rules={[{ max: 80, message: 'Subtitle cannot be longer than 80 characters' }]}>
           <TextArea 
+            maxLength={81}
+            autoSize={{ minRows: 1 }}
             allowClear
             placeholder="Subtitle (Optional)"
             onChange={(e) => {
@@ -436,25 +455,25 @@ export const TemplateComponent: FC<TemplateComponentDataProps> = (props) => {
         </Form.Item>
           {buttons&&buttons.map((button, buttonIndex) => (
             <Button
+              className='ant-btn-multiple'
               key={"component" + parentKey + "pane" + componentKey + "button" + buttonIndex}
               block
               onClick={() => {
-                console.log({ row: button });
                 setSelectedButton(button);
                 setSelectedButtonIndex(buttonIndex)
                 showModal();
-              }}
-            >
+              }}>
               {button.title.EN}
             </Button>
           ))}
           {buttons&&buttons.length < 3 && (
             <Button
+              className='ant-btn-multiple'
               key={"component" + parentKey + "pane" + componentKey + "buttonNew"}
               onClick={() => {
                 showModal();
                 setSelectedButtonIndex(buttons.length)
-                setSelectedButton({type: 'flow', title: {EN: ''}});
+                setSelectedButton({type: 'postback', title: {EN: ''}});
               }}
               type="dashed"
               block
@@ -467,6 +486,7 @@ export const TemplateComponent: FC<TemplateComponentDataProps> = (props) => {
             visible={isModalVisible}
             onOk={handleOkModal}
             onCancel={handleCancelModal}
+            centered
             destroyOnClose={true}
             width={450}
             footer={[
@@ -481,11 +501,10 @@ export const TemplateComponent: FC<TemplateComponentDataProps> = (props) => {
             <Form
               id="my-form"
               onFinish={async (values) => {
-                console.log('button', values)
                 onChange((prevState: any) => [...prevState].map((item, index) => {
                   if (index === parentKey) {
                     let updatedButton: Buttons;
-                    if (values.type === 'flow')
+                    if (values.type === 'postback')
                       {updatedButton = {...values, title: {EN: values.title}, payload: {flowId: values.flowId}}}
                     else {updatedButton = {...values, title: {EN: values.title}}}
                     return { ...item, data: {elements: 
@@ -537,7 +556,7 @@ export const TemplateComponent: FC<TemplateComponentDataProps> = (props) => {
               <Form.Item
                 label="Type"
                 name="type"
-                initialValue={selectedButton ? selectedButton.type : 'flow'}
+                initialValue={selectedButton ? selectedButton.type : 'postback'}
               >
                 <Radio.Group
                   onChange={(event) => {
@@ -558,7 +577,7 @@ export const TemplateComponent: FC<TemplateComponentDataProps> = (props) => {
                   <ProFormSelect
                     name="flowId"
                     label="Flow Response"
-                    initialValue={selectedButton?.type === 'flow' ? selectedButton?.payload?.flowId : null}
+                    initialValue={selectedButton?.type === 'postback' ? selectedButton?.payload?.flowId : null}
                     showSearch
                     // @ts-ignore
                     request={async () => {
@@ -577,13 +596,17 @@ export const TemplateComponent: FC<TemplateComponentDataProps> = (props) => {
 export const ButtonTemplateComponent: FC<ButtonTemplateComponentDataProps> = (props) => {
   const { componentKey, componentData, onChange } = props;
   const [selectedButton, setSelectedButton] = useState<Partial<Buttons>>();
+  const [selectedButtonValues, setSelectedButtonValues] = useState({});
   const [selectedButtonIndex, setSelectedButtonIndex] = useState<number>();
   const [isModalVisible, setIsModalVisible] = useState(false);
 
-  console.log(componentData);
-
   const showModal = () => {
     setIsModalVisible(true);
+    setSelectedButtonValues({
+      title: selectedButton?.title.EN? selectedButton.title.EN : null,
+      type: selectedButton? selectedButton.type : 'postback',
+      url: selectedButton?.type === 'url' ? selectedButton?.url : null,
+      flowId: selectedButton?.type === 'postback' ? selectedButton?.payload?.flowId : null})
   };
 
   const handleOkModal = () => {
@@ -594,13 +617,13 @@ export const ButtonTemplateComponent: FC<ButtonTemplateComponentDataProps> = (pr
     setIsModalVisible(false);
   };
 
-  return (
-    <>
-      <Divider orientation="left">
-        Button Template
-      </Divider>
+  const handleVisibleChange = (visible: React.SetStateAction<boolean>) => {
+    setIsModalVisible(visible);
+  }
 
-      <Card size="small">
+  return (
+    <Card title='Button Template' size='small' style={{background: 'transparent'}} bordered={false} 
+      extra={<Button shape="circle" onClick={() => handleDelete(componentKey, onChange)}><DeleteOutlined /></Button>}>
       <Form.Item
         key={componentKey.toString()}
         rules={[{ required: true, message: 'Field is required' }]}>
@@ -620,27 +643,26 @@ export const ButtonTemplateComponent: FC<ButtonTemplateComponentDataProps> = (pr
           }}
         />
         </Form.Item>
-          {componentData?.buttons.map((button, buttonIndex) => (
-            <Button
-              key={"component" + componentKey + "button" + buttonIndex}
-              block
-              onClick={() => {
-                console.log({ row: button });
-                setSelectedButton(button);
-                setSelectedButtonIndex(buttonIndex)
-                showModal();
-              }}
-            >
-              {button.title.EN}
-            </Button>
-          ))}
+          {componentData?.buttons.map((button, buttonIndex) => {
+             return <Button className='ant-btn-multiple'
+                key={"component" + componentKey + "button" + buttonIndex}
+                block
+                onClick={() => {
+                  setSelectedButton(button);
+                  setSelectedButtonIndex(buttonIndex)
+                  showModal();
+                }}
+              >
+                {button.title.EN}
+              </Button>
+          })}
           {componentData?.buttons.length < 3 && (
             <Button
               key={"component" + componentKey + "buttonNew"}
               onClick={() => {
-                showModal();
                 setSelectedButtonIndex(componentData?.buttons.length)
-                setSelectedButton({type: 'flow', title: {EN: ''}});
+                setSelectedButton({type: 'postback', title: {EN: ''}});
+                showModal();
               }}
               type="dashed"
               block
@@ -654,6 +676,7 @@ export const ButtonTemplateComponent: FC<ButtonTemplateComponentDataProps> = (pr
           onOk={handleOkModal}
           onCancel={handleCancelModal}
           destroyOnClose={true}
+          centered
           width={450}
           footer={[
             <Button key="back" onClick={handleCancelModal}>
@@ -666,29 +689,29 @@ export const ButtonTemplateComponent: FC<ButtonTemplateComponentDataProps> = (pr
           <Form
             id="my-form"
             onFinish={(values) => {
-              console.log('values', values)
               onChange((prevState: any) => [...prevState].map((item, index) => {
                 if (index === componentKey) {
                   let updatedButton: Buttons;
-                  if (values.type === 'flow')
+                  if (values.type === 'postback')
                     {updatedButton = {...values, title: {EN: values.title}, payload: {flowId: values.flowId}}}
-                  else {updatedButton = {...values, title: {EN: values.title}}}
-                  if (selectedButtonIndex === item.data.buttons.length) 
-                    return { ...item, data: {...item.data, buttons: [...item.data.buttons, updatedButton]}}
-                  return { ...item, data: {...item.data, buttons: [item.data.buttons.map((button: Buttons, buttonIndex: number) => {
+                  else {updatedButton = {...values, title: {EN: values.title}, url: values.url}}
+                  if (selectedButtonIndex === item.data.buttons.length) {
+                    return { ...item, data: {...item.data, buttons: [...item.data.buttons, updatedButton]}}}
+                  return { ...item, data: {...item.data, buttons: item.data.buttons.map((button: Buttons, buttonIndex: number) => {
                     if (buttonIndex === selectedButtonIndex)
                       return updatedButton
                     return button 
-                  })]}}
+                  })}}
                 }
                 else return item;
               }))
               message.success('Button added');
             }}
             initialValues={{
-              // text: selectRow?.text,
-              // content: selectRow?.type,
+              title: selectedButton?.title.EN? selectedButton.title.EN : null,
+              type: selectedButton? selectedButton.type : 'postback',
               url: selectedButton?.type === 'url' ? selectedButton?.url : null,
+              flowId: selectedButton?.type === 'postback' ? selectedButton?.payload?.flowId : null
             }}
             labelCol={{ span: 7 }}
             wrapperCol={{ span: 16 }}
@@ -697,14 +720,12 @@ export const ButtonTemplateComponent: FC<ButtonTemplateComponentDataProps> = (pr
               label="Display Text"
               name="title"
               rules={[{ required: true, message: 'Please input display text' }]}
-              initialValue={selectedButton?.title.EN}
             >
               <Input />
             </Form.Item>
             <Form.Item
               label="Type"
               name="type"
-              initialValue={selectedButton ? selectedButton.type : 'flow'}
             >
               <Radio.Group
                 onChange={(event) => {
@@ -724,7 +745,6 @@ export const ButtonTemplateComponent: FC<ButtonTemplateComponentDataProps> = (pr
                 <ProFormSelect
                   name="flowId"
                   label="Flow Response"
-                  initialValue={selectedButton?.type === 'flow' ? selectedButton?.payload?.flowId : null}
                   showSearch
                   // @ts-ignore
                   request={async () => {
@@ -734,8 +754,8 @@ export const ButtonTemplateComponent: FC<ButtonTemplateComponentDataProps> = (pr
             }
           </Form>
         </Modal>
+        
       </Card>
-    </>
   );
 };
 
@@ -743,19 +763,16 @@ export const FlowComponent: FC<FlowComponentDataProps> = (props) => {
   const { componentKey, componentData, onChange } = props
 
   return (
-    <>
-      <Divider orientation="left">
-        Flow
-      </Divider>
+    <Card title='Flow' size='small' style={{background: 'transparent'}} bordered={false} 
+      extra={<Button shape="circle" onClick={() => handleDelete(componentKey, onChange)}><DeleteOutlined /></Button>}>
       <ProFormSelect
         name={componentData.name}
         showSearch
-        fieldProps={{ onSelect: (e) => {
-          console.log(e);
+        fieldProps={{ onSelect: (e, option) => {
           onChange((prevState: any) =>
             [...prevState].map((item, index) => {
               if (index === componentKey) {
-                return {...item, data: {...item.data, flowId: e } };
+                return {...item, data: {...item.data, flow: {flowId: e, name: option.label}} };
               } else return item;
             }),
           );
@@ -775,7 +792,7 @@ export const FlowComponent: FC<FlowComponentDataProps> = (props) => {
           },
         ]}
       />
-    </>
+    </Card>
   );
 };
 
@@ -797,6 +814,7 @@ export const QuickReplyComponent: React.FC<QuickReplyComponentDataProps> = (prop
       Quick Reply
     </Button>
   );
+
   const showModal = () => {
     setIsModalVisible(true);
   };
@@ -810,31 +828,31 @@ export const QuickReplyComponent: React.FC<QuickReplyComponentDataProps> = (prop
   };
 
   return (
-    <>
+    <Card title='Quick Replies' size='small' style={{background: 'transparent'}} bordered={false} 
+      extra={<Button shape="circle" onClick={() => handleDelete(componentKey, onChange)}><DeleteOutlined /></Button>}>
       <Form.Item style={{ marginTop: -6 }} >
-        <Space>
+        <Space wrap>
           {componentData.quickReplies.map((button) => (
             <Button
               block
               shape="round"
               onClick={() => {
-                console.log({ row: button });
                 setSelectRow(button);
                 showModal();
-              }}
-            >
+              }}>
               {button.text.EN}
             </Button>
           ))}
-          {componentData.quickReplies.length < 3 && addNewQuickReplyButton}
+          {componentData.quickReplies.length < 11 && addNewQuickReplyButton}
         </Space>
         <Modal
-          title="New Button"
+          title="New Quick Reply"
           visible={isModalVisible}
           onOk={handleOkModal}
           onCancel={handleCancelModal}
           destroyOnClose={true}
           width={450}
+          centered
           footer={[
             <Button key="back" onClick={handleCancelModal}>
               Cancel
@@ -847,7 +865,6 @@ export const QuickReplyComponent: React.FC<QuickReplyComponentDataProps> = (prop
           <Form
             id="my-form"
             onFinish={async (values) => {
-              console.log(values);
               onChange((prevState: any) => [...prevState].map((item, index) => {
                 if (index === componentKey) {
                   return { ...item, data: { ...item.data, quickReplies: [...item.data.quickReplies, {...values, text: {EN: values.text}}]}}
@@ -881,6 +898,6 @@ export const QuickReplyComponent: React.FC<QuickReplyComponentDataProps> = (prop
           </Form>
         </Modal>
       </Form.Item>
-    </>
+    </Card>
   );
 };

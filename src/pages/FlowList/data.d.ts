@@ -56,6 +56,7 @@ export type FlowList = {
     | 'buttonTemplate'
     | 'flow'
     | 'custom'
+    | 'input'
     | 'quickReplies';
 };
 

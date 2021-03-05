@@ -60,7 +60,6 @@ export default class ListSort extends React.Component {
     dragClassName: PropTypes.string,
     appearAnim: PropTypes.object,
     onEventChange: PropTypes.any,
-    refreshProp: PropTypes.any,
   };
 
   static defaultProps = {
@@ -72,7 +71,6 @@ export default class ListSort extends React.Component {
     onEventChange: () => {
     },
     appearAnim: null,
-    refreshProp: null,
   };
 
   constructor(props) {
@@ -174,7 +172,7 @@ export default class ListSort extends React.Component {
       return d;
     });
     const animation = this.children.map((item, ii) => (i === ii && (!this.props.dragClassName
-      ? { scale: 1.2, boxShadow: '0 10px 10px rgba(0,0,0,0.15)' } : null)) || null);
+      ? { scale: 1, boxShadow: '0 10px 10px rgba(0,0,0,0.15)' } : null)) || null);
     this.index = i;
     this.swapIndex = i;
     this.mouseXY = {

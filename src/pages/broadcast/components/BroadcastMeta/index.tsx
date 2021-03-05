@@ -19,9 +19,9 @@ const BroadcastMeta: FC = (props) => {
   const [scheduled, setScheduled] = useState(false);
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
 
-  useEffect(() => {
-    parentForm.validateFields(['tags']);
-  }, [selectedTags]);
+  // useEffect(() => {
+  //   parentForm.validateFields(['tags']);
+  // }, [selectedTags]);
 
   const disabledDate = (current: Moment) => current && current < moment().startOf('day')
 
@@ -88,6 +88,7 @@ const BroadcastMeta: FC = (props) => {
             return <Option key={i}>{i}</Option>
           })}
         </Select>
+        {/* Target Selected:   */}
       </FormItem>
       <Space direction="horizontal" size={32}>
         <FormItem name="scheduled" label="Send as Scheduled">

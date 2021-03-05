@@ -78,6 +78,13 @@ export async function addFlow(data
   });
 }
 
+export async function editFlow(data
+  ): Promise<{}> {
+    return request('http://localhost:5000/flows/', {
+      method: 'put',
+      data: data,
+    });
+  }
 
 export async function getFlow(id: string,
   ): Promise<{data: FlowNew}> {

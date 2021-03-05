@@ -1,11 +1,10 @@
 import React, { FC, useCallback, useEffect, useState } from 'react';
 import ProCard from '@ant-design/pro-card';
 // @ts-ignore
-import { FormattedMessage, useIntl, useParams, useRequest } from 'umi';
+import { FormattedMessage, Redirect, useIntl, useParams, useRequest } from 'umi';
 import { changeLanguage } from '@/utils/language';
-import { Button, Divider, Form, Input, List, Popover, Row, Space, Tree } from 'antd';
+import { Button, Divider, Form, Input, List, message, Popover, Space } from 'antd';
 import styles from './index.less';
-import NewComponentsList from '../components/NewComponentsList';
 import FlowComponentsList from '@/pages/FlowList/components/FlowComponentsList';
 import {
   GenericTemplateComponent,
@@ -17,17 +16,15 @@ import {
   VideoComponent,
   FileComponent,
   CustomComponent,
+  InputComponent,
 } from '@/components/FlowItems/UpdateFlow';
-import { FooterToolbar } from '@ant-design/pro-layout';
+import { FooterToolbar, PageContainer } from '@ant-design/pro-layout';
 import { CloseCircleOutlined, DeleteOutlined, RightOutlined } from '@ant-design/icons';
-import { addFlow, getFlow } from '../service';
+import { addFlow, editFlow, getFlow } from '../service';
 import { FlowEditableComponent, FlowItem, FlowItemData } from 'models/flows';
 
 import { Link } from '@umijs/preset-dumi/lib/theme';
 import PhonePreview from '@/components/PhonePreview';
-import { DraggableListItems } from '../data';
-
-import ReactDragListView from "react-drag-listview";
 import ListSort from '../components/ListSort';
 
 changeLanguage('en-US');
@@ -43,6 +40,8 @@ const NewFlow: FC = (props) => {
   let { flowId } = useParams<{flowId: string}>()
   const [componentList, setComponentList] = useState<FlowItem[]>([]);
   const [error, setError] = useState<ErrorField[]>([]);
+  const [redirect, setRedirect] = useState(false);
+  const [action, setAction] = useState('updated');
   const [name, setName] = useState<string>('');
 
   const [componentLength, setComponentLength] = useState(0);
@@ -58,7 +57,16 @@ const NewFlow: FC = (props) => {
       setName(currName);
 
       const list = data?.flow || [];
-      setComponentList(list)
+      let newList: FlowItem[];
+      newList = []
+      list.map((ele, index) => {
+        newList = [...newList, ele]
+        if ('quickReplies' in ele.data) {
+          newList = [...newList, {type: 'quickReplies', data: {quickReplies: ele.data.quickReplies}}]
+        }
+      })
+      console.log(newList)
+      setComponentList(newList)
       setComponentLength(list.length)
     },
     throwOnError: true
@@ -66,16 +74,30 @@ const NewFlow: FC = (props) => {
 
   const { run: postRun } = useRequest(
     (data) => {
-      return addFlow(data);
+      if (flowId) 
+        return editFlow(data);
+      else
+        return addFlow(data);
     },
     {
       manual: true,
       onSuccess: (result) => {
         console.log(result);
+        if (flowId) 
+          message.success(`Flow "${data?.name}" ${action}`)
+        else
+          message.success('New flow added')
+        setRedirect(true)
+
       },
       throwOnError: true,
     },
   );
+  
+  const handleDelete = () => {
+    setAction('deleted')
+    postRun({...data, isActive: false});
+  }
 
   const onFinish = (values: any) => {
     let toSubmit: FlowItemData[] = [];
@@ -93,7 +115,10 @@ const NewFlow: FC = (props) => {
     // })
     console.log('values: ', values);
     console.log('componentList: ', toSubmit);
-    postRun({ name: values.name, flow: toSubmit });
+    if (flowId)
+      postRun({ id: flowId, name: values.name? values.name : data?.name, flow: toSubmit, isActive: true});
+    else
+      postRun({ name: values.name? values.name : data?.name, flow: toSubmit, isActive: true });
   };
 
   const renderComponent = (component: { data: any; type: string }, index: number) => {
@@ -147,7 +172,12 @@ const NewFlow: FC = (props) => {
         break;
       case 'custom':
         renderedComponent = (
-          <CustomComponent componentKey={index} componentData={data} onChange={setComponentList} />
+          <CustomComponent componentKey={index} componentData={data} onChange={setComponentList} disabled={flowId? true: false}/>
+        );
+        break;
+      case 'input':
+        renderedComponent = (
+          <InputComponent componentKey={index} componentData={data} onChange={setComponentList} />
         );
         break;
       case 'quickReplies':
@@ -210,41 +240,8 @@ const NewFlow: FC = (props) => {
     );
   };
   
-  const onDragEnter = (info) => {
-  };
-  const onClickRemove = (key: string) => {
-    const newArr = componentList.filter((obj) => obj.key !== key);
-    setComponentList(newArr);
-  };
-
-  const onDrop = (info) => {
-    console.log('info', info);
-    const dropKey = info.node.key;
-    const dragKey = info.dragNode.key;
-    const data = componentList.map((item, index) => {return {...item, title: item.type, key: index}});
-
-    // Find dragObject
-    let dragObj;
-    for (let i = 0; i < data.length; i++) {
-      if (data[i].key === dragKey) {
-        dragObj = data[i]
-      }
-    }
-
-    console.log('dragObj', dragObj)
-
-    data.splice(dragKey, 1)
-
-    console.log(dragObj, data)
-
-    dragObj? data.splice(dropKey, 0, dragObj):console.log(dragObj, data)
-
-    setComponentList(data);
-  };
-  
   const Refreshable: FC = () => {
     setComponentLength(componentList.length)
-    console.log('Refresh', componentList)
     return (
     <div className={'list-sort-demo-wrapper'}>
       <div className='list-sort-demo'>
@@ -257,17 +254,32 @@ const NewFlow: FC = (props) => {
       </div>
     </div>
     )
-  }
+  };
+
+  const handleChange = (data: any) => {
+    console.log('handleChange', typeof(data), data.length)
+    if (!data.length)
+      return
+    let newData: FlowItem[]; 
+    newData = [...data]?.map((entry) => {
+      console.log(entry.key)
+      return componentList[Number(entry.key)]
+    })
+    setComponentList(newData);
+  };
 
   return (
+    redirect? (<Redirect to="/flows" />):(
+      <Form name="complex-form" onFinish={onFinish} initialValues={{name: name}}>
+        <PageContainer
+          title={<Space> 
+            {name? name : 'New Flow'} <RightOutlined />
+            <Form.Item name="name" style={{margin: 0}}><Input placeholder="Flow Name"/></Form.Item>
+          </Space>}
+      extra={flowId?<Button type="primary" danger onClick={handleDelete}><DeleteOutlined /> Delete </Button>:<></>}
+    >
     <div className={styles.componentsList}>
-      <Form name="complex-form" onFinish={onFinish}>
         <ProCard
-          title={
-            <Space>{name} <RightOutlined />
-              <Form.Item name="name" style={{margin: 0}}><Input placeholder="Flow Name" value={name}/></Form.Item>
-            </Space>}
-          extra={<Button size="small"><DeleteOutlined /></Button>}
           split="vertical"
           bordered
           headerBordered
@@ -277,33 +289,19 @@ const NewFlow: FC = (props) => {
               Components
             </Divider>
             <FlowComponentsList setNewComponentsList={setComponentList}/>
-            {/* <Divider orientation="center">Current Flow</Divider> */}
-            {/* <NewComponentsList componentList={componentList.map((item, index) => {return {...item, title: item.type, key: index}})} setComponentsList={setComponentList} /> */}
           </ProCard>
           <ProCard title="Flow Content" colSpan={9}>
-            {(componentLength !==componentList.length)? <Refreshable/>: <div className={'list-sort-demo-wrapper'}>
+            {(componentLength != componentList.length)? <Refreshable/>: <div className={'list-sort-demo-wrapper'}>
               <div className='list-sort-demo'>
                 <ListSort
-                  refreshProp = {componentLength}
-                  component="List"
+                  onChange={handleChange}
                   dragClassName="list-drag-selected"
                   appearAnim={{ animConfig: { marginTop: [5, 30], opacity: [1, 0] } }}> 
-                    {componentList.map((flowNode, index) => <List className='list-sort-demo-list' key={index}>{renderComponent(flowNode, index)}</List>)}
+                    {componentList.map((flowNode, index) => <div className='list-sort-demo-list' key={index}>
+                      {renderComponent(flowNode, index)}</div>)}
                 </ListSort>
               </div>
             </div>}
-            {/* <Tree
-              className="draggable-tree"
-              draggable
-              blockNode
-              onDragEnter={onDragEnter}
-              onDrop={onDrop}
-              treeData={componentList.map((item, index) => {return {...item, title: item.type, key: index}})}
-              titleRender={(flowNode) => {
-                return renderComponent(flowNode, flowNode.key)
-                // return <List className='list-sort-demo-list'>{renderComponent(flowNode, flowNode.key)}</List>
-              }}/> */}
-
             <FooterToolbar>
               {getErrorInfo(error)}
               {/*<Button type="primary" onClick={() => form?.submit()} loading={submitting}>*/}
@@ -319,12 +317,13 @@ const NewFlow: FC = (props) => {
             )}
           </ProCard>
           <ProCard title="Preview" colSpan={10} style={{textAlign: 'center'}}>
-            <PhonePreview data={componentList}/>
+            <PhonePreview data={componentList} editMode={true}/>
           </ProCard>
         </ProCard>
+        </div></PageContainer>
       </Form>
-    </div>
-  );
+    
+  ));
 };
 
 export default NewFlow;

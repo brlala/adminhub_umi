@@ -18,6 +18,7 @@ const FlowComponentsList: React.FC<UpdateComponentsListProps> = ({ setNewCompone
     { name: 'Button Template', type: 'buttonTemplate' },
     { name: 'Flow', type: 'flow' },
     { name: 'Custom', type: 'custom' },
+    { name: 'Input', type: 'input' },
     { name: 'Quick Replies', type: 'quickReplies' },
   ];
 
@@ -45,10 +46,13 @@ const FlowComponentsList: React.FC<UpdateComponentsListProps> = ({ setNewCompone
         componentData = { type, data: { url: '' } };
         break;
       case 'flow':
-        componentData = { type, data: { flowId: '', params: [] } };
+        componentData = { type, data: { flow: { name: '', flowId: '', params: [] } } };
         break;
       case 'custom':
         componentData = { type, data: { function: '' } };
+        break;
+      case 'input':
+        componentData = { type, data: { inputName: '', isTemporary: true, inputType: '', customRegex: '', invalidMessage: '' } };
         break;
       case 'quickReplies':
         componentData = { type, data: { quickReplies: []}};

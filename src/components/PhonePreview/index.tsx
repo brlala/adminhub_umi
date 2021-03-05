@@ -7,10 +7,11 @@ import styles from './index.less';
 
 interface PhoneProps {
   data: FlowItem[] | [];
+  editMode: boolean | false;
 }
 
 const PhonePreview: FC<PhoneProps> = (props) => {
-  const { data } = props;
+  const { data, editMode } = props;
   return (
       <Fragment>
           <div className={styles.body}>
@@ -45,8 +46,8 @@ const PhonePreview: FC<PhoneProps> = (props) => {
               <div className={styles.content}>
                 <div className={styles.contentWrapper}>
                   <div className={styles.clearfix}>
-                    <Space direction="vertical" size={16}>
-                      {data.map((flowNode, index) => renderDisplayComponent(flowNode, index))}
+                    <Space direction="vertical" size={12} style={{width: '260px'}}>
+                      {data.map((flowNode: FlowItem, index: string) => renderDisplayComponent(flowNode, index, editMode))}
                     </Space>
 
                   </div>

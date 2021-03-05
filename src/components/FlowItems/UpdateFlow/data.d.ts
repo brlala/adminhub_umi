@@ -8,6 +8,7 @@ export type CustomComponentDataProps = {
     componentKey: number;
     componentData?: { function: string };
     onChange: (prevState: any) => void;
+    disabled: boolean;
     };
 
 export type AttachmentComponentDataProps = {
@@ -62,6 +63,18 @@ componentData: {
 };
 onChange: (prevState: any) => void;
 };
+
+export type InputComponentDataProps = {
+    componentKey: number;
+    componentData: {
+        inputName: string;
+        inputType: string;
+        customRegex: string;
+        isTemporary: boolean;
+        invalidMessage: string;
+    };
+    onChange: (prevState: any) => void;
+    };
 
 export type QrButtons = {
 text: StringObject;
