@@ -13,6 +13,7 @@ import { queryFlows, removeQuestion, updateRule } from './service';
 import moment from 'moment';
 import { changeLanguage } from '@/utils/language';
 import { Link } from '@umijs/preset-dumi/lib/theme';
+import PhonePreview from '@/components/PhonePreview';
 
 /**
  * 更新节点
@@ -128,9 +129,12 @@ const FlowList: React.FC = () => {
       hideInSearch: true,
       hideInForm: true,
       hideInTable: true,
-      render: (dom, entity) => (
-        <img src="https://pandai-admin-portal.s3-ap-southeast-1.amazonaws.com/portal/flows/Screenshot%202021-02-05%20at%201.39.37%20PM.png" />
-      ),
+      render: (dom, entity) => {
+        console.log(entity.flow)
+        return <PhonePreview data={entity.flow}/>
+
+      }
+      ,
     },
     {
       title: (
@@ -178,14 +182,18 @@ const FlowList: React.FC = () => {
       dataIndex: 'option',
       valueType: 'option',
       render: (_, record) => [
-        <a
-          key="config"
-          onClick={() => {
-            console.log('clicked edit');
-          }}
-        >
+
+        <Link to={"/flows/" + record.id}>
           <FormattedMessage id="pages.searchTable.edit" defaultMessage="Edit" />
-        </a>,
+        </Link>,
+        // <a
+        //   key="config"
+        //   onClick={() => {
+        //     console.log('clicked edit');
+        //   }}
+        // >
+        //   <FormattedMessage id="pages.searchTable.edit" defaultMessage="Edit" />
+        // </a>,
       ],
     },
   ];

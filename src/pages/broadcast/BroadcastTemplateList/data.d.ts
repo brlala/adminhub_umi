@@ -29,11 +29,14 @@ export interface NewBroadcastTemplate {
 export interface NewBroadcastEntry {
   id?: string;
   name: string;
-  flow: NewFlow[];
+  flowId?: string;
+  flow?: NewFlow[];
   tags: string[];
   exclude: string[];
   sendToAll: boolean;
   platforms?: string[];
+  scheduled: boolean;
+  sendAt?: string[];
 }
 
 export interface BroadcastTemplateListItem {

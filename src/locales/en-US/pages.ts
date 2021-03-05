@@ -94,5 +94,6 @@ export default {
   'pages.broadcast.reach.reachLabel': 'Reach',
   'pages.broadcast.author.authorLabel': 'Author',
   'pages.broadcast.sendAt.sendAtLabel': 'Broadcast Time',
-  'pages.broadcast.flow.flowLabel': 'Flow'
+  'pages.broadcast.flow.flowLabel': 'Content',
+  'pages.broadcast.failed.failedLabel': 'Missed Target',
 };

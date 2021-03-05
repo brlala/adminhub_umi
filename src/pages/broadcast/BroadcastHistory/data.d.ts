@@ -39,6 +39,7 @@ export interface BroadcastHistoryListItem {
 export interface BroadcastHistoryItem {
   processed: number;
   id: string;
+  flowId: string;
   flow: FlowItem[];
   status: string;
   tags: string[];
@@ -49,4 +50,5 @@ export interface BroadcastHistoryItem {
   sendAt: string;
   createdAt: string;
   createdBy: Member;
+  failed?: string[];
 }

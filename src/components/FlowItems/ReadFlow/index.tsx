@@ -1,215 +1,237 @@
-import React, { FC } from 'react';
-import { Button, Card, Space, Carousel, Image } from 'antd';
+import React, { FC, useState } from 'react';
+import { Button, Card, Space, Carousel, Image, Popover, Divider } from 'antd';
 import Meta from 'antd/lib/card/Meta';
 import styles from './index.less';
 import ProCard from '@ant-design/pro-card';
 import { FlowItemData } from 'models/flows';
-import { LeftOutlined, RightOutlined } from '@ant-design/icons';
+import { ApartmentOutlined, FunctionOutlined, LeftOutlined, LinkOutlined, PaperClipOutlined, RightOutlined } from '@ant-design/icons';
+import PhonePreview from '@/components/PhonePreview';
+import { useRequest } from 'umi';
+import { getFlow } from '@/pages/FlowList/service';
 
 interface DisplayComponentProps {
-  componentKey: number;
+  componentKey: string;
   componentData: FlowItemData;
 }
 
 export const QuickReplyDisplayComponent: FC<DisplayComponentProps> = (props) => {
   const { componentKey, componentData } = props;
   return (
-    <Space>
-      {componentData &&
-        componentData.quickReplies?.map((element, index) => (
-          <Button key={componentKey + 'qr' + index} type="default" style={{ borderRadius: 20 }}>
-            {element.text.EN}
-          </Button>
-        ))}{' '}
-    </Space>
+    componentData.quickReplies?.length?
+    <>
+      <Space style={{ width: '260px', overflow: "scroll"}}>
+        {componentData &&
+          componentData.quickReplies?.map((element, index) => (
+            <Popover placement="right" content={getNextFlow(element, index)} trigger="click" color='transparent' overlayInnerStyle={{boxShadow:'none'}}>
+              <Button key={componentKey + 'qr' + index} type="default" style={{ borderRadius: 20 }}>
+                {element.text.EN}
+              </Button>
+            </Popover>
+            
+          ))}{' '}
+      </Space>
+    </>: <></>
   );
 };
 
 export const TextDisplayComponent: FC<DisplayComponentProps> = (props) => {
   const { componentKey, componentData } = props;
-  if (componentData) {
+  if (componentData?.text?.EN) 
     return (
-      <ProCard key={componentKey} style={{ borderRadius: 20, background: '#F6F6F6' }} size="small">
-        <div>{componentData.text?.EN}</div>
+      <div className={styles.TextComponent}>
+      <ProCard key={componentKey} size="small">
+        {componentData.text?.EN}
       </ProCard>
-    );
-  }
-  return (
-    <ProCard key={componentKey} style={{ borderRadius: 20, background: '#F6F6F6' }} size="small">
-      {' '}
-      Placeholder Text{' '}
-    </ProCard>
-  );
+      </div>
+    )
+  return <></>
 };
 
 export const ImageDisplayComponent: FC<DisplayComponentProps> = (props) => {
   const { componentKey, componentData } = props;
-  if (componentData) {
-    return (
-      <Image
-        style={{ maxWidth: 300, maxHeight: 200, display: 'block', width: 'auto', height: 'auto' }}
-        key={componentKey}
-        src={componentData.url}
-      />
-    );
-  }
-  return (
+  return componentData.url?(
     <Image
-      style={{ maxWidth: 300, maxHeight: 200, display: 'block', width: 'auto', height: 'auto' }}
+      className={styles.ImageComponent}
       key={componentKey}
-      src="https://placekitten.com/300/150"
-    />
+      src={componentData.url}/>
+  ): <></>
+};
+
+export const VideoDisplayComponent: FC<DisplayComponentProps> = (props) => {
+  const { componentKey, componentData } = props;
+  return componentData.url?(
+    <video
+      key={componentKey}
+      className={styles.ImageComponent}
+      controls
+      src={componentData.url}/>
+  ): <></>
+};
+
+export const FileDisplayComponent: FC<DisplayComponentProps> = (props) => {
+  const { componentKey } = props;
+  return (
+    <div className={styles.TextComponent}>
+      <ProCard key={componentKey} size="small">
+        <PaperClipOutlined /> File
+      </ProCard>
+    </div>
   );
 };
 
+export const getNextFlow = (button: any, buttonIdex: number) => {
+  if (!button.type || button.type === 'postback') {
+
+    const { data, run } = useRequest((values: any) => {
+      if (button.payload?.flowId)
+        return getFlow(button.payload?.flowId);
+      return null
+    });
+    const list = data?.flow || [];
+    return (
+        <PhonePreview key={'reference' + buttonIdex} data={list} editMode={false}/>
+      )}
+  return <a target='_blank' href={button.url}><LinkOutlined /> Open Link</a>
+}
+
 export const GenericTemplateDisplayComponent: FC<DisplayComponentProps> = (props) => {
-  const { componentKey, componentData } = props;
-  const CarouselButtonGroup = (total: number, current: number) => {
-    const items = [];
-    for (let x = 0; x < total; x++) {
-      items.push(
-        <Button type={current === x ? 'primary' : 'default'} shape="circle">
-          {x + 1}
-        </Button>,
-      );
-    }
-    return (
-      <Space style={{ width: '100%', justifyContent: 'center', margin: '10px' }}>{items} </Space>
-    );
-  };
+  const { componentKey, componentData } = props
 
-  const CarouselNextArrow = (carouselProps) => {
-    const { className, style, onClick } = carouselProps;
+  const CarouselPrevArrow = (carouselProps: any) => {
+    const { onClick } = carouselProps
     return (
-      <div
-        className={className}
-        style={{
-          ...style,
-          color: 'black',
-          fontSize: '15px',
-          lineHeight: '1.5715',
-        }}
-        onClick={onClick}
-      >
-        <RightOutlined />
-      </div>
-    );
-  };
+      <div className={styles.CarouselSlickLeft} onClick={onClick}>
+        <LeftOutlined/>
+      </div>)}
 
-  const CarouselPrevArrow = (carouselProps) => {
-    const { className, style, onClick } = carouselProps;
+  const CarouselNextArrow = (carouselProps: any) => {
+    const { onClick } = carouselProps
     return (
-      <div
-        className={className}
-        style={{
-          ...style,
-          color: 'black',
-          fontSize: '15px',
-          lineHeight: '1.5715',
-        }}
-        onClick={onClick}
-      >
-        <LeftOutlined />
-      </div>
-    );
-  };
+      <div className={styles.CarouselSlickRight} onClick={onClick}>
+        <RightOutlined/>
+      </div>)}
 
   return (
-    <Carousel
-      key={componentKey}
-      className={styles.carousel}
-      arrows
-      {...{ nextArrow: <CarouselNextArrow />, prevArrow: <CarouselPrevArrow /> }}
-    >
-      {componentData &&
-        componentData.elements?.map((element, index) => (
-          <div
-            style={{
-              height: '600px',
-              color: '#fff',
-              lineHeight: '600px',
-              textAlign: 'center',
-              background: '#364d79',
-            }}
-          >
-            {/* {CarouselButtonGroup(componentData.elements.length, index)} */}
-            <Card
-              key={index}
-              style={{ borderRadius: 10, background: '#F6F6F6' }}
-              size="small"
-              cover={<img src={element ? element.imageUrl : ''} />}
-            >
-              <Meta title={element.title?.EN} description={element.subtitle?.EN} />
-              {element.buttons?.map((button, buttonIdex) => (
-                <ProCard
-                  key={buttonIdex}
-                  style={{ borderRadius: 10, marginTop: 10, textAlign: 'center' }}
-                  size="small"
-                >
-                  {button.title.EN}
-                </ProCard>
-              ))}
-            </Card>
-          </div>
-        ))}
-    </Carousel>
-  );
+    componentData.elements?.length?
+    <div className={styles.GenericComponent}>
+      <Carousel key={componentKey} dots={false} draggable arrows prevArrow={<CarouselPrevArrow/>} nextArrow={<CarouselNextArrow/>}>
+        {componentData && componentData.elements?.map((element, index) => {
+          if (element.title?.EN || element.subtitle?.EN || element.imageUrl || (element.buttons && element.buttons?.length > 0) ) 
+            return (
+              <Card key={index} size="small" bordered={false} cover={<img src={element ? element.imageUrl : ''} />}>
+                <p><b>{element.title?.EN}</b></p>
+                <Meta description={element.subtitle?.EN} />
+                {element.buttons?.map((button, buttonIdex) => (
+                  button.type === 'postback'? 
+                  <Popover placement="right" content={getNextFlow(button, buttonIdex)} trigger="click" color='transparent' overlayInnerStyle={{boxShadow:'none'}}>
+                    <ProCard key={buttonIdex} size="small">
+                      {button.title?.EN}
+                    </ProCard>
+                  </Popover>:
+                  <Popover placement="right" content={<a target='_blank' href={button.url}><LinkOutlined /> Open Link</a>} trigger="click">
+                    <ProCard key={buttonIdex} size="small">
+                      {button.title?.EN}
+                    </ProCard>
+                  </Popover>))}
+              </Card>)
+          return <></>
+        })}
+      </Carousel>
+    </div>: <></>
+  )
 };
 
 export const ButtonTemplateDisplayComponent: FC<DisplayComponentProps> = (props) => {
   const { componentKey, componentData } = props;
-  if (componentData) {
+  if (componentData.text?.EN || componentData.buttons?.length) {
     return (
-      <ProCard
-        key={componentKey}
-        style={{ borderRadius: 10, background: '#F6F6F6', width: 270 }}
-        size="small"
-      >
-        {componentData.title?.EN}
-        {componentData.buttons?.map((button, buttonIdex) => (
-          <Card
-            key={buttonIdex}
-            style={{ borderRadius: 10, marginTop: 10, textAlign: 'center' }}
-            size="small"
-          >
-            {button.title?.EN}
-          </Card>
-        ))}
-      </ProCard>
+      <div className={styles.ButtonComponent}>
+        <Card key={componentKey} bordered={false} size="small">
+          {componentData.text?.EN}
+          {componentData.buttons?.map((button, buttonIdex) => (
+            button.type === 'postback'? 
+            <Popover placement="right" content={getNextFlow(button, buttonIdex)} trigger="click" color='transparent' overlayInnerStyle={{boxShadow:'none'}}>
+              <ProCard key={buttonIdex} size="small">
+                {button.title?.EN}
+              </ProCard>
+            </Popover>:
+            <Popover placement="right" content={<a target='_blank' href={button.url}><LinkOutlined /> Open Link</a>} trigger="click">
+              <ProCard key={buttonIdex} size="small">
+                {button.title?.EN}
+              </ProCard>
+            </Popover>
+            ))}
+        </Card>
+      </div>
     );
   }
-  return (
-    <ProCard key={componentKey} style={{ borderRadius: 20, background: '#F6F6F6' }} size="small">
-      {' '}
-      Placeholder Text{' '}
-    </ProCard>
-  );
+  return <></>;
 };
 
 export const FlowDisplayComponent: FC<DisplayComponentProps> = (props) => {
   const { componentKey, componentData } = props;
-  if (componentData) {
-    return (
-      <ProCard
-        key={componentKey}
-        style={{ borderRadius: 10, background: '#F6F6F6', width: 270 }}
-        size="small"
-      >
-        <Meta title="GO TO" />
-        <Card
-          key={'Button' + componentKey}
-          style={{ borderRadius: 10, marginTop: 10, textAlign: 'center' }}
-          size="small"
-        >
-          {componentData.flow?.name}
-        </Card>
-      </ProCard>
-    );
-  }
+  console.log('componentData', componentData)
+
+  const { data, run } = useRequest((values: any) => {
+    console.log('componentData', componentData, componentData.flow?.flowId)
+    if (componentData.flow?.flowId)
+      return getFlow(componentData.flow?.flowId);
+    return null
+  }, {manual: true});
+  const list = data?.flow || [];
+
   return (
-    <ProCard key={componentKey} style={{ borderRadius: 20, background: '#F6F6F6' }} size="small">
-      {' '}
-      Placeholder Text{' '}
-    </ProCard>
+    componentData.flow?.flowId?
+    <>
+      <Divider plain style={{margin: '6px', color: 'gray'}}>
+        To Next Flow
+      </Divider>
+      <Space>
+      
+      <Popover placement="right" trigger="click" color='transparent' overlayInnerStyle={{boxShadow:'none'}}
+        content={<PhonePreview data={list} editMode={false}/>}>
+        <ProCard key={'reference' + componentKey} size="small" onMouseEnter={run}>
+          <Space> <ApartmentOutlined /> View {componentData.flow?.name} </Space>
+        </ProCard>
+      </Popover>
+      </Space>
+      <Divider plain style={{margin: '6px'}}>
+      </Divider>
+    </>: <></>
   );
 };
+
+
+export const CustomDisplayComponent: FC<DisplayComponentProps> = (props) => {
+  const { componentData } = props;
+  return (
+    <>
+      <Divider plain style={{margin: '6px', color: 'gray'}}>
+        Custom Function
+      </Divider>
+      <Space>
+      <FunctionOutlined />{componentData.function}
+      </Space>
+      <Divider plain style={{margin: '6px'}}>
+      </Divider>
+    </>
+    // <div className={styles.ButtonComponent}>
+    //   <Card key={componentKey} bordered={false} size="small" title="Custom Function">
+    //     <FunctionOutlined />{componentData.function}
+    //   </Card>
+    // </div>
+  );
+};
+
+
+export const InputDisplayComponent: FC<DisplayComponentProps> = (props) => {
+  const { componentData } = props;
+  return (
+    <>
+      <Divider plain style={{margin: '6px', color: 'gray'}}>
+        Input: {componentData.inputName}
+      </Divider>
+    </>
+  );
+};
+
