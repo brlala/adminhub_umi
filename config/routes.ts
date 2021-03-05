@@ -43,12 +43,6 @@
     component: './QuestionList',
   },
   {
-    name: 'list.conversation',
-    icon: 'table',
-    path: '/conversations',
-    component: './ConversationList',
-  },
-  {
     name: 'list.flow-list',
     icon: 'ApartmentOutlined',
     path: '/flows',
@@ -100,6 +94,18 @@
         component: './broadcast/BroadcastHistory',
       },
     ],
+  },
+  {
+    name: 'list.conversation',
+    icon: 'table',
+    path: '/conversations',
+    component: './ConversationList',
+  },
+  {
+    name: 'list.grading-list',
+    icon: 'EditOutlined',
+    path: '/gradings',
+    component: './GradingList',
   },
   {
     path: '/',
