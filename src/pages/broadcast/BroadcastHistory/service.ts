@@ -4,7 +4,6 @@ import { Params, BroadcastHistoryListItem, BroadcastHistoryItem } from './data.d
 export async function queryBroadcastHistoryList(
   params: Params
 ): Promise<{ data: BroadcastHistoryListItem[] }> {
-  console.log(params)
   return request('http://localhost:5000/broadcasts/history', {params});
 }
 

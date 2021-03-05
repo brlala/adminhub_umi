@@ -1,3 +1,4 @@
+import { FlowNew } from 'models/flows';
 import { request } from 'umi';
 import type { FlowListParams, newQuestionItem, DropdownProps } from './data.d';
 
@@ -71,8 +72,23 @@ export async function updateRule(params: QuestionListParams) {
 
 export async function addFlow(data
 ): Promise<{}> {
-  return request('http://localhost:5000/flows', {
+  return request('http://localhost:5000/flows/', {
     method: 'post',
     data: data,
   });
 }
+
+export async function editFlow(data
+  ): Promise<{}> {
+    return request('http://localhost:5000/flows/', {
+      method: 'put',
+      data: data,
+    });
+  }
+
+export async function getFlow(id: string,
+  ): Promise<{data: FlowNew}> {
+    return request(`http://localhost:5000/flows/${id}`, {
+    });
+  }
+  

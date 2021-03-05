@@ -3,15 +3,16 @@ import React, { FC, useState } from 'react';
 import { useIntl, useRequest, FormattedMessage } from 'umi';
 
 import type { ProColumns } from '@ant-design/pro-table';
-import StandardFormRow from './components/StandardFormRow';
-import TagSelect from './components/TagSelect';
 import { BroadcastHistoryItem, BroadcastHistoryListItem } from './data.d';
 import styles from './style.less';
 import ProTable from '@ant-design/pro-table';
 import moment from 'moment';
 import { queryBroadcastHistory, queryBroadcastHistoryList } from './service';
-import BroadcastHistoryDrawer from './components/BroadcastHistoryDrawer';
 import { PageContainer } from '@ant-design/pro-layout';
+import TagSelect from '../components/TagSelect';
+import StandardFormRow from '../components/StandardFormRow';
+import BroadcastHistoryDrawer from './components/broadcastHistoryDrawerColumns';
+import { getTags } from '../components/BroadcastMeta/service';
 
 const FormItem = Form.Item;
 
@@ -31,7 +32,6 @@ const BroadcastHistory: FC = () => {
 
   const { run: postRun } = useRequest(
     (id: string) => {
-      console.log(id);
       return queryBroadcastHistory(id);
     },
     {
@@ -41,6 +41,8 @@ const BroadcastHistory: FC = () => {
       },
     },
   );
+
+  const { data: tags } = useRequest(getTags);
 
   const intl = useIntl();
 
@@ -64,6 +66,29 @@ const BroadcastHistory: FC = () => {
       render: (_, object) => {
         return moment(object.sendAt).format('yyyy-MM-DD HH:mm');
       },
+    },
+    {
+      title: <FormattedMessage id="pages.searchTable.titleTags" defaultMessage="Tags" />,
+      hideInSearch: true,
+      render: (_, object, index) => (
+        <>
+          {object.sendToAll? <Tag color='green' key="everyone">Everyone</Tag>: ""}
+          {object.tags.map((tag) => {
+            return (
+              <Tag color='geekblue' key={index + 'tag' + tag}>
+                {tag.toUpperCase()}
+              </Tag>
+            );
+          })}
+          {object.exclude.map((tag) => {
+            return (
+              <Tag color='red' key={index + 'tag' + tag}>
+                {"- " + tag.toUpperCase()}
+              </Tag>
+            );
+          })}
+        </>
+      ),
     },
     {
       title: <FormattedMessage id="pages.searchTable.titleStatus" defaultMessage="Status" />,
@@ -100,36 +125,13 @@ const BroadcastHistory: FC = () => {
       render: (_, object) => (
         <>
           <Tooltip
-            title={object.sent + ' Sent / ' + (object.processed - object.sent) + ' Failed / ' + (object.total - object.processed) + ' Pending'}
+            title={object.sent + ' / ' + object.total}
           >
-            {(object.total === object.processed || object.processed === 0) ? <> {object.sent} / {object.total} </> :
-            <Progress percent={(object.processed * 100) / object.total} status="active"
+            <Progress percent={(object.processed * 100) / object.total} 
               success={{percent: (object.sent * 100) / object.total}}
-            />}
+              strokeColor='red' showInfo={false}
+            />
           </Tooltip>
-        </>
-      ),
-    },
-    {
-      title: <FormattedMessage id="pages.searchTable.titleTags" defaultMessage="Tags" />,
-      hideInSearch: true,
-      render: (_, object) => (
-        <>
-          {object.sendToAll? <Tag color='green' key="everyone">Everyone</Tag>: ""}
-          {object.tags.map((tag) => {
-            return (
-              <Tag color='geekblue' key={tag}>
-                {tag.toUpperCase()}
-              </Tag>
-            );
-          })}
-          {object.exclude.map((tag) => {
-            return (
-              <Tag color='red' key={tag}>
-                {"- " + tag.toUpperCase()}
-              </Tag>
-            );
-          })}
         </>
       ),
     },
@@ -162,7 +164,7 @@ const BroadcastHistory: FC = () => {
               run(values);
             }}
           >
-            <StandardFormRow title="Tags" block style={{ paddingBottom: 11 }}>
+            <StandardFormRow title="Tags" block>
               <Row>
                 <Col span={2}>
                   <FormItem name="intersect">
@@ -171,15 +173,12 @@ const BroadcastHistory: FC = () => {
                 </Col>
                 <FormItem name="tags">
                     <TagSelect hideCheckAll>
-                      <TagSelect.Option value="Pandai">Pandai</TagSelect.Option>
-                      <TagSelect.Option value="Testers">Testers</TagSelect.Option>
-                      <TagSelect.Option value="BBL">BBL</TagSelect.Option>
-                      <TagSelect.Option value="RMs">RMs</TagSelect.Option>
+                      {tags && tags.map((tag, index) => <TagSelect.Option value={tag} key={'tagsSelect' + index}>{tag}</TagSelect.Option>)}
                     </TagSelect>
                   </FormItem>
               </Row>
             </StandardFormRow>
-            <StandardFormRow title="Status"  style={{ marginBottom: -16, borderBottom: 0 }}>
+            <StandardFormRow title="Status" last>
               <Row>
                 <FormItem name="status">
                   <TagSelect hideCheckAll singleOption>

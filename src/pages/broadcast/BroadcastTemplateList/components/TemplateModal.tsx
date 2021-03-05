@@ -1,10 +1,9 @@
 import React, { FC, useEffect, useState } from 'react';
 import moment from 'moment';
 import { PlusOutlined, DeleteOutlined } from '@ant-design/icons';
-import { Modal, Result, Button, Form, List, Input, Space, Row, Col } from 'antd';
+import { Modal, Button, Form, List, Input, Space } from 'antd';
 
 import ProCard from '@ant-design/pro-card';
-import TagSelect from '../components/TagSelect';
 import { BroadcastTemplateListItem } from '../data';
 import styles from '../style.less';
 
@@ -67,15 +66,6 @@ const TemplateModal: FC<OperationModalProps> = (props) => {
         <Form.Item name="name" key='name'
           rules={[{ required: true, message: 'Please enter a template name' }]}>
           <Input placeholder={current?.name || "Template Name"} />
-        </Form.Item>
-        <Form.Item name="platforms" key='platforms'>
-          <TagSelect>
-            <TagSelect.Option value="facebook">Messenger</TagSelect.Option>
-            <TagSelect.Option value="line">Line</TagSelect.Option>
-            <TagSelect.Option value="slack">Slack</TagSelect.Option>
-            <TagSelect.Option value="whatsapp">Whatsapp</TagSelect.Option>
-            <TagSelect.Option value="telegram">Telegram</TagSelect.Option>
-          </TagSelect>
         </Form.Item>
         <Form.Item name="flow">
         <div className={styles.componentsList}>
