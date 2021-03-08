@@ -5,7 +5,6 @@ import { FormattedMessage, Link } from 'umi';
 import { ProColumns } from '@ant-design/pro-table';
 import moment from 'moment';
 import { BroadcastHistoryItem } from '../../data';
-import { renderDisplayComponent } from '@/pages/broadcast/components/RenderFlowComponent';
 import PhonePreview from '@/components/PhonePreview';
 
 interface OperationDrawerProps {
@@ -16,6 +15,7 @@ interface OperationDrawerProps {
 
 const BroadcastHistoryDrawer: FC<OperationDrawerProps> = (props) => {
   const { visible, current, onClose } = props;
+  let failedId: string[] = [];
 
   const broadcastHistoryDrawerColumns: ProColumns<BroadcastHistoryItem>[] = [
     {
@@ -116,25 +116,27 @@ const BroadcastHistoryDrawer: FC<OperationDrawerProps> = (props) => {
       title: <FormattedMessage id="pages.broadcast.flow.flowLabel" defaultMessage="Flow" />,
       dataIndex: 'flow',
       render: (_, object) => {
-        return (<PhonePreview data={object.flow}/>
-          // <>
-          //   <Space direction="vertical" size={16}>
-          //     {object.flow.map((component, index) => renderDisplayComponent(component, object.id + index.toString()))}
-          //   </Space>
-          // </>
-        );
+        return <PhonePreview data={object.flow} editMode={false}/>;
       },
     },
     {
-      title: <FormattedMessage id="pages.broadcast.failed.failedLabel" defaultMessage="Missed Target" />,
-      dataIndex: 'failed',
+      title: <FormattedMessage id="pages.broadcast.target.targetLabel" defaultMessage="Reached Target" />,
+      dataIndex: 'targets',
       hideInSearch: true,
       render: (_, object, index) => (
         <List size="small">
           {object.failed && object.failed.map((user) => {
+            failedId = [...failedId, user.id]
             return (
-              <p color='geekblue' key={index + 'user' + user}>{user}</p>
+              <Tag color='red' key={index + 'user' + user.id}>{user.name}</Tag>
             );
+          })}
+          {object.targets && object.targets.map((user) => {
+            if (failedId.indexOf(user.id ) < 0)
+              return (
+                <Tag color='green' key={index + 'user' + user.id}>{user.name}</Tag>
+              );
+            else return <></>
           })}
         </List>
       ),

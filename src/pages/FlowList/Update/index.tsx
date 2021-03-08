@@ -286,9 +286,12 @@ const NewFlow: FC = (props) => {
         >
           <ProCard title="Flow Panel" colSpan={5}>
             <Divider style={{ marginTop: -6 }} orientation="center">
-              Components
+              Add Component
             </Divider>
             <FlowComponentsList setNewComponentsList={setComponentList}/>
+            <Divider orientation="center">
+              Triggers
+            </Divider>
           </ProCard>
           <ProCard title="Flow Content" colSpan={9}>
             {(componentLength != componentList.length)? <Refreshable/>: <div className={'list-sort-demo-wrapper'}>

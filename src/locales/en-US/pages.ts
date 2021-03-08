@@ -96,4 +96,5 @@ export default {
   'pages.broadcast.sendAt.sendAtLabel': 'Broadcast Time',
   'pages.broadcast.flow.flowLabel': 'Content',
   'pages.broadcast.failed.failedLabel': 'Missed Target',
+  'pages.broadcast.target.targetLabel': 'Targets',
 };
