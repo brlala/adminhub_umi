@@ -47,6 +47,7 @@ export type FlowListParams = {
 
 export type FlowList = {
   name: string;
+  icon: ReactDOM;
   type:
     | 'message'
     | 'image'

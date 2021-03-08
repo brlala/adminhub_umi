@@ -1,5 +1,5 @@
 import { Button, Col, Row, Space } from 'antd';
-import { PlusOutlined } from '@ant-design/icons';
+import { ApartmentOutlined, AppstoreOutlined, ClusterOutlined, EditOutlined, FontSizeOutlined, FunctionOutlined, MessageOutlined, PaperClipOutlined, PartitionOutlined, PictureOutlined, PlusOutlined, SendOutlined, VideoCameraOutlined } from '@ant-design/icons';
 import React from 'react';
 import type { DraggableListItems, FlowList } from '../data';
 import { nanoid } from 'nanoid';
@@ -10,16 +10,16 @@ export type UpdateComponentsListProps = {
 
 const FlowComponentsList: React.FC<UpdateComponentsListProps> = ({ setNewComponentsList }) => {
   const componentsList: FlowList[] = [
-    { name: 'Text', type: 'message' },
-    { name: 'Image', type: 'image' },
-    { name: 'Video', type: 'video' },
-    { name: 'File', type: 'file' },
-    { name: 'Generic Template', type: 'genericTemplate' },
-    { name: 'Button Template', type: 'buttonTemplate' },
-    { name: 'Flow', type: 'flow' },
-    { name: 'Custom', type: 'custom' },
-    { name: 'Input', type: 'input' },
-    { name: 'Quick Replies', type: 'quickReplies' },
+    { name: 'Text', type: 'message', icon: <FontSizeOutlined /> },
+    { name: 'Image', type: 'image', icon: <PictureOutlined /> },
+    { name: 'Video', type: 'video', icon: <VideoCameraOutlined /> },
+    { name: 'File', type: 'file', icon: <PaperClipOutlined /> },
+    { name: 'Generic Template', type: 'genericTemplate', icon: <ClusterOutlined /> },
+    { name: 'Button Template', type: 'buttonTemplate', icon: <AppstoreOutlined /> },
+    { name: 'Flow', type: 'flow', icon: <ApartmentOutlined /> },
+    { name: 'Custom', type: 'custom', icon: <FunctionOutlined /> },
+    { name: 'Input', type: 'input', icon: <EditOutlined /> },
+    { name: 'Quick Replies', type: 'quickReplies', icon: <SendOutlined /> },
   ];
 
   const addComponent = (item: FlowList) => {
@@ -85,7 +85,8 @@ const FlowComponentsList: React.FC<UpdateComponentsListProps> = ({ setNewCompone
                   value={item.type}
                   onClick={() => addComponent(item)}
                 >
-                  <PlusOutlined /> {item.name}
+                  {/* <PlusOutlined /> */}
+                  {item.icon} {item.name}
                 </Button>
               </Col>
             </Row>

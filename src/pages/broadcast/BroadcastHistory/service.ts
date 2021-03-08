@@ -7,7 +7,6 @@ export async function queryBroadcastHistoryList(
   return request('http://localhost:5000/broadcasts/history', {params});
 }
 
-
 export async function queryBroadcastHistory(
   id: string
 ): Promise<{ data: BroadcastHistoryItem }> {

@@ -64,8 +64,8 @@ const ReBroadcast: FC = () => {
             <Form 
               name="broadcast-form"
               initialValues={{tags: [], exclude: [], sendToAll: false, scheduled: false}} 
-              onFinish={onFinish}>
-                
+              onFinish={onFinish}
+              hideRequiredMark>
                 <FormItem >
                   <BroadcastMeta></BroadcastMeta>
                 </FormItem>
