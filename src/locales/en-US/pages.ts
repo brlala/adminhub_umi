@@ -70,6 +70,7 @@ export default {
   'pages.searchTable.batchDeletion': 'Batch deletion',
   'pages.searchTable.batchApproval': 'Batch approval',
   'pages.searchTable.edit': 'Edit',
+  'pages.searchTable.delete': 'Delete',
   'pages.searchTable.nameStatus.deleted': 'Deleted',
   'pages.searchTable.nameStatus.inactive': 'Inactive',
   'pages.searchTable.nameStatus.active': 'Active',

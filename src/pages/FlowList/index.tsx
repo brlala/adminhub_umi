@@ -9,7 +9,7 @@ import ProTable from '@ant-design/pro-table';
 import type { ProDescriptionsItemProps } from '@ant-design/pro-descriptions';
 import ProDescriptions from '@ant-design/pro-descriptions';
 import type { FlowListItem } from './data.d';
-import { queryFlows, removeQuestion, updateRule } from './service';
+import { queryFlows, removeFlows, updateRule } from './service';
 import moment from 'moment';
 import { changeLanguage } from '@/utils/language';
 import { Link } from '@umijs/preset-dumi/lib/theme';
@@ -46,7 +46,7 @@ const handleRemove = async (selectedRows: FlowListItem[]) => {
   const hide = message.loading('Deleting');
   if (!selectedRows) return true;
   try {
-    await removeQuestion({
+    await removeFlows({
       key: selectedRows.map((row) => row.id),
     });
     hide();
@@ -181,19 +181,23 @@ const FlowList: React.FC = () => {
       title: <FormattedMessage id="pages.searchTable.titleOption" defaultMessage="Option" />,
       dataIndex: 'option',
       valueType: 'option',
+      hideInTable: true,
       render: (_, record) => [
-
+        <Button type='text' style={{color: 'red'}} onClick={()=> {handleRemove([record]); 
+          setSelectedRows([]);
+          actionRef.current?.reloadAndRest?.();setShowDetail(false)}}>
+          <FormattedMessage id="pages.searchTable.delete" defaultMessage="Delete" />
+        </Button>
+      ],
+    },
+    {
+      title: <FormattedMessage id="pages.searchTable.titleOption" defaultMessage="Option" />,
+      dataIndex: 'option',
+      valueType: 'option',
+      render: (_, record) => [
         <Link to={"/flows/" + record.id}>
           <FormattedMessage id="pages.searchTable.edit" defaultMessage="Edit" />
-        </Link>,
-        // <a
-        //   key="config"
-        //   onClick={() => {
-        //     console.log('clicked edit');
-        //   }}
-        // >
-        //   <FormattedMessage id="pages.searchTable.edit" defaultMessage="Edit" />
-        // </a>,
+        </Link>
       ],
     },
   ];

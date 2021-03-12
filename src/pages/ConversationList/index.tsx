@@ -249,8 +249,8 @@ const ConversationList: FC = () => {
                   <img alt="" src='https://gw.alipayobjects.com/zos/antfincdn/XAosXuNZyF/BiazfanxmamNRoxxVxka.png' />
                   <Space direction='vertical'>
                     <div className='idField'><UserOutlined /> ID: {currentUser.id}</div>
-                    <div ><FormOutlined className='infoLogo'/> Registration Date: {moment(currentUser.createdAt).format('YYYY-MM-DD')}</div>
-                    <div ><ClockCircleOutlined className='infoLogo'/> Last Active: {moment(currentUser.updatedAt).toNow()}</div>
+                    <div ><FormOutlined className='infoLogo'/> Registration Date: {console.log(currentUser)} {moment(currentUser.createdAt).format('YYYY-MM-DD')}</div>
+                    <div ><ClockCircleOutlined className='infoLogo'/> Last Active: {moment(currentUser.lastActive.sentAt).toNow()}</div>
                     <div ><CommentOutlined className='infoLogo'/> Total Conversations: TBD</div>
                     <div ><MessageOutlined className='infoLogo'/> Total Messages: TBD</div>
                   </Space>
