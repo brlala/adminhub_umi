@@ -293,7 +293,7 @@ const NewFlow: FC = (props) => {
               Triggers
             </Divider>
           </ProCard>
-          <ProCard title="Flow Content" colSpan={9}>
+          <ProCard title="Flow Content" colSpan={9} className={styles.FlowEditArea} >
             {(componentLength != componentList.length)? <Refreshable/>: <div className={'list-sort-demo-wrapper'}>
               <div className='list-sort-demo'>
                 <ListSort

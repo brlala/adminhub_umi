@@ -23,7 +23,7 @@ export const QuickReplyDisplayComponent: FC<DisplayComponentProps> = (props) => 
         {componentData &&
           componentData.quickReplies?.map((element, index) => (
             <Popover placement="right" content={getNextFlow(element, index)} trigger="click" color='transparent' overlayInnerStyle={{boxShadow:'none'}}>
-              <Button key={componentKey + 'qr' + index} type="default" style={{ borderRadius: 20 }}>
+              <Button key={componentKey + 'qr' + index} type="default" style={{ borderRadius: '4px' }}>
                 {element.text.EN}
               </Button>
             </Popover>

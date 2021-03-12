@@ -1,27 +1,32 @@
 import { request } from 'umi';
-import type { QuestionListParams, newQuestionItem, DropdownProps } from './data.d';
+import type { DropdownProps, ConversationParams } from './data.d';
 
-export async function queryQuestions(params?: QuestionListParams) {
-  let { sorter, filter, ...searchParam } = params;
-  let sortQuery: string = '';
-  if (Object.keys(sorter).length !== 0) {
-    let temp: string[] = [];
-    for (const [key, value] of Object.entries(sorter)) {
-      if (value === 'ascend') {
-        temp.push(`+${key}`);
-      } else {
-        temp.push(`-${key}`);
-      }
+export async function queryConversationsUsers(params: ConversationParams) {
+  return request('http://localhost:5000/conversations/', { params: params, getResponse: true });
+}
 
-      sortQuery = temp.join();
-    }
-    searchParam = { ...searchParam, sortBy: sortQuery };
-  }
-  params = { ...searchParam };
+export async function queryConversations(params: ConversationParams) {
+  return request('http://localhost:5000/conversations/messages/', {
+    params: params,
+    getResponse: true,
+  });
+}
 
-  // return request('/api/rule', {
-  return request('http://localhost:5000/questions', {
-    params,
+export async function queryMessages(userId: string, params: ConversationParams) {
+  return request(`http://localhost:5000/conversations/users/${userId}`, {
+    params: params,
+    getResponse: true,
+  });
+}
+
+export async function queryCurrent(userId: string) {
+  return request(`http://localhost:5000/botuser/${userId}`, { getResponse: true });
+}
+
+export async function patchUserTags(userId: string, tags: string[]) {
+  return request(`http://localhost:5000/botuser/${userId}`, {
+    params: { tags: tags },
+    method: 'patch',
   });
 }
 
@@ -37,42 +42,4 @@ export async function queryFlowsFilter(field: string) {
   let results: DropdownProps[] = [];
   flows.forEach((flow: any) => results.push({ label: flow.name, value: flow.id, key: flow.id }));
   return results;
-}
-
-export async function removeQuestion(params: { key: string[] }) {
-  console.log(params);
-  return request('http://localhost:5000/questions/', {
-    method: 'DELETE',
-    data: {
-      ...params,
-    },
-  });
-}
-
-export async function addQuestion(params: newQuestionItem) {
-  return request('http://localhost:5000/questions/', {
-    method: 'POST',
-    data: {
-      ...params,
-    },
-  });
-}
-
-export async function editQuestion(params: newQuestionItem) {
-  return request('http://localhost:5000/questions', {
-    method: 'PUT',
-    data: {
-      ...params,
-    },
-  });
-}
-
-export async function updateRule(params: QuestionListParams) {
-  return request('/api/rule', {
-    method: 'POST',
-    data: {
-      ...params,
-      method: 'update',
-    },
-  });
 }
