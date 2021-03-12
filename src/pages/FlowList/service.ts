@@ -25,47 +25,12 @@ export async function queryFlows(params?: FlowListParams) {
   });
 }
 
-export async function queryTopics() {
-  const topics: string[] = await request('http://localhost:5000/questions/topics');
-  let results: DropdownProps[] = [];
-  topics.forEach((topic) => results.push({ label: topic, value: topic, key: topic }));
-  return results;
-}
-
-export async function removeQuestion(params: { key: string[] }) {
+export async function removeFlows(params: { key: string[] }) {
   console.log(params);
-  return request('http://localhost:5000/questions/', {
+  return request('http://localhost:5000/flows/', {
     method: 'DELETE',
     data: {
       ...params,
-    },
-  });
-}
-
-export async function addQuestion(params: newQuestionItem) {
-  return request('http://localhost:5000/questions/', {
-    method: 'POST',
-    data: {
-      ...params,
-    },
-  });
-}
-
-export async function editQuestion(params: newQuestionItem) {
-  return request('http://localhost:5000/questions', {
-    method: 'PUT',
-    data: {
-      ...params,
-    },
-  });
-}
-
-export async function updateRule(params: QuestionListParams) {
-  return request('/api/rule', {
-    method: 'POST',
-    data: {
-      ...params,
-      method: 'update',
     },
   });
 }
