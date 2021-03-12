@@ -1,11 +1,10 @@
 import React, { FC } from 'react';
-import { Space, Drawer, Tag, Tooltip, Progress, Button, List } from 'antd';
+import { Drawer, Tag, Tooltip, Progress, Button, List } from 'antd';
 import ProDescriptions, { ProDescriptionsItemProps } from '@ant-design/pro-descriptions';
 import { FormattedMessage, Link } from 'umi';
 import { ProColumns } from '@ant-design/pro-table';
 import moment from 'moment';
 import { BroadcastHistoryItem } from '../../data';
-import { renderDisplayComponent } from '@/pages/broadcast/components/RenderFlowComponent';
 import PhonePreview from '@/components/PhonePreview';
 
 interface OperationDrawerProps {
@@ -16,6 +15,7 @@ interface OperationDrawerProps {
 
 const BroadcastHistoryDrawer: FC<OperationDrawerProps> = (props) => {
   const { visible, current, onClose } = props;
+  let failedId: string[] = [];
 
   const broadcastHistoryDrawerColumns: ProColumns<BroadcastHistoryItem>[] = [
     {
@@ -27,9 +27,7 @@ const BroadcastHistoryDrawer: FC<OperationDrawerProps> = (props) => {
       },
     },
     {
-      title: (
-        <FormattedMessage id="pages.searchTable.titleCreatedAt" defaultMessage="Created At" />
-      ),
+      title: <FormattedMessage id="pages.searchTable.titleCreatedAt" defaultMessage="Created At" />,
       dataIndex: 'createdAt',
       valueType: 'dateTimeRange',
       render: (_, object) => {
@@ -52,18 +50,24 @@ const BroadcastHistoryDrawer: FC<OperationDrawerProps> = (props) => {
       hideInSearch: true,
       render: (_, object, index) => (
         <>
-          {object.sendToAll? <Tag color='green' key={index + 'tagEveryone'}>Everyone</Tag>: ""}
+          {object.sendToAll ? (
+            <Tag color="green" key={index + 'tagEveryone'}>
+              Everyone
+            </Tag>
+          ) : (
+            ''
+          )}
           {object.tags.map((tag) => {
             return (
-              <Tag color='geekblue' key={index + 'tag' + tag}>
+              <Tag color="geekblue" key={index + 'tag' + tag}>
                 {tag.toUpperCase()}
               </Tag>
             );
           })}
           {object.exclude.map((tag) => {
             return (
-              <Tag color='red' key={index + 'tag' + tag}>
-                {"- " + tag.toUpperCase()}
+              <Tag color="red" key={index + 'tag' + tag}>
+                {'- ' + tag.toUpperCase()}
               </Tag>
             );
           })}
@@ -105,9 +109,13 @@ const BroadcastHistoryDrawer: FC<OperationDrawerProps> = (props) => {
       render: (_, object) => (
         <>
           <Tooltip title={object.sent + ' / ' + object.total}>
-            <Progress percent={(object.processed * 100) / object.total} 
-              success={{percent: (object.sent * 100) / object.total}} strokeWidth='12px'
-              strokeColor='red' showInfo={false}/>
+            <Progress
+              percent={(object.processed * 100) / object.total}
+              success={{ percent: (object.sent * 100) / object.total }}
+              strokeWidth="12px"
+              strokeColor="red"
+              showInfo={false}
+            />
           </Tooltip>
         </>
       ),
@@ -116,26 +124,36 @@ const BroadcastHistoryDrawer: FC<OperationDrawerProps> = (props) => {
       title: <FormattedMessage id="pages.broadcast.flow.flowLabel" defaultMessage="Flow" />,
       dataIndex: 'flow',
       render: (_, object) => {
-        return (<PhonePreview data={object.flow}/>
-          // <>
-          //   <Space direction="vertical" size={16}>
-          //     {object.flow.map((component, index) => renderDisplayComponent(component, object.id + index.toString()))}
-          //   </Space>
-          // </>
-        );
+        return <PhonePreview data={object.flow} editMode={false} />;
       },
     },
     {
-      title: <FormattedMessage id="pages.broadcast.failed.failedLabel" defaultMessage="Missed Target" />,
-      dataIndex: 'failed',
+      title: (
+        <FormattedMessage id="pages.broadcast.target.targetLabel" defaultMessage="Reached Target" />
+      ),
+      dataIndex: 'targets',
       hideInSearch: true,
       render: (_, object, index) => (
         <List size="small">
-          {object.failed && object.failed.map((user) => {
-            return (
-              <p color='geekblue' key={index + 'user' + user}>{user}</p>
-            );
-          })}
+          {object.failed &&
+            object.failed.map((user) => {
+              failedId = [...failedId, user.id];
+              return (
+                <Tag color="red" key={index + 'user' + user.id}>
+                  {user.name}
+                </Tag>
+              );
+            })}
+          {object.targets &&
+            object.targets.map((user) => {
+              if (failedId.indexOf(user.id) < 0)
+                return (
+                  <Tag color="green" key={index + 'user' + user.id}>
+                    {user.name}
+                  </Tag>
+                );
+              else return <></>;
+            })}
         </List>
       ),
     },
@@ -149,9 +167,12 @@ const BroadcastHistoryDrawer: FC<OperationDrawerProps> = (props) => {
       // closable={false}
       onClose={onClose}
       footer={[
-          <Link to={`/broadcasts/history/${current?.id}`}>
-            <Button type="primary" key={current?.id}>Retarget Broadcast</Button>
-          </Link>]}
+        <Link to={`/broadcasts/history/${current?.id}`}>
+          <Button type="primary" key={current?.id}>
+            Retarget Broadcast
+          </Button>
+        </Link>,
+      ]}
       footerStyle={{ textAlign: 'center' }}
     >
       {current?.flow && (

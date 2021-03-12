@@ -1,12 +1,11 @@
 import React, { useState, FC } from 'react';
 import { ProFormSelect, ProFormTextArea } from '@ant-design/pro-form';
-import { Button, Form, Input, message, Radio, Card, Space, Image } from 'antd';
+import { Button, Form, Input, message, Radio, Card, Space, Image, Tooltip } from 'antd';
 import { queryFlowsFilter } from '@/pages/QuestionList/service';
 import { FormattedMessage } from '@@/plugin-locale/localeExports';
 import { Modal } from 'antd';
 const { TextArea } = Input;
-import { DeleteOutlined, FileAddOutlined, FunctionOutlined, LoadingOutlined, PaperClipOutlined, PlusOutlined, VideoCameraAddOutlined } from '@ant-design/icons';
-import { VideoDisplayComponent } from '../ReadFlow';
+import { CloseOutlined, DeleteOutlined, FileAddOutlined, FunctionOutlined, LoadingOutlined, PaperClipOutlined, PlusOutlined, VideoCameraAddOutlined } from '@ant-design/icons';
 import ImgCrop from 'antd-img-crop';
 import { Tabs } from 'antd';
 import './index.less';
@@ -23,11 +22,14 @@ export const handleDelete = (componentKey: number, onChange: any) => {
   })
 };
 
+export const deleteButton = (componentKey: number, onChange: any) => {
+  return <Tooltip placement="top" title='Remove Component'><Button shape="circle" onClick={() => handleDelete(componentKey, onChange)}><CloseOutlined /></Button></Tooltip>
+}
+
 export const TextComponent: FC<TextComponentDataProps> = (props) => {
   const { componentKey, componentData, onChange } = props
   return (
-    <Card title='Text' size='small' style={{background: 'transparent'}} bordered={false} 
-      extra={<Button shape="circle" onClick={() => handleDelete(componentKey, onChange)}><DeleteOutlined /></Button>}>
+    <Card title='Text' size='small' style={{background: 'transparent'}} bordered={false} extra={deleteButton(componentKey, onChange)}>
       <Form.Item
         key={'component' + componentKey.toString() + 'text'}
         name={'component' + componentKey.toString() + 'text'}
@@ -54,8 +56,7 @@ export const TextComponent: FC<TextComponentDataProps> = (props) => {
 export const CustomComponent: FC<CustomComponentDataProps> = (props) => {
   const { componentKey, componentData, onChange, disabled } = props
   return (
-    <Card title='Custom' size='small' style={{background: 'transparent'}} bordered={false} 
-      extra={<Button shape="circle" onClick={() => handleDelete(componentKey, onChange)}><DeleteOutlined /></Button>}>
+    <Card title='Custom' size='small' style={{background: 'transparent'}} bordered={false} extra={deleteButton(componentKey, onChange)}>
       <Form.Item
         key={'component' + componentKey.toString() + 'function'}
         name={'component' + componentKey.toString() + 'function'}
@@ -64,7 +65,7 @@ export const CustomComponent: FC<CustomComponentDataProps> = (props) => {
       >
         <Input
           prefix={<FunctionOutlined />}
-          placeholder="Please input"
+          placeholder={disabled?"Contact developer to add/update component":"Please input"}
           disabled={disabled}
           onChange={(e) => {
             onChange((prevState: any) =>
@@ -84,8 +85,7 @@ export const CustomComponent: FC<CustomComponentDataProps> = (props) => {
 export const InputComponent: FC<InputComponentDataProps> = (props) => {
   const { componentKey, componentData, onChange } = props
   return (
-    <Card title='Input' size='small' style={{background: 'transparent'}} bordered={false} 
-      extra={<Button shape="circle" onClick={() => handleDelete(componentKey, onChange)}><DeleteOutlined /></Button>}>
+    <Card title='Input' size='small' style={{background: 'transparent'}} bordered={false} extra={deleteButton(componentKey, onChange)}>
       <Form.Item
         key={'component' + componentKey.toString() + 'function'}
         name={'component' + componentKey.toString() + 'function'}
@@ -139,9 +139,19 @@ export const ImageComponent: FC<AttachmentComponentDataProps> = (props) => {
     },
   };
 
+  const removeImage = () => {
+    setPreviewImage('')
+    setUploading(false)
+    onChange((prevState: any) => [...prevState].map((item, index) => {
+      if (index === componentKey) {
+        return { ...item, data: {url: ''}}
+      }
+      else return item;
+    }))
+  }
+
   return (
-    <Card title='Image' size='small' style={{background: 'transparent'}} bordered={false} 
-      extra={<Button shape="circle" onClick={() => handleDelete(componentKey, onChange)}><DeleteOutlined /></Button>}>
+    <Card title='Image' size='small' style={{background: 'transparent'}} bordered={false} extra={deleteButton(componentKey, onChange)}>
       <Form.Item
         key={'component' + componentKey.toString() + 'image'}
         name={'component' + componentKey.toString() + 'image'}
@@ -151,7 +161,7 @@ export const ImageComponent: FC<AttachmentComponentDataProps> = (props) => {
         {previewImage? 
           <Space>
             <Image className='ImageComponent' key={componentKey} src={previewImage} 
-              preview={{mask: <Button className='image-mask' shape="circle" size='large' onClick={() => setPreviewImage('')}><DeleteOutlined/></Button>}}/>
+              preview={{mask: <Button className='image-mask' shape="circle" size='large' onClick={removeImage}><DeleteOutlined/></Button>}}/>
           </Space>
           : 
           <Dragger {...draggerProps}>
@@ -194,10 +204,25 @@ export const VideoComponent: FC<AttachmentComponentDataProps> = (props) => {
       }
     },
   };
+  
+  const removeImage = () => {
+    setPreviewImage('')
+    setUploading(false)
+    onChange((prevState: any) => [...prevState].map((item, index) => {
+      if (index === componentKey) {
+        return { ...item, data: {url: ''}}
+      }
+      else return item;
+    }))
+  }
 
   return (
     <Card title='Video' size='small' style={{background: 'transparent'}} bordered={false} 
-      extra={<Button shape="circle" onClick={() => handleDelete(componentKey, onChange)}><DeleteOutlined /></Button>}>
+      extra={<Space> {previewImage?
+        <Tooltip placement="top" title='Remove Video'>
+          <Button shape="circle" onClick={removeImage}><DeleteOutlined/></Button>
+        </Tooltip> :<></>}
+        {deleteButton(componentKey, onChange)}</Space>}>
       <Form.Item
         key={'component' + componentKey.toString() + 'image'}
         name={'component' + componentKey.toString() + 'image'}
@@ -206,8 +231,13 @@ export const VideoComponent: FC<AttachmentComponentDataProps> = (props) => {
       >
         {previewImage? 
           <Space>
-            <VideoDisplayComponent componentKey={componentKey.toString()} componentData={{url: previewImage}}/>
-            <Button shape="round" onClick={() => setPreviewImage('')}><DeleteOutlined/></Button>
+            <video
+              key={componentKey}
+              className='ImageComponent'
+              controls
+              src={componentData.url}/>
+            {/* <VideoDisplayComponent componentKey={componentKey.toString()} componentData={{url: previewImage}}/>
+            <Button shape="round" onClick={() => setPreviewImage('')}><DeleteOutlined/></Button> */}
           </Space>
           : 
           <Dragger {...draggerProps}>
@@ -251,7 +281,7 @@ export const FileComponent: FC<AttachmentComponentDataProps> = (props) => {
 
   return (
     <Card title='File' size='small' style={{background: 'transparent'}} bordered={false} 
-      extra={<Button shape="circle" onClick={() => handleDelete(componentKey, onChange)}><DeleteOutlined /></Button>}>
+      extra={deleteButton(componentKey, onChange)}>
       <Form.Item
         key={'component' + componentKey.toString() + 'image'}
         name={'component' + componentKey.toString() + 'image'}
@@ -261,7 +291,7 @@ export const FileComponent: FC<AttachmentComponentDataProps> = (props) => {
         {fileName? 
           <Space>
             <PaperClipOutlined /> {fileName}
-            <Button shape="round" onClick={() => setFileName('')}><DeleteOutlined/></Button>
+            <Button shape="circle" onClick={() => setFileName('')}><DeleteOutlined/></Button>
           </Space>
           : 
           <Dragger {...draggerProps}>
@@ -315,7 +345,7 @@ export const GenericTemplateComponent: FC<GenericTemplateComponentDataProps> = (
 
   return (
     <Card title='Generic Template' size='small' bordered={false} style={{background: 'transparent'}}
-      extra={<Button shape="circle" onClick={() => handleDelete(componentKey, onChange)}><DeleteOutlined /></Button>}>
+      extra={deleteButton(componentKey, onChange)}>
       <div className="card-container">
         <Tabs
           type="editable-card"
@@ -341,16 +371,16 @@ export const TemplateComponent: FC<TemplateComponentDataProps> = (props) => {
   const { componentKey, componentData, onChange, parentKey } = props
   const [previewImage, setPreviewImage] = useState(componentData.imageUrl);
   const [uploading, setUploading] = useState(componentData.imageUrl?true:false);
-  const [previewVisible, setPreviewVisible] = useState(false);
-  const [previewTitle, setPreviewTitle] = useState(false);
   const [selectedButton, setSelectedButton] = useState<Partial<Buttons>>();
   const [selectedButtonIndex, setSelectedButtonIndex] = useState<number>();
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const [buttons, setButtons] = useState(componentData.buttons)
+  const [buttons, setButtons] = useState(componentData.buttons);
+  const [wordCount, setWordCount] = useState(0);
 
 
   const showModal = () => {
     setIsModalVisible(true);
+    setWordCount(selectedButton?.title.EN.length);
   };
 
   const handleOkModal = () => {
@@ -529,9 +559,6 @@ export const TemplateComponent: FC<TemplateComponentDataProps> = (props) => {
                         }
                         else return pane;})
                     }}
-
-
-
                   }
                   else return item;
                 }))
@@ -551,7 +578,7 @@ export const TemplateComponent: FC<TemplateComponentDataProps> = (props) => {
                 rules={[{ required: true, message: 'Please input display text' }]}
                 initialValue={selectedButton?.title.EN}
               >
-                <Input />
+                <Input maxLength={20} onChange={(e) => setWordCount(e.target.value.length)} suffix={<div style={{color:'#BEBEBE'}}> {wordCount}/20</div>}/>
               </Form.Item>
               <Form.Item
                 label="Type"
@@ -563,7 +590,7 @@ export const TemplateComponent: FC<TemplateComponentDataProps> = (props) => {
                     setSelectedButton({...selectedButton, type: event.target.value})
                   }}
                 >
-                  <Radio.Button value="flow">Flow</Radio.Button>
+                  <Radio.Button value="postback">Flow</Radio.Button>
                   <Radio.Button value="url">URL</Radio.Button>
                 </Radio.Group>
               </Form.Item>
@@ -596,17 +623,13 @@ export const TemplateComponent: FC<TemplateComponentDataProps> = (props) => {
 export const ButtonTemplateComponent: FC<ButtonTemplateComponentDataProps> = (props) => {
   const { componentKey, componentData, onChange } = props;
   const [selectedButton, setSelectedButton] = useState<Partial<Buttons>>();
-  const [selectedButtonValues, setSelectedButtonValues] = useState({});
   const [selectedButtonIndex, setSelectedButtonIndex] = useState<number>();
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [wordCount, setWordCount] = useState(0);
 
   const showModal = () => {
     setIsModalVisible(true);
-    setSelectedButtonValues({
-      title: selectedButton?.title.EN? selectedButton.title.EN : null,
-      type: selectedButton? selectedButton.type : 'postback',
-      url: selectedButton?.type === 'url' ? selectedButton?.url : null,
-      flowId: selectedButton?.type === 'postback' ? selectedButton?.payload?.flowId : null})
+    setWordCount(selectedButton?.title.EN.length);
   };
 
   const handleOkModal = () => {
@@ -617,19 +640,15 @@ export const ButtonTemplateComponent: FC<ButtonTemplateComponentDataProps> = (pr
     setIsModalVisible(false);
   };
 
-  const handleVisibleChange = (visible: React.SetStateAction<boolean>) => {
-    setIsModalVisible(visible);
-  }
-
   return (
-    <Card title='Button Template' size='small' style={{background: 'transparent'}} bordered={false} 
-      extra={<Button shape="circle" onClick={() => handleDelete(componentKey, onChange)}><DeleteOutlined /></Button>}>
+    <Card title='Button Template' size='small' style={{background: 'transparent'}} bordered={false} extra={deleteButton(componentKey, onChange)}>
       <Form.Item
         key={componentKey.toString()}
-        rules={[{ required: true, message: 'Field is required' }]}>
+        rules={[{ required: true, message: 'Field is required' }, { max: 160, message: 'Text cannot be longer than 160 characters' }]}>
         <TextArea
+          maxLength={161}
+          autoSize={{ minRows: 1 }}
           allowClear
-          rows={4}
           placeholder="Please input"
           defaultValue={componentData?.text?.EN}
           onChange={(e) => {
@@ -721,7 +740,7 @@ export const ButtonTemplateComponent: FC<ButtonTemplateComponentDataProps> = (pr
               name="title"
               rules={[{ required: true, message: 'Please input display text' }]}
             >
-              <Input />
+              <Input maxLength={20} onChange={(e) => setWordCount(e.target.value.length)} suffix={<div style={{color:'#BEBEBE'}}> {wordCount}/20</div>}/>
             </Form.Item>
             <Form.Item
               label="Type"
@@ -731,7 +750,7 @@ export const ButtonTemplateComponent: FC<ButtonTemplateComponentDataProps> = (pr
                 onChange={(event) => {
                   setSelectedButton({...selectedButton, type: event.target.value})
                 }}>
-                <Radio.Button value="flow">Flow</Radio.Button>
+                <Radio.Button value="postback">Flow</Radio.Button>
                 <Radio.Button value="url">URL</Radio.Button>
               </Radio.Group>
             </Form.Item>
@@ -763,8 +782,7 @@ export const FlowComponent: FC<FlowComponentDataProps> = (props) => {
   const { componentKey, componentData, onChange } = props
 
   return (
-    <Card title='Flow' size='small' style={{background: 'transparent'}} bordered={false} 
-      extra={<Button shape="circle" onClick={() => handleDelete(componentKey, onChange)}><DeleteOutlined /></Button>}>
+    <Card title='Flow' size='small' style={{background: 'transparent'}} bordered={false} extra={deleteButton(componentKey, onChange)}>
       <ProFormSelect
         name={componentData.name}
         showSearch
@@ -800,6 +818,7 @@ export const QuickReplyComponent: React.FC<QuickReplyComponentDataProps> = (prop
   const { componentKey, componentData, onChange } = props
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectRow, setSelectRow] = useState<QrButtons>();
+  const [wordCount, setWordCount] = useState(0);
   const [flows, setFlows] = useState<DropdownProps[]>([]);
   const addNewQuickReplyButton = (
     <Button
@@ -828,8 +847,7 @@ export const QuickReplyComponent: React.FC<QuickReplyComponentDataProps> = (prop
   };
 
   return (
-    <Card title='Quick Replies' size='small' style={{background: 'transparent'}} bordered={false} 
-      extra={<Button shape="circle" onClick={() => handleDelete(componentKey, onChange)}><DeleteOutlined /></Button>}>
+    <Card title='Quick Replies' size='small' style={{background: 'transparent'}} bordered={false} extra={deleteButton(componentKey, onChange)}>
       <Form.Item style={{ marginTop: -6 }} >
         <Space wrap>
           {componentData.quickReplies.map((button) => (
@@ -879,9 +897,9 @@ export const QuickReplyComponent: React.FC<QuickReplyComponentDataProps> = (prop
             <Form.Item
               label="Display Text"
               name="text"
-              rules={[{ required: true, message: 'Please input display text' }]}
+              rules={[{ required: true, message: 'Please input display text' }, { max: 20, message: 'Button title cannot be longer than 20 characters' }]}
               initialValue={selectRow?.text.EN}>
-              <Input />
+              <Input maxLength={20} onChange={(e) => setWordCount(e.target.value.length)} suffix={<div style={{color:'#BEBEBE'}}> {wordCount}/20</div>}/>
             </Form.Item>
             <ProFormSelect
               name="flowId"

@@ -50,5 +50,11 @@ export interface BroadcastHistoryItem {
   sendAt: string;
   createdAt: string;
   createdBy: Member;
-  failed?: string[];
+  failed?: BotUserObject[];
+  targets?: BotUserObject[];
+}
+
+export interface BotUserObject {
+  id: string;
+  name: string;
 }

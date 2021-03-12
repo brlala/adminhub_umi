@@ -50,13 +50,26 @@ export type QuestionListData = {
   pagination: Partial<QuestionListPagination>;
 };
 
-export type QuestionListParams = {
-  status?: string;
-  name?: string;
-  desc?: string;
-  key?: number;
+export type ConversationParams = {
   pageSize?: number;
-  currentPage?: number;
-  filter: Record<string, any[]> | {};
-  sorter: Record<string, any> | {};
+  current?: number;
+  searchQuery?: string;
+  tags?: string[];
+};
+
+export type BotUsers = {
+  id: string;
+  fullname?: string;
+  tags: string[];
+  lastMessage: {
+    message: string;
+    createdAt: string;
+  };
+};
+
+export type ConversationUsers = {
+  user: { id: string };
+  fullname?: string;
+  convoCount: number;
+  lastMessageDate: string;
 };
