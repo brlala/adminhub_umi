@@ -543,10 +543,7 @@ const QuestionList: React.FC = () => {
               actionRef.current?.reloadAndRest?.();
             }}
           >
-            <FormattedMessage
-              id="pages.searchTable.batchDeletion"
-              defaultMessage="Batch deletion"
-            />
+            <FormattedMessage id="pages.searchTable.batchDeletion" defaultMessage="Delete" />
           </Button>
         </FooterToolbar>
       )}

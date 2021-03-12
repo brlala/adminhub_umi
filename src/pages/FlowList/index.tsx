@@ -1,6 +1,6 @@
 import { PlusOutlined } from '@ant-design/icons';
 import { Button, Drawer, message, Slider, Space, Tag } from 'antd';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useRef, useState } from 'react';
 // @ts-ignore
 import { FormattedMessage, useIntl } from 'umi';
 import { FooterToolbar, PageContainer } from '@ant-design/pro-layout';
@@ -130,11 +130,9 @@ const FlowList: React.FC = () => {
       hideInForm: true,
       hideInTable: true,
       render: (dom, entity) => {
-        console.log(entity.flow)
-        return <PhonePreview data={entity.flow}/>
-
-      }
-      ,
+        console.log(entity.flow);
+        return <PhonePreview data={entity.flow} editMode={false}/>;
+      },
     },
     {
       title: (
@@ -253,10 +251,7 @@ const FlowList: React.FC = () => {
               actionRef.current?.reloadAndRest?.();
             }}
           >
-            <FormattedMessage
-              id="pages.searchTable.batchDeletion"
-              defaultMessage="Batch deletion"
-            />
+            <FormattedMessage id="pages.searchTable.batchDeletion" defaultMessage="Delete" />
           </Button>
         </FooterToolbar>
       )}
