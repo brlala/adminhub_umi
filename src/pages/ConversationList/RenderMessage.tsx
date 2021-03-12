@@ -2,12 +2,12 @@ import React from 'react';
 import { MessageData } from 'models/messages';
 import { ButtonTemplateDisplayComponent, PostbackDisplayComponent, FileDisplayComponent, GenericTemplateDisplayComponent, ImageDisplayComponent, QuickReplyDisplayComponent, TextDisplayComponent, VideoDisplayComponent } from '@/components/FlowItems/ReadMessage';
 
-export const renderMessageComponent = (component: MessageData, type: string, index: string, isBot: boolean) => {
+export const renderMessageComponent = (component: MessageData, type: string, index: string, isBot: boolean, isBroadcast: boolean) => {
     let renderedComponent;
     switch (type) {
         case 'message':
         renderedComponent = (
-            <TextDisplayComponent componentKey={index} componentData={component} isBot={isBot}/>
+            <TextDisplayComponent componentKey={index} componentData={component} isBot={isBot} isBroadcast={isBroadcast}/>
         );
         break;
         case 'postback':

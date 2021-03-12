@@ -567,7 +567,7 @@ export const TemplateComponent: FC<TemplateComponentDataProps> = (props) => {
               initialValues={{
                 title: selectedButton?.title.EN,
                 content: selectedButton?.type,
-                url: selectedButton?.type === 'url' ? selectedButton?.url : null,
+                url: selectedButton?.type === 'web_url' ? selectedButton?.url : null,
               }}
               labelCol={{ span: 7 }}
               wrapperCol={{ span: 16 }}
@@ -591,10 +591,10 @@ export const TemplateComponent: FC<TemplateComponentDataProps> = (props) => {
                   }}
                 >
                   <Radio.Button value="postback">Flow</Radio.Button>
-                  <Radio.Button value="url">URL</Radio.Button>
+                  <Radio.Button value="web_url">URL</Radio.Button>
                 </Radio.Group>
               </Form.Item>
-              {selectedButton?.type === 'url'? (
+              {selectedButton?.type === 'web_url'? (
                   <ProFormTextArea
                     name="url"
                     label="URL"
@@ -729,7 +729,7 @@ export const ButtonTemplateComponent: FC<ButtonTemplateComponentDataProps> = (pr
             initialValues={{
               title: selectedButton?.title.EN? selectedButton.title.EN : null,
               type: selectedButton? selectedButton.type : 'postback',
-              url: selectedButton?.type === 'url' ? selectedButton?.url : null,
+              url: selectedButton?.type === 'web_url' ? selectedButton?.url : null,
               flowId: selectedButton?.type === 'postback' ? selectedButton?.payload?.flowId : null
             }}
             labelCol={{ span: 7 }}
@@ -751,10 +751,10 @@ export const ButtonTemplateComponent: FC<ButtonTemplateComponentDataProps> = (pr
                   setSelectedButton({...selectedButton, type: event.target.value})
                 }}>
                 <Radio.Button value="postback">Flow</Radio.Button>
-                <Radio.Button value="url">URL</Radio.Button>
+                <Radio.Button value="web_url">URL</Radio.Button>
               </Radio.Group>
             </Form.Item>
-            {selectedButton?.type === 'url'? (
+            {selectedButton?.type === 'web_url'? (
                 <ProFormTextArea
                   name="url"
                   label="URL"
@@ -823,7 +823,7 @@ export const QuickReplyComponent: React.FC<QuickReplyComponentDataProps> = (prop
   const addNewQuickReplyButton = (
     <Button
       type="dashed"
-      shape="round"
+      style={{borderRadius: '4px'}}
       icon={<PlusOutlined />}
       onClick={() => {
         showModal();
@@ -853,7 +853,7 @@ export const QuickReplyComponent: React.FC<QuickReplyComponentDataProps> = (prop
           {componentData.quickReplies.map((button) => (
             <Button
               block
-              shape="round"
+              style={{borderRadius: '4px'}}
               onClick={() => {
                 setSelectRow(button);
                 showModal();
@@ -885,7 +885,7 @@ export const QuickReplyComponent: React.FC<QuickReplyComponentDataProps> = (prop
             onFinish={async (values) => {
               onChange((prevState: any) => [...prevState].map((item, index) => {
                 if (index === componentKey) {
-                  return { ...item, data: { ...item.data, quickReplies: [...item.data.quickReplies, {...values, text: {EN: values.text}}]}}
+                  return { ...item, data: { ...item.data, quickReplies: [...item.data.quickReplies, {payload: {flowId: values.flowId}, text: {EN: values.text}}]}}
                 }
                 else return item;
               }))
@@ -904,7 +904,7 @@ export const QuickReplyComponent: React.FC<QuickReplyComponentDataProps> = (prop
             <ProFormSelect
               name="flowId"
               label="Flow Response"
-              initialValue={selectRow?.flowId}
+              initialValue={selectRow?.payload.flowId}
               showSearch
               // @ts-ignore
               request={async () => {

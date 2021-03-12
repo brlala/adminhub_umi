@@ -78,7 +78,7 @@ export type InputComponentDataProps = {
 
 export type QrButtons = {
 text: StringObject;
-flowId?: string;
+payload: {flowId?: string;}
 };
 
 export type QuickReplyComponentDataProps = {

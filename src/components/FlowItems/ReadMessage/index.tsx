@@ -4,7 +4,7 @@ import Meta from 'antd/lib/card/Meta';
 import styles from './index.less';
 import ProCard from '@ant-design/pro-card';
 import { MessageData } from 'models/messages';
-import { ApartmentOutlined, FunctionOutlined, LeftOutlined, LinkOutlined, PaperClipOutlined, RightOutlined } from '@ant-design/icons';
+import { ApartmentOutlined, FunctionOutlined, LeftOutlined, LinkOutlined, NotificationOutlined, PaperClipOutlined, RightOutlined } from '@ant-design/icons';
 import PhonePreview from '@/components/PhonePreview';
 import { useRequest } from 'umi';
 import { getFlow } from '@/pages/FlowList/service';
@@ -13,6 +13,7 @@ interface DisplayComponentProps {
   componentKey: string;
   componentData: MessageData;
   isBot?: boolean;
+  isBroadcast?: boolean;
 }
 
 export const QuickReplyDisplayComponent: FC<DisplayComponentProps> = (props) => {
@@ -23,7 +24,7 @@ export const QuickReplyDisplayComponent: FC<DisplayComponentProps> = (props) => 
       <Space wrap className={styles.QuickReplies}>
         {componentData &&
           componentData.quickReplies?.map((element, index) => (
-            <Button shape='round' key={componentKey + 'qr' + index} type="default">
+            <Button  key={componentKey + 'qr' + index} type="default" style={{borderRadius: '4px'}}>
               {element.title}
             </Button>
           ))}{' '}
@@ -33,13 +34,15 @@ export const QuickReplyDisplayComponent: FC<DisplayComponentProps> = (props) => 
 };
 
 export const TextDisplayComponent: FC<DisplayComponentProps> = (props) => {
-  const { componentKey, componentData, isBot } = props;
+  const { componentKey, componentData, isBot, isBroadcast } = props;
   if (componentData?.text) 
     return (
       <div className={isBot?styles.TextComponentBot:styles.TextComponent}>
-      <ProCard key={componentKey} size="small">
-        {isBot?'True': 'False'}{componentData.text}
-      </ProCard>
+        <Space direction='horizontal'>{isBroadcast? <NotificationOutlined style={{color: '#1890ff'}}/>: <></>}
+          <ProCard key={componentKey} size="small">
+            {componentData.text}
+          </ProCard>
+        </Space>
       </div>
     )
   return <></>
@@ -54,7 +57,7 @@ export const PostbackDisplayComponent: FC<DisplayComponentProps> = (props) => {
       <ProCard key={componentKey} size="small">
         <Space direction='horizontal' wrap>
           <div>Clicked: </div>
-          <Button shape='round' key={componentKey + 'qr'} type="default">
+          <Button key={componentKey + 'qr'} type="default" style={{borderRadius: '4px'}}>
             {componentData.text}
           </Button>
         </Space>

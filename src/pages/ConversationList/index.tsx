@@ -232,10 +232,10 @@ const ConversationList: FC = () => {
             renderItem={(item) => 
             <List.Item key={'message' + item.id} >
               <Row justify={item.incomingMessageId || item.isBroadcast?'end':'start'}>
-              {renderMessageComponent(item.data, item.type, item.id, item.incomingMessageId || item.isBroadcast)}
+              {renderMessageComponent(item.data, item.type, item.id, item.incomingMessageId != null || item.isBroadcast, item.isBroadcast)}
               </Row>
               {item.data.quickReplies? <Row justify={item.incomingMessageId || item.isBroadcast?'end':'start'} style={{marginTop: '10px'}}>
-              {renderMessageComponent(item.data, 'quickReplies', item.id, item.incomingMessageId || item.isBroadcast)}
+              {renderMessageComponent(item.data, 'quickReplies', item.id, item.incomingMessageId != null || item.isBroadcast, item.isBroadcast)}
               </Row>:<></>}
               <Row justify={item.incomingMessageId || item.isBroadcast?'end':'start'}>
               <div style={{fontSize: "11px", color: 'rgba(0,0,0,0.45)'}}>{moment(item.createdAt).format('MM-DD HH:mm')} </div></Row>
