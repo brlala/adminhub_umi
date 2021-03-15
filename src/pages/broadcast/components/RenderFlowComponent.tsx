@@ -58,8 +58,6 @@ export const renderDisplayComponent = (component: FlowItem, index: string, editM
         default:
         renderedComponent = <div key={index}>Cannot render {component}</div>;
     }
-    console.log('editMode', component, editMode, !editMode && component.data.quickReplies)
-
     if (!editMode) {
         if (component.data.quickReplies) {
             return [

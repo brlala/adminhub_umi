@@ -125,7 +125,7 @@ const ConversationList: FC = () => {
     itemLayout="vertical"
     size="large"
     renderItem={(item) => 
-    <List.Item key={'convoList' + item.user.id} >
+    <List.Item key={'convoList' + item.user.id} className={item.user.id === currentUser?.id?'current':'selectable'} onClick={() => {currentRun(item.user.id)}}>
       <Row wrap={false}>
         <Col flex='auto' style={{whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis'}}>
           <span style={{fontWeight: "bolder", marginRight: '6px'}}>{item.fullname} </span>

@@ -1,5 +1,5 @@
 import React, { FC, useState } from 'react';
-import { Button, Card, Space, Carousel, Image, Popover, Divider } from 'antd';
+import { Button, Card, Space, Carousel, Image, Popover, Divider, Drawer } from 'antd';
 import Meta from 'antd/lib/card/Meta';
 import styles from './index.less';
 import ProCard from '@ant-design/pro-card';
@@ -9,27 +9,51 @@ import PhonePreview from '@/components/PhonePreview';
 import { useRequest } from 'umi';
 import { getFlow } from '@/pages/FlowList/service';
 
+
 interface DisplayComponentProps {
   componentKey: string;
   componentData: FlowItemData;
 }
 
+
+export const NextFlow: FC<{flowId: string}> = (props) => {
+  const {flowId} = props
+  const { data } = useRequest(() => {
+    return getFlow(flowId);
+  });
+  return (
+    <ProCard title={data?.name} ghost style={{alignItems: 'center'}}>
+      <PhonePreview key={'reference' + flowId} data={data?.flow|| []} editMode={false}/>
+    </ProCard>
+    )
+}
+
 export const QuickReplyDisplayComponent: FC<DisplayComponentProps> = (props) => {
   const { componentKey, componentData } = props;
+  const [drawerVisible, setDrawerVisible] = useState(false)
+  const [curId, setCurId] = useState<string>('')
+
   return (
     componentData.quickReplies?.length?
     <>
       <Space style={{ width: '260px', overflow: "scroll"}}>
         {componentData &&
           componentData.quickReplies?.map((element, index) => (
-            <Popover placement="right" content={getNextFlow(element, index)} trigger="click" color='transparent' overlayInnerStyle={{boxShadow:'none'}}>
-              <Button key={componentKey + 'qr' + index} type="default" style={{ borderRadius: '4px' }}>
-                {element.text.EN}
-              </Button>
-            </Popover>
-            
+            <Button key={componentKey + 'qr' + index} type="default" style={{ borderRadius: '4px' }} onClick={() => {setCurId(element.payload.flowId); setDrawerVisible(true)}}>
+              {element.text.EN}
+            </Button>
           ))}{' '}
       </Space>
+      <Drawer
+        width={364}
+        visible={drawerVisible}
+        onClose={() => {
+          setDrawerVisible(false);
+          setCurId('');
+        }}
+      >
+        {curId && <NextFlow flowId={curId}/>}
+      </Drawer>
     </>: <></>
   );
 };
@@ -79,23 +103,10 @@ export const FileDisplayComponent: FC<DisplayComponentProps> = (props) => {
   );
 };
 
-export const getNextFlow = (button: any, buttonIdex: number) => {
-  if (!button.type || button.type === 'postback') {
-
-    const { data, run } = useRequest((values: any) => {
-      if (button.payload?.flowId)
-        return getFlow(button.payload?.flowId);
-      return null
-    });
-    const list = data?.flow || [];
-    return (
-        <PhonePreview key={'reference' + buttonIdex} data={list} editMode={false}/>
-      )}
-  return <a target='_blank' href={button.url}><LinkOutlined /> Open Link</a>
-}
-
 export const GenericTemplateDisplayComponent: FC<DisplayComponentProps> = (props) => {
   const { componentKey, componentData } = props
+  const [drawerVisible, setDrawerVisible] = useState(false)
+  const [curId, setCurId] = useState<string>('')
 
   const CarouselPrevArrow = (carouselProps: any) => {
     const { onClick } = carouselProps
@@ -123,11 +134,9 @@ export const GenericTemplateDisplayComponent: FC<DisplayComponentProps> = (props
                 <Meta description={element.subtitle?.EN} />
                 {element.buttons?.map((button, buttonIdex) => (
                   button.type === 'postback'? 
-                  <Popover placement="right" content={getNextFlow(button, buttonIdex)} trigger="click" color='transparent' overlayInnerStyle={{boxShadow:'none'}}>
-                    <ProCard key={buttonIdex} size="small">
-                      {button.title?.EN}
-                    </ProCard>
-                  </Popover>:
+                  <ProCard key={buttonIdex} size="small" onClick={() => {setCurId(button.payload.flowId); setDrawerVisible(true)}}>
+                    {button.title?.EN}
+                  </ProCard>:
                   <Popover placement="right" content={<a target='_blank' href={button.url}><LinkOutlined /> Open Link</a>} trigger="click">
                     <ProCard key={buttonIdex} size="small">
                       {button.title?.EN}
@@ -137,12 +146,24 @@ export const GenericTemplateDisplayComponent: FC<DisplayComponentProps> = (props
           return <></>
         })}
       </Carousel>
+      <Drawer
+        width={364}
+        visible={drawerVisible}
+        onClose={() => {
+          setDrawerVisible(false);
+          setCurId('');
+        }}>
+        {curId && <NextFlow flowId={curId}/>}
+      </Drawer>
     </div>: <></>
   )
 };
 
 export const ButtonTemplateDisplayComponent: FC<DisplayComponentProps> = (props) => {
   const { componentKey, componentData } = props;
+  const [drawerVisible, setDrawerVisible] = useState(false)
+  const [curId, setCurId] = useState<string>('')
+  
   if (componentData.text?.EN || componentData.buttons?.length) {
     return (
       <div className={styles.ButtonComponent}>
@@ -150,11 +171,9 @@ export const ButtonTemplateDisplayComponent: FC<DisplayComponentProps> = (props)
           {componentData.text?.EN}
           {componentData.buttons?.map((button, buttonIdex) => (
             button.type === 'postback'? 
-            <Popover placement="right" content={getNextFlow(button, buttonIdex)} trigger="click" color='transparent' overlayInnerStyle={{boxShadow:'none'}}>
-              <ProCard key={buttonIdex} size="small">
-                {button.title?.EN}
-              </ProCard>
-            </Popover>:
+            <ProCard key={buttonIdex} size="small" onClick={() => {setCurId(button.payload.flowId); setDrawerVisible(true)}}>
+              {button.title?.EN}
+            </ProCard>:
             <Popover placement="right" content={<a target='_blank' href={button.url}><LinkOutlined /> Open Link</a>} trigger="click">
               <ProCard key={buttonIdex} size="small">
                 {button.title?.EN}
@@ -162,6 +181,15 @@ export const ButtonTemplateDisplayComponent: FC<DisplayComponentProps> = (props)
             </Popover>
             ))}
         </Card>
+        <Drawer
+          width={364}
+          visible={drawerVisible}
+          onClose={() => {
+            setDrawerVisible(false);
+            setCurId('');
+          }}>
+          {curId && <NextFlow flowId={curId}/>}
+        </Drawer>
       </div>
     );
   }
@@ -170,7 +198,8 @@ export const ButtonTemplateDisplayComponent: FC<DisplayComponentProps> = (props)
 
 export const FlowDisplayComponent: FC<DisplayComponentProps> = (props) => {
   const { componentKey, componentData } = props;
-  console.log('componentData', componentData)
+  const [drawerVisible, setDrawerVisible] = useState(false)
+  const [curId, setCurId] = useState<string>('')
 
   const { data, run } = useRequest((values: any) => {
     console.log('componentData', componentData, componentData.flow?.flowId)
@@ -188,13 +217,20 @@ export const FlowDisplayComponent: FC<DisplayComponentProps> = (props) => {
       </Divider>
       <Space>
       
-      <Popover placement="right" trigger="click" color='transparent' overlayInnerStyle={{boxShadow:'none'}}
-        content={<PhonePreview data={list} editMode={false}/>}>
-        <ProCard key={'reference' + componentKey} size="small" onMouseEnter={run}>
-          <Space> <ApartmentOutlined /> View {componentData.flow?.name} </Space>
-        </ProCard>
-      </Popover>
+      <ProCard key={'reference' + componentKey} size="small" 
+        onClick={() => {setCurId(componentData.flow.flowId); setDrawerVisible(true)}}>
+        <Space> <ApartmentOutlined /> View {componentData.flow?.name} </Space>
+      </ProCard>
       </Space>
+      <Drawer
+        width={364}
+        visible={drawerVisible}
+        onClose={() => {
+          setDrawerVisible(false);
+          setCurId('');
+        }}>
+        {curId && <NextFlow flowId={curId}/>}
+      </Drawer>
       <Divider plain style={{margin: '6px'}}>
       </Divider>
     </>: <></>
@@ -215,11 +251,6 @@ export const CustomDisplayComponent: FC<DisplayComponentProps> = (props) => {
       <Divider plain style={{margin: '6px'}}>
       </Divider>
     </>
-    // <div className={styles.ButtonComponent}>
-    //   <Card key={componentKey} bordered={false} size="small" title="Custom Function">
-    //     <FunctionOutlined />{componentData.function}
-    //   </Card>
-    // </div>
   );
 };
 

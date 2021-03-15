@@ -92,7 +92,10 @@ export type ButtonData = {
 
 export type QrButtonData = {
   text: StringObject;
-  payload: string;
+  payload: {
+    flowId: string
+    params: string[]
+  };
 };
 
 export type FlowData = {
