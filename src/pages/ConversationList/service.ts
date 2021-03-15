@@ -12,6 +12,12 @@ export async function queryConversations(params: ConversationParams) {
   });
 }
 
+export async function queryConversation(convoId: string, params: ConversationParams) {
+  return request(`http://localhost:5000/conversations/convos/${convoId}`, {
+    params: params,
+    getResponse: true,
+  });
+}
 export async function queryMessages(userId: string, params: ConversationParams) {
   return request(`http://localhost:5000/conversations/users/${userId}`, {
     params: params,

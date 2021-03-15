@@ -72,4 +72,5 @@ export type ConversationUsers = {
   fullname?: string;
   convoCount: number;
   lastMessageDate: string;
+  convoId: string[];
 };

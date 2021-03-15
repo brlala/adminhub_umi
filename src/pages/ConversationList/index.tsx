@@ -5,7 +5,7 @@ import ProCard from '@ant-design/pro-card';
 // @ts-ignore
 import './index.less';
 import { PageContainer } from '@ant-design/pro-layout';
-import { patchUserTags, queryConversations, queryConversationsUsers, queryCurrent, queryMessages } from './service';
+import { patchUserTags, queryConversation, queryConversations, queryConversationsUsers, queryCurrent, queryMessages } from './service';
 import moment from 'moment';
 import { useRequest } from 'umi';
 import { getTags } from '../broadcast/components/BroadcastMeta/service';
@@ -25,6 +25,7 @@ const ConversationList: FC = () => {
   const [showConversationSearch, setShowConversationSearch] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [currentTags, setCurrentTags] = useState<string[]>([]);
+  const [currentConvo, setCurrentConvo] = useState<string>('');
   
   const updateTags = (checked, tag) => {
     if (checked) {
@@ -48,9 +49,21 @@ const ConversationList: FC = () => {
     }
   )
   
-  const { data: convoData, loading: convoLoading, pagination: convoPagination } = useRequest(
+  const { data: convosData, loading: convosLoading, pagination: convosPagination } = useRequest(
     ({ current, pageSize }) => {
       return queryConversations({ current: current, pageSize: pageSize, searchQuery: searchQuery })
+    },
+    { 
+      refreshDeps: [searchQuery, selectedTags],
+      formatResult: (response) => {return {...response.data, list: response.data.data}},
+      onSuccess: (response) => {currentRun(response.list[0].user.id)}, 
+      paginated: true,
+    }
+  )
+
+  const { data: convoData, loading: convoLoading, pagination: convoPagination } = useRequest(
+    ({ current, pageSize }) => {
+      return queryConversation( currentConvo, { current: current, pageSize: pageSize, searchQuery: searchQuery })
     },
     { 
       refreshDeps: [searchQuery, selectedTags],
@@ -113,11 +126,11 @@ const ConversationList: FC = () => {
   
   const UsersConversationList = <List<ConversationUsers>
     style={{height: "calc(100vh - 250px)", overflow: 'scroll'}}
-    dataSource={convoData?.list}
-    loading={convoLoading}
+    dataSource={convosData?.list}
+    loading={convosLoading}
     pagination={{
-      ...(convoPagination as any),
-      onShowSizeChange: convoPagination.onChange,
+      ...(convosPagination as any),
+      onShowSizeChange: convosPagination.onChange,
       simple: true,
       position: 'bottom',
       responsive: true,
@@ -125,7 +138,8 @@ const ConversationList: FC = () => {
     itemLayout="vertical"
     size="large"
     renderItem={(item) => 
-    <List.Item key={'convoList' + item.user.id} className={item.user.id === currentUser?.id?'current':'selectable'} onClick={() => {currentRun(item.user.id)}}>
+    <List.Item key={'convoList' + item.user.id} className={item.user.id === currentUser?.id?'current':'selectable'} onClick={() => {
+      currentRun(item.user.id);setCurrentConvo(item.convoId[0])}}>
       <Row wrap={false}>
         <Col flex='auto' style={{whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis'}}>
           <span style={{fontWeight: "bolder", marginRight: '6px'}}>{item.fullname} </span>
@@ -213,7 +227,35 @@ const ConversationList: FC = () => {
           <Divider className='plainDivider' />
           {showConversationSearch? UsersConversationList:UsersList}
         </ProCard>
-        {currentUser?.id &&
+        {currentUser?.id && (showConversationSearch?
+        <ProCard title={currentUser.firstName + ' ' + currentUser.lastName} ghost>
+          <List<ConversationMessage>
+            dataSource={convoData?.list}
+            loading={convoLoading}
+            pagination={{
+              ...(convoPagination as any),
+              onShowSizeChange: convoPagination.onChange,
+              size: 'small',
+              // simple: true,
+              position: 'bottom',
+              // showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} messages`,
+            }}
+            itemLayout="vertical"
+            size="large"
+            className='ConvoLog'
+            renderItem={(item) => 
+            <List.Item key={'message' + item.id} >
+              <Row justify={item.incomingMessageId || item.isBroadcast?'end':'start'}>
+              {renderMessageComponent(item.data, item.type, item.id, item.incomingMessageId != null || item.isBroadcast, item.isBroadcast)}
+              </Row>
+              {item.data.quickReplies? <Row justify={item.incomingMessageId || item.isBroadcast?'end':'start'} style={{marginTop: '10px'}}>
+              {renderMessageComponent(item.data, 'quickReplies', item.id, item.incomingMessageId != null || item.isBroadcast, item.isBroadcast)}
+              </Row>:<></>}
+              <Row justify={item.incomingMessageId || item.isBroadcast?'end':'start'}>
+              <div style={{fontSize: "11px", color: 'rgba(0,0,0,0.45)'}}>{moment(item.createdAt).format('MM-DD HH:mm')} </div></Row>
+              
+            </List.Item>}/>   
+        </ProCard>:
         <ProCard title={currentUser.firstName + ' ' + currentUser.lastName} ghost>
           <List<ConversationMessage>
             dataSource={messageData?.list}
@@ -241,7 +283,8 @@ const ConversationList: FC = () => {
               <div style={{fontSize: "11px", color: 'rgba(0,0,0,0.45)'}}>{moment(item.createdAt).format('MM-DD HH:mm')} </div></Row>
               
             </List.Item>}/>   
-        </ProCard>}
+        </ProCard>)}
+        
         <ProCard colSpan="25%" loading={currentLoading}>
             {!currentLoading && currentUser && (
               <div>
