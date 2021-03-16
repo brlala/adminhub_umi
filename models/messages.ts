@@ -27,7 +27,7 @@ export type MessageData = {
 
 export type ButtonData = {
   type: string;
-  title: StringObject;
+  title: string;
   url?: string;
   payload?: {flowId?: string;}
 };
