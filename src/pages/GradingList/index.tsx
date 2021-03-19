@@ -553,7 +553,7 @@ export default () => {
       editable: false,
       valueEnum: topics,
       render: (_, record) => {
-        return record.answerFlow?.topic ? record.answerFlow.topic : '-';
+        return record.answerQuestion?.topic ? record.answerQuestion.topic : '-';
       },
     },
     {
@@ -564,7 +564,7 @@ export default () => {
       editable: false,
       width: '10%',
       render: (dom, record) => {
-        return moment(record.createdAt).format('yyyy-MM-DD HH:mm:ss');
+        return moment(record.createdAt).format('yyyy-MM-DD');
       },
     },
     {
@@ -572,7 +572,7 @@ export default () => {
       dataIndex: 'accuracy',
       valueType: 'accuracyRange',
       editable: false,
-      width: '5%',
+      width: '7%',
       render: (dom, record) => {
         const unanswered = !(record.nlp?.nlpResponse?.matchedQuestions?.length > 0);
         return unanswered
@@ -588,6 +588,7 @@ export default () => {
       hideInSearch: true,
       valueEnum: questions,
       render: (dom, record) => {
+        console.log(record);
         const unanswered = !(record.nlp?.nlpResponse?.matchedQuestions?.length > 0);
         return unanswered ? '-' : `${record.answerQuestion?.text.EN}`;
       },
@@ -616,8 +617,8 @@ export default () => {
           tagColour = 'magenta';
           tagKey = 'Text';
           tagText = (record.answerFlow?.flow[0].data.text as any)?.EN
-            ? readMore((record.answerFlow.flow[0].data.text as any).EN, 10)
-            : 'ux';
+            ? readMore((record.answerFlow?.flow[0].data.text as any).EN, 10)
+            : `[${record.answerFlow.flow[0].data.type}]`;
           // tagText = (record.answerFlow.flow[0].data.text as any).EN;
         }
         return (
