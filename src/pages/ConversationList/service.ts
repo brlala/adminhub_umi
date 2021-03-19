@@ -18,6 +18,7 @@ export async function queryConversation(convoId: string, params: ConversationPar
     getResponse: true,
   });
 }
+
 export async function queryMessages(userId: string, params: ConversationParams) {
   return request(`http://localhost:5000/conversations/users/${userId}`, {
     params: params,

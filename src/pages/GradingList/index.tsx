@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useRef, useState } from 'react';
 import type { ProColumns } from '@ant-design/pro-table';
 import ProTable, { ActionType, TableDropdown } from '@ant-design/pro-table';
-import { Button, Input, message, Slider, Space, Tag, Tooltip } from 'antd';
+import { Button, Drawer, Input, List, message, Modal, Row, Slider, Space, Tag, Tooltip } from 'antd';
 import ProProvider from '@ant-design/pro-provider';
 import moment from 'moment';
 import { readMore } from '@/utils/utils';
@@ -9,6 +9,13 @@ import { queryTopics, queryQuestionsFilter, skipMessage, queryGradings } from '.
 import { FrownOutlined, SmileOutlined } from '@ant-design/icons';
 import './index.less';
 import { queryQuestions } from '@/pages/QuestionList/service';
+import ConversationDrawer from '../ConversationList/RenderConversation';
+import { useRequest } from 'umi';
+import { queryConversation } from '../ConversationList/service';
+import ProCard from '@ant-design/pro-card';
+import { ConversationMessage } from 'models/messages';
+import { renderMessageComponent } from '../ConversationList/RenderMessage';
+import { isNull, isUndefined } from 'lodash';
 
 type DataSourceType = {
   id: React.Key;
@@ -402,6 +409,58 @@ export type TableListItem = {
   createdAt: number;
 };
 
+
+const ConvoModal: React.FC<{focus: TableListItem|null, setFocus: any }> = ({ focus, setFocus }) => {
+  
+  const { data, loading, pagination } = useRequest(
+    ({ current, pageSize }) => {
+      return queryConversation(focus.chatbot.convoId, { current: current, pageSize: pageSize})
+    },
+    {   
+        refreshDeps: [focus],
+        formatResult: (response) => {console.log(response.data); return {...response.data, list: response.data.data.reverse()}},
+        paginated: true
+    }
+  )
+
+  return (
+    <Modal
+      style={{ whiteSpace: 'pre-line' }}
+      width={600}
+      visible={focus != null}
+      onOk={() => {setFocus(null)}}
+      onCancel={() => {setFocus(null)}}
+      footer={null}>
+      <ProCard ghost>
+          <List<ConversationMessage>
+              dataSource={data?.list}
+              loading={loading}
+              pagination={{
+              ...(pagination as any),
+              onShowSizeChange: pagination.onChange,
+              size: 'small',
+              position: 'bottom',
+              }}
+              itemLayout="vertical"
+              size="large"
+              className='ConvoLog'
+              renderItem={(item) => 
+              <List.Item key={'message' + item.id} >
+              <Row justify={item.incomingMessageId || item.isBroadcast?'end':'start'}>
+              {renderMessageComponent(item.data, item.type, item.id, item.incomingMessageId != null || item.isBroadcast, item.isBroadcast, "")}
+              </Row>
+              {item.data.quickReplies? <Row justify={item.incomingMessageId || item.isBroadcast?'end':'start'} style={{marginTop: '10px'}}>
+              {renderMessageComponent(item.data, 'quickReplies', item.id, item.incomingMessageId != null || item.isBroadcast, item.isBroadcast, "")}
+              </Row>:<></>}
+              <Row justify={item.incomingMessageId || item.isBroadcast?'end':'start'}>
+              <div style={{fontSize: "11px", color: 'rgba(0,0,0,0.45)'}}>{moment(item.createdAt).format('MM-DD HH:mm')} </div></Row>
+              </List.Item>}/> 
+        </ProCard>  
+      </Modal> 
+  );
+};
+
+
 const TagList: React.FC<{
   value?: {
     key: string;
@@ -501,9 +560,10 @@ const handleRemove = async (messageId: string) => {
 export default () => {
   const [topics, setTopics] = useState([]);
   const [questions, setQuestions] = useState([]);
+  const [focus, setFocus] = useState(null);
   const values = useContext(ProProvider);
   const actionRef = useRef<ActionType>();
-
+  
   useEffect(() => {
     queryTopics().then((res) => {
       setTopics(res);
@@ -537,7 +597,7 @@ export default () => {
       copyable: true,
       render: (_, record) => {
         const tagText = record.data.text ? readMore(record.data.text, 15) : 'ux';
-        return tagText;
+        return <a onClick={() => {setFocus(record)}}>{tagText}</a>;
       },
     },
     {
@@ -713,6 +773,8 @@ export default () => {
         //   </Button>,
         // ]}
       />
+
+      <ConvoModal focus={focus} setFocus={setFocus} />
     </ProProvider.Provider>
   );
 };
