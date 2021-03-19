@@ -5,6 +5,9 @@ import type { FlowListParams, newQuestionItem, DropdownProps } from './data.d';
 export async function queryFlows(params?: FlowListParams) {
   let { sorter, filter, ...searchParam } = params;
   let sortQuery: string = '';
+  if (sorter == undefined) {
+    sorter = {};
+  }
   if (Object.keys(sorter).length !== 0) {
     let temp: string[] = [];
     for (const [key, value] of Object.entries(sorter)) {
@@ -35,25 +38,20 @@ export async function removeFlows(params: { key: string[] }) {
   });
 }
 
-export async function addFlow(data
-): Promise<{}> {
+export async function addFlow(data): Promise<{}> {
   return request('http://localhost:5000/flows/', {
     method: 'post',
     data: data,
   });
 }
 
-export async function editFlow(data
-  ): Promise<{}> {
-    return request('http://localhost:5000/flows/', {
-      method: 'put',
-      data: data,
-    });
-  }
+export async function editFlow(data): Promise<{}> {
+  return request('http://localhost:5000/flows/', {
+    method: 'put',
+    data: data,
+  });
+}
 
-export async function getFlow(id: string,
-  ): Promise<{data: FlowNew}> {
-    return request(`http://localhost:5000/flows/${id}`, {
-    });
-  }
-  
+export async function getFlow(id: string): Promise<{ data: FlowNew }> {
+  return request(`http://localhost:5000/flows/${id}`, {});
+}

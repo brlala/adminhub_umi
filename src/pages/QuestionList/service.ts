@@ -4,6 +4,9 @@ import type { QuestionListParams, newQuestionItem, DropdownProps } from './data.
 export async function queryQuestions(params?: QuestionListParams) {
   let { sorter, filter, ...searchParam } = params;
   let sortQuery: string = '';
+  if (sorter == undefined) {
+    sorter = {};
+  }
   if (Object.keys(sorter).length !== 0) {
     let temp: string[] = [];
     for (const [key, value] of Object.entries(sorter)) {
