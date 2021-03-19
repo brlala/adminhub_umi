@@ -24,3 +24,24 @@
 .icon-wrapper .anticon:last-child {
   right: 0;
 }
+
+.ConvoLog {
+  height: 80vh;
+  overflow: scroll;
+  .ant-list-item {
+    border: 0px;
+  }
+
+  .ant-list-pagination {
+    position: sticky;
+    bottom: 0px;
+    margin: 0px;
+    padding: 12px;
+    background: #fff;
+    box-shadow: 0 10px 10px 10px rgba(0, 0, 0, 0.06);
+  }
+
+  .ant-spin-nested-loading {
+    min-height: calc(80vh - 49px);
+  }
+}

@@ -1,32 +1,34 @@
-import React, { FC, useEffect, useRef, useState } from 'react';
-import { Typography, Card, Col, List, Row, Space, Tag, Select, Divider, Dropdown, Input, Pagination, message } from 'antd';
-import { Button, Badge } from 'antd';
+import React, { FC, useRef, useState } from 'react';
+import { Typography, Card, Col, List, Row, Space, Tag, Divider, Dropdown, Input, message, AutoComplete } from 'antd';
+import { Button } from 'antd';
 import ProCard from '@ant-design/pro-card';
 // @ts-ignore
 import './index.less';
 import { PageContainer } from '@ant-design/pro-layout';
-import { patchUserTags, queryConversations, queryConversationsUsers, queryCurrent, queryMessages } from './service';
+import { patchUserTags, queryConversation, queryConversations, queryConversationsUsers, queryCurrent, queryMessages } from './service';
 import moment from 'moment';
 import { useRequest } from 'umi';
 import { getTags } from '../broadcast/components/BroadcastMeta/service';
-import { ClockCircleOutlined, CommentOutlined, FilterFilled, FilterOutlined, FormOutlined, MessageOutlined, PlusOutlined, SearchOutlined, TagOutlined, TagsOutlined, UserOutlined } from '@ant-design/icons';
+import { ClockCircleOutlined, CommentOutlined, DownOutlined, FilterFilled, FilterOutlined, FormOutlined, MessageOutlined, PlusOutlined, SearchOutlined, TagsOutlined, UpOutlined, UserOutlined } from '@ant-design/icons';
 import { BotUsers, ConversationUsers } from './data';
 import { ConversationMessage } from '../../../models/messages';
 import { renderMessageComponent } from './RenderMessage';
 
 const { Text } = Typography;
 const { CheckableTag } = Tag;
+const { Option } = AutoComplete;
 
 const ConversationList: FC = () => {
 
-  const { data: tags } = useRequest(getTags);
+  const { data: tags, run: tagsRun} = useRequest(getTags);
   const [dropdownTag, setDropdownTag] = useState(false);
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [showConversationSearch, setShowConversationSearch] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  const [currentTags, setCurrentTags] = useState<string[]>([]);
+  const [currentConvoList, setCurrentConvoList] = useState<string[]>();
+  const [currentConvo, setCurrentConvo] = useState<number>(0);
   
-  const updateTags = (checked, tag) => {
+  const updateTags = (checked: boolean, tag: string) => {
     if (checked) {
       setSelectedTags([...selectedTags, tag])
     }
@@ -35,6 +37,34 @@ const ConversationList: FC = () => {
     }
   }
   
+  const renderLabel = (label: string) => {
+    if (searchQuery) {
+
+        let index = label.toLowerCase().indexOf(searchQuery.toLowerCase());
+
+        if (index !== -1) {
+
+            let length = searchQuery.length;
+
+            let prefix = label.substring(0, index);
+            let suffix = label.substring(index + length);
+            let match = label.substring(index, index + length);
+
+            return (
+                <span>
+                    {prefix}<Text mark>{match}</Text>{suffix}
+                </span>
+            );
+        }
+    }
+
+    return (
+        <span>
+            {label}
+        </span>
+    );
+  }
+
   const { data: userData, loading: userLoading, pagination: userPagination } = useRequest(
     ({ current, pageSize }) => {
       if (searchQuery.length > 0) pageSize -= 1
@@ -48,7 +78,7 @@ const ConversationList: FC = () => {
     }
   )
   
-  const { data: convoData, loading: convoLoading, pagination: convoPagination } = useRequest(
+  const { data: convosData, loading: convosLoading, pagination: convosPagination } = useRequest(
     ({ current, pageSize }) => {
       return queryConversations({ current: current, pageSize: pageSize, searchQuery: searchQuery })
     },
@@ -56,6 +86,19 @@ const ConversationList: FC = () => {
       refreshDeps: [searchQuery, selectedTags],
       formatResult: (response) => {return {...response.data, list: response.data.data}},
       onSuccess: (response) => {currentRun(response.list[0].user.id)}, 
+      paginated: true,
+    }
+  )
+
+  const { data: convoData, loading: convoLoading, pagination: convoPagination } = useRequest(
+    ({ current, pageSize }) => {
+      if (currentConvoList)
+        return queryConversation( currentConvoList[currentConvo], { current: current, pageSize: pageSize})
+      return {}
+    },
+    { 
+      refreshDeps: [currentConvoList, currentConvo],
+      formatResult: (response) => {console.log(response.data); return {...response.data, list: response.data.data.reverse()}},
       paginated: true,
     }
   )
@@ -76,7 +119,6 @@ const ConversationList: FC = () => {
 
   const { data: messageData, loading: messageLoading, pagination: messagePagination } = useRequest(
     ({ current, pageSize }) => {
-      console.log('new messageData')
       return queryMessages(currentUser.id, { current: current, pageSize: pageSize})
     },
     { 
@@ -113,11 +155,11 @@ const ConversationList: FC = () => {
   
   const UsersConversationList = <List<ConversationUsers>
     style={{height: "calc(100vh - 250px)", overflow: 'scroll'}}
-    dataSource={convoData?.list}
-    loading={convoLoading}
+    dataSource={convosData?.list}
+    loading={convosLoading}
     pagination={{
-      ...(convoPagination as any),
-      onShowSizeChange: convoPagination.onChange,
+      ...(convosPagination as any),
+      onShowSizeChange: convosPagination.onChange,
       simple: true,
       position: 'bottom',
       responsive: true,
@@ -125,7 +167,8 @@ const ConversationList: FC = () => {
     itemLayout="vertical"
     size="large"
     renderItem={(item) => 
-    <List.Item key={'convoList' + item.user.id} >
+    <List.Item key={'convoList' + item.user.id} className={item.user.id === currentUser?.id?'current':'selectable'} onClick={() => {
+      currentRun(item.user.id); setCurrentConvoList(item.convoId)}}>
       <Row wrap={false}>
         <Col flex='auto' style={{whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis'}}>
           <span style={{fontWeight: "bolder", marginRight: '6px'}}>{item.fullname} </span>
@@ -150,13 +193,14 @@ const ConversationList: FC = () => {
     }}
     itemLayout="vertical"
     size="large"
+    style={{height: searchQuery && searchQuery.length > 0 ? 'calc(100vh - 290px)': 'calc(100vh - 250px)'}}
     className='UserList'
     renderItem={(item) => 
     <List.Item key={'userList' + item.id} className={item.id === currentUser?.id?'current':'selectable'} onClick={() => {currentRun(item.id)}}>
       <div className='selectable'>
       <Row wrap={false}>
         <Col flex='auto' style={{whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis'}}>
-          <span style={{fontWeight: "bolder", marginRight: '6px'}}>{item.fullname} </span>
+          <span style={{fontWeight: "bolder", marginRight: '6px'}}>{renderLabel(item?.fullname||'')} </span>
           {item.tags.map((tag) => <Tag key={'userTag' + item.id + tag}>{tag}</Tag>)}
         </Col>
         <Col flex="70px" style={{fontSize: "11px", textAlign: 'right', color: 'rgba(0,0,0,0.45)'}}>{moment(item.lastMessage.createdAt).format('MM-DD HH:mm')} </Col>
@@ -182,7 +226,8 @@ const ConversationList: FC = () => {
 
   const handleInputConfirm = () => {
     let tags: string[];
-    if (inputValue && currentUser.tags.filter((tag: string) => tag === inputValue).length === 0) {
+    if (inputValue === '') {}
+    else if (inputValue && currentUser.tags.filter((tag: string) => tag === inputValue).length === 0) {
       tags = [...currentUser.tags, inputValue]
       tagRun(currentUser.id, tags)
       message.success(`Tag "${inputValue}" Added`)
@@ -196,7 +241,6 @@ const ConversationList: FC = () => {
   
   const handleDeleteTag = (tag: string) => {
     let tags = currentUser.tags.filter((ele: string) => ele !== tag)
-    console.log(tags)
     tagRun(currentUser.id, tags)
     message.success(`Tag "${tag}" Deleted`)
   };
@@ -208,12 +252,58 @@ const ConversationList: FC = () => {
           {SearchBar}
           {searchQuery.length > 0 && !showConversationSearch ? 
             <><Divider className='plainDivider' /> <Button size='large' type='link' onClick={() => setShowConversationSearch(true)} style={{width: '100%'}}>
-              <SearchOutlined/> Search in Messenger Conversation</Button></> 
+              <SearchOutlined/> Search in User Conversation</Button></> 
             : <></>}
           <Divider className='plainDivider' />
           {showConversationSearch? UsersConversationList:UsersList}
         </ProCard>
-        {currentUser?.id &&
+        {currentUser?.id && (showConversationSearch?
+        <ProCard title={currentUser.firstName + ' ' + currentUser.lastName} ghost split='horizontal'>
+          <ProCard className='navBar'>
+            <ProCard style={{padding: '6px'}} ghost>
+              Showing messages from conversation {currentConvo + 1} / {currentConvoList?.length}
+            </ProCard>
+            <ProCard ghost colSpan={'120px'}>
+              <Button type='link' style={{padding: '6px'}} onClick={() => setCurrentConvo(prev => prev - 1)} disabled={currentConvo === 0}>
+                <UpOutlined />
+              </Button>
+              <Button type='link' style={{padding: '6px'}} onClick={() => setCurrentConvo(prev => prev + 1)} disabled={currentConvo + 1 === currentConvoList?.length}>
+                <DownOutlined />
+              </Button>
+              <Button type='text' style={{padding: '6px'}} onClick={() => setShowConversationSearch(false)}>
+                Close
+              </Button>
+            </ProCard>
+          </ProCard>
+          <ProCard ghost>
+            <List<ConversationMessage>
+              dataSource={convoData?.list}
+              loading={convoLoading}
+              pagination={{
+                ...(convoPagination as any),
+                onShowSizeChange: convoPagination.onChange,
+                size: 'small',
+                // simple: true,
+                position: 'bottom',
+                // showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} messages`,
+              }}
+              itemLayout="vertical"
+              size="large"
+              style={{height: 'calc(100vh - 285px)'}}
+              className='ConvoLog'
+              renderItem={(item) => 
+              <List.Item key={'message' + item.id} >
+                <Row justify={item.incomingMessageId || item.isBroadcast?'end':'start'}>
+                {renderMessageComponent(item.data, item.type, item.id, item.incomingMessageId != null || item.isBroadcast, item.isBroadcast, searchQuery)}
+                </Row>
+                {item.data.quickReplies? <Row justify={item.incomingMessageId || item.isBroadcast?'end':'start'} style={{marginTop: '10px'}}>
+                {renderMessageComponent(item.data, 'quickReplies', item.id, item.incomingMessageId != null || item.isBroadcast, item.isBroadcast, searchQuery)}
+                </Row>:<></>}
+                <Row justify={item.incomingMessageId || item.isBroadcast?'end':'start'}>
+                <div style={{fontSize: "11px", color: 'rgba(0,0,0,0.45)'}}>{moment(item.createdAt).format('MM-DD HH:mm')} </div></Row>
+              </List.Item>}/> 
+          </ProCard>  
+        </ProCard>:
         <ProCard title={currentUser.firstName + ' ' + currentUser.lastName} ghost>
           <List<ConversationMessage>
             dataSource={messageData?.list}
@@ -232,16 +322,16 @@ const ConversationList: FC = () => {
             renderItem={(item) => 
             <List.Item key={'message' + item.id} >
               <Row justify={item.incomingMessageId || item.isBroadcast?'end':'start'}>
-              {renderMessageComponent(item.data, item.type, item.id, item.incomingMessageId != null || item.isBroadcast, item.isBroadcast)}
+              {renderMessageComponent(item.data, item.type, item.id, item.incomingMessageId != null || item.isBroadcast, item.isBroadcast, searchQuery)}
               </Row>
               {item.data.quickReplies? <Row justify={item.incomingMessageId || item.isBroadcast?'end':'start'} style={{marginTop: '10px'}}>
-              {renderMessageComponent(item.data, 'quickReplies', item.id, item.incomingMessageId != null || item.isBroadcast, item.isBroadcast)}
+              {renderMessageComponent(item.data, 'quickReplies', item.id, item.incomingMessageId != null || item.isBroadcast, item.isBroadcast, searchQuery)}
               </Row>:<></>}
               <Row justify={item.incomingMessageId || item.isBroadcast?'end':'start'}>
               <div style={{fontSize: "11px", color: 'rgba(0,0,0,0.45)'}}>{moment(item.createdAt).format('MM-DD HH:mm')} </div></Row>
-              
             </List.Item>}/>   
-        </ProCard>}
+        </ProCard>)}
+        
         <ProCard colSpan="25%" loading={currentLoading}>
             {!currentLoading && currentUser && (
               <div>
@@ -249,7 +339,7 @@ const ConversationList: FC = () => {
                   <img alt="" src='https://gw.alipayobjects.com/zos/antfincdn/XAosXuNZyF/BiazfanxmamNRoxxVxka.png' />
                   <Space direction='vertical'>
                     <div className='idField'><UserOutlined /> ID: {currentUser.id}</div>
-                    <div ><FormOutlined className='infoLogo'/> Registration Date: {console.log(currentUser)} {moment(currentUser.createdAt).format('YYYY-MM-DD')}</div>
+                    <div ><FormOutlined className='infoLogo'/> Registration Date: {moment(currentUser.createdAt).format('YYYY-MM-DD')}</div>
                     <div ><ClockCircleOutlined className='infoLogo'/> Last Active: {moment(currentUser.lastActive.sentAt).toNow()}</div>
                     <div ><CommentOutlined className='infoLogo'/> Total Conversations: TBD</div>
                     <div ><MessageOutlined className='infoLogo'/> Total Messages: TBD</div>
@@ -263,15 +353,38 @@ const ConversationList: FC = () => {
                     <Tag closable onClose={() => handleDeleteTag(item)} key={'userTag' + item}>{item}</Tag>
                   ))}
                   {inputVisible && (
-                    <Input
+                    // <Select
+                    //   showSearch
+                    //   style={{ width: '100%' }}
+                    //   onChange={(e) => {console.log('onchange'm e);}} //setInputValue()}}
+                    //   onBlur={handleInputConfirm}
+                    //   // onPressEnter={handleInputConfirm}
+                    //   onSearch={tagsRun}
+                    //   onFocus={tagsRun}
+                    //   loading={tagsLoading}>
+                    //   {tags &&
+                    //     tags.map((i: string) => {
+                    //       return <Option key={i} value={i}>{i}</Option>;
+                    //     })}
+                    // </Select>
+
+                    <AutoComplete
+                      onSearch={tagsRun}
                       ref={ref}
-                      type="text"
+                      // options={options}
                       size="small"
                       style={{ width: 78 }}
+                      dropdownMatchSelectWidth={false}
                       value={inputValue}
-                      onChange={(e) => {setInputValue(e.target.value)}}
+                      onChange={(e) => {setInputValue(e)}}
                       onBlur={handleInputConfirm}
-                      onPressEnter={handleInputConfirm}/>
+                      // onPressEnter={handleInputConfirm}
+                      filterOption={(inputValue, option) =>
+                        option!.value.toUpperCase().indexOf(inputValue.toUpperCase()) !== -1
+                      }
+                    >
+                      {tags&&tags.map((tag: string) => (<Option key={tag} value={tag}>{tag}</Option>))}
+                    </AutoComplete>
                   )}
                   {!inputVisible && (
                     <Tag onClick={showInput} style={{ borderStyle: 'dashed' }}>

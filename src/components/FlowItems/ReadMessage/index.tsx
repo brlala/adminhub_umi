@@ -1,23 +1,50 @@
-import React, { FC, useState } from 'react';
-import { Button, Card, Space, Carousel, Image, Popover, Divider } from 'antd';
+import React, { FC } from 'react';
+import { Button, Card, Space, Carousel, Image, Typography } from 'antd';
 import Meta from 'antd/lib/card/Meta';
 import styles from './index.less';
 import ProCard from '@ant-design/pro-card';
 import { MessageData } from 'models/messages';
-import { ApartmentOutlined, FunctionOutlined, LeftOutlined, LinkOutlined, NotificationOutlined, PaperClipOutlined, RightOutlined } from '@ant-design/icons';
-import PhonePreview from '@/components/PhonePreview';
-import { useRequest } from 'umi';
-import { getFlow } from '@/pages/FlowList/service';
+import {AudioOutlined, FileImageOutlined, LeftOutlined, NotificationOutlined, PaperClipOutlined, PictureOutlined, RightOutlined, VideoCameraOutlined } from '@ant-design/icons';
+const { Text } = Typography;
 
 interface DisplayComponentProps {
   componentKey: string;
   componentData: MessageData;
   isBot?: boolean;
   isBroadcast?: boolean;
+  searchQuery?: string;
+}
+
+export const renderLabel = (label: string | undefined, searchQuery: string | undefined) => {
+  if (searchQuery && label) {
+
+      let index = label.toLowerCase().indexOf(searchQuery.toLowerCase());
+
+      if (index !== -1) {
+
+          let length = searchQuery.length;
+
+          let prefix = label.substring(0, index);
+          let suffix = label.substring(index + length);
+          let match = label.substring(index, index + length);
+
+          return (
+              <span>
+                  {prefix}<Text mark>{match}</Text>{suffix}
+              </span>
+          );
+      }
+  }
+
+  return (
+      <span>
+          {label}
+      </span>
+  );
 }
 
 export const QuickReplyDisplayComponent: FC<DisplayComponentProps> = (props) => {
-  const { componentKey, componentData } = props;
+  const { componentKey, componentData, searchQuery } = props;
   return (
     componentData.quickReplies?.length?
     <>
@@ -25,7 +52,7 @@ export const QuickReplyDisplayComponent: FC<DisplayComponentProps> = (props) => 
         {componentData &&
           componentData.quickReplies?.map((element, index) => (
             <Button  key={componentKey + 'qr' + index} type="default" style={{borderRadius: '4px'}}>
-              {element.title}
+              {renderLabel(element.title, searchQuery)}
             </Button>
           ))}{' '}
       </Space>
@@ -34,13 +61,14 @@ export const QuickReplyDisplayComponent: FC<DisplayComponentProps> = (props) => 
 };
 
 export const TextDisplayComponent: FC<DisplayComponentProps> = (props) => {
-  const { componentKey, componentData, isBot, isBroadcast } = props;
+  const { componentKey, componentData, isBot, isBroadcast, searchQuery } = props;
+  
   if (componentData?.text) 
     return (
       <div className={isBot?styles.TextComponentBot:styles.TextComponent}>
         <Space direction='horizontal'>{isBroadcast? <NotificationOutlined style={{color: '#1890ff'}}/>: <></>}
           <ProCard key={componentKey} size="small">
-            {componentData.text}
+            {renderLabel(componentData.text, searchQuery)}
           </ProCard>
         </Space>
       </div>
@@ -48,9 +76,8 @@ export const TextDisplayComponent: FC<DisplayComponentProps> = (props) => {
   return <></>
 };
 
-
 export const PostbackDisplayComponent: FC<DisplayComponentProps> = (props) => {
-  const { componentKey, componentData } = props;
+  const { componentKey, componentData, searchQuery } = props;
   if (componentData?.text) 
     return (
       <div className={styles.TextComponent}>
@@ -58,7 +85,7 @@ export const PostbackDisplayComponent: FC<DisplayComponentProps> = (props) => {
         <Space direction='horizontal' wrap>
           <div>Clicked: </div>
           <Button key={componentKey + 'qr'} type="default" style={{borderRadius: '4px'}}>
-            {componentData.text}
+            {renderLabel(componentData.text, searchQuery)}
           </Button>
         </Space>
           
@@ -69,54 +96,45 @@ export const PostbackDisplayComponent: FC<DisplayComponentProps> = (props) => {
 };
 
 export const ImageDisplayComponent: FC<DisplayComponentProps> = (props) => {
-  const { componentKey, componentData } = props;
+  const { componentKey, componentData, isBroadcast } = props;
   return componentData.url?(
-    <Image
-      className={styles.ImageComponent}
-      key={componentKey}
-      src={componentData.url}/>
+    <Space direction='horizontal'>{isBroadcast? <NotificationOutlined style={{color: '#1890ff'}}/>: <></>}
+      <Image
+        className={styles.ImageComponent}
+        key={componentKey}
+        src={componentData.url}/>
+    </Space>
   ): <></>
 };
 
 export const VideoDisplayComponent: FC<DisplayComponentProps> = (props) => {
-  const { componentKey, componentData } = props;
+  const { componentKey, componentData, isBroadcast } = props;
   return componentData.url?(
-    <video
-      key={componentKey}
-      className={styles.ImageComponent}
-      controls
-      src={componentData.url}/>
+    <Space direction='horizontal'>{isBroadcast? <NotificationOutlined style={{color: '#1890ff'}}/>: <></>}
+      <video
+        key={componentKey}
+        className={styles.ImageComponent}
+        controls
+        src={componentData.url}/>
+    </Space>
   ): <></>
 };
 
 export const FileDisplayComponent: FC<DisplayComponentProps> = (props) => {
-  const { componentKey } = props;
+  const { componentKey, isBroadcast } = props;
   return (
-    <div className={styles.TextComponent}>
-      <ProCard key={componentKey} size="small">
-        <PaperClipOutlined /> File
-      </ProCard>
-    </div>
+    <Space direction='horizontal'>{isBroadcast? <NotificationOutlined style={{color: '#1890ff'}}/>: <></>}
+      <div className={styles.TextComponent}>
+        <ProCard key={componentKey} size="small">
+          <PaperClipOutlined /> File
+        </ProCard>
+      </div>
+    </Space>
   );
 };
 
-export const getNextFlow = (button: any, buttonIdex: number) => {
-  if (!button.type || button.type === 'postback') {
-
-    const { data, run } = useRequest((values: any) => {
-      if (button.payload?.flowId)
-        return getFlow(button.payload?.flowId);
-      return null
-    });
-    const list = data?.flow || [];
-    return (
-        <PhonePreview key={'reference' + buttonIdex} data={list} editMode={false}/>
-      )}
-  return <a target='_blank' href={button.url}><LinkOutlined /> Open Link</a>
-}
-
 export const GenericTemplateDisplayComponent: FC<DisplayComponentProps> = (props) => {
-  const { componentKey, componentData } = props
+  const { componentKey, componentData, isBroadcast, searchQuery } = props
 
   const CarouselPrevArrow = (carouselProps: any) => {
     const { onClick } = carouselProps
@@ -134,41 +152,75 @@ export const GenericTemplateDisplayComponent: FC<DisplayComponentProps> = (props
 
   return (
     componentData.elements?.length?
-    <div className={styles.GenericComponent}>
-      <Carousel key={componentKey} dots={false} draggable arrows prevArrow={<CarouselPrevArrow/>} nextArrow={<CarouselNextArrow/>}>
-        {componentData && componentData.elements?.map((element, index) => {
-          if (element.title || element.subtitle || element.imageUrl || (element.buttons && element.buttons?.length > 0) ) 
-            return (
-              <Card key={index} size="small" bordered={false} cover={<img src={element ? element.imageUrl : ''} />}>
-                <p><b>{element.title}</b></p>
-                <Meta description={element.subtitle} />
-                {element.buttons?.map((button, buttonIdex) => (
-                  <ProCard key={buttonIdex} size="small">
-                    {button.title}
-                  </ProCard>))}
-              </Card>)
-          return <></>
-        })}
-      </Carousel>
-    </div>: <></>
+    <Space direction='horizontal'>{isBroadcast? <NotificationOutlined style={{color: '#1890ff'}}/>: <></>}
+      <div className={styles.GenericComponent}>
+        <Carousel key={componentKey} dots={false} draggable arrows prevArrow={<CarouselPrevArrow/>} nextArrow={<CarouselNextArrow/>}>
+          {componentData && componentData.elements?.map((element, index) => {
+            if (element.title || element.subtitle || element.imageUrl || (element.buttons && element.buttons?.length > 0) ) 
+              return (
+                <Card key={index} size="small" bordered={false} cover={<img src={element ? element.imageUrl : ''} />}>
+                  <p><b>{renderLabel(element.title, searchQuery)}</b></p>
+                  <Meta description={renderLabel(element.subtitle, searchQuery)} />
+                  {element.buttons?.map((button, buttonIdex) => (
+                    <ProCard key={buttonIdex} size="small">
+                      {renderLabel(button.title, searchQuery)}
+                    </ProCard>))}
+                </Card>)
+            return <></>
+          })}
+        </Carousel>
+      </div>
+    </Space>: <></>
   )
 };
 
 export const ButtonTemplateDisplayComponent: FC<DisplayComponentProps> = (props) => {
-  const { componentKey, componentData } = props;
+  const { componentKey, componentData, isBroadcast, searchQuery } = props;
   if (componentData.text || componentData.buttons?.length) {
     return (
-      <div className={styles.ButtonComponent}>
-        <Card key={componentKey} bordered={false} size="small">
-          {componentData.text}
-          {componentData.buttons?.map((button, buttonIdex) => (
-            <ProCard key={buttonIdex} size="small">
-              {button.title}
-            </ProCard>
-            ))}
-        </Card>
-      </div>
+      <Space direction='horizontal'>{isBroadcast? <NotificationOutlined style={{color: '#1890ff'}}/>: <></>}
+        <div className={styles.ButtonComponent}>
+          <Card key={componentKey} bordered={false} size="small">
+            {renderLabel(componentData.text, searchQuery)}
+            {componentData.buttons?.map((button, buttonIdex) => (
+              <ProCard key={buttonIdex} size="small">
+                {renderLabel(button.title, searchQuery)}
+              </ProCard>
+              ))}
+          </Card>
+        </div>
+      </Space>
     );
   }
   return <></>;
+};
+
+
+export const AudiosDisplayComponent: FC<DisplayComponentProps> = (props) => {
+  const { componentKey } = props;
+  return (
+    <ProCard key={componentKey} size="small" className={styles.TextComponent}>
+      <AudioOutlined /> Audios
+    </ProCard>
+    )
+};
+
+
+export const ImagesDisplayComponent: FC<DisplayComponentProps> = (props) => {
+  const { componentKey } = props;
+  return (
+    <ProCard key={componentKey} size="small" className={styles.TextComponent}>
+      <PictureOutlined /> Images
+    </ProCard>
+    )
+};
+
+
+export const VideosDisplayComponent: FC<DisplayComponentProps> = (props) => {
+  const { componentKey } = props;
+  return (
+    <ProCard key={componentKey} size="small" className={styles.TextComponent}>
+      <VideoCameraOutlined /> Videos
+    </ProCard>
+    )
 };

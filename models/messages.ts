@@ -9,6 +9,10 @@ export type ConversationMessage = {
     | 'image'
     | 'video'
     | 'file'
+    | 'images'
+    | 'videos'
+    | 'files'
+    | 'audios'
     | 'genericTemplate'
     | 'buttonTemplate'
     | 'postback'
@@ -27,7 +31,7 @@ export type MessageData = {
 
 export type ButtonData = {
   type: string;
-  title: StringObject;
+  title: string;
   url?: string;
   payload?: {flowId?: string;}
 };
