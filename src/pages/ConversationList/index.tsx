@@ -1,5 +1,5 @@
 import React, { FC, useRef, useState } from 'react';
-import { Typography, Card, Col, List, Row, Space, Tag, Divider, Dropdown, Input, message } from 'antd';
+import { Typography, Card, Col, List, Row, Space, Tag, Divider, Dropdown, Input, message, AutoComplete } from 'antd';
 import { Button } from 'antd';
 import ProCard from '@ant-design/pro-card';
 // @ts-ignore
@@ -9,17 +9,18 @@ import { patchUserTags, queryConversation, queryConversations, queryConversation
 import moment from 'moment';
 import { useRequest } from 'umi';
 import { getTags } from '../broadcast/components/BroadcastMeta/service';
-import { ClockCircleOutlined, CommentOutlined, DownOutlined, FilterFilled, FilterOutlined, FormOutlined, MessageOutlined, MinusOutlined, PlusOutlined, SearchOutlined, TagsOutlined, UpOutlined, UserOutlined } from '@ant-design/icons';
+import { ClockCircleOutlined, CommentOutlined, DownOutlined, FilterFilled, FilterOutlined, FormOutlined, MessageOutlined, PlusOutlined, SearchOutlined, TagsOutlined, UpOutlined, UserOutlined } from '@ant-design/icons';
 import { BotUsers, ConversationUsers } from './data';
 import { ConversationMessage } from '../../../models/messages';
 import { renderMessageComponent } from './RenderMessage';
 
 const { Text } = Typography;
 const { CheckableTag } = Tag;
+const { Option } = AutoComplete;
 
 const ConversationList: FC = () => {
 
-  const { data: tags } = useRequest(getTags);
+  const { data: tags, run: tagsRun} = useRequest(getTags);
   const [dropdownTag, setDropdownTag] = useState(false);
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [showConversationSearch, setShowConversationSearch] = useState(false);
@@ -97,7 +98,7 @@ const ConversationList: FC = () => {
     },
     { 
       refreshDeps: [currentConvoList, currentConvo],
-      formatResult: (response) => {return {...response.data, list: response.data.data}},
+      formatResult: (response) => {console.log(response.data); return {...response.data, list: response.data.data.reverse()}},
       paginated: true,
     }
   )
@@ -118,7 +119,6 @@ const ConversationList: FC = () => {
 
   const { data: messageData, loading: messageLoading, pagination: messagePagination } = useRequest(
     ({ current, pageSize }) => {
-      console.log('new messageData')
       return queryMessages(currentUser.id, { current: current, pageSize: pageSize})
     },
     { 
@@ -200,7 +200,7 @@ const ConversationList: FC = () => {
       <div className='selectable'>
       <Row wrap={false}>
         <Col flex='auto' style={{whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis'}}>
-          <span style={{fontWeight: "bolder", marginRight: '6px'}}>{renderLabel(item.fullname)} </span>
+          <span style={{fontWeight: "bolder", marginRight: '6px'}}>{renderLabel(item?.fullname||'')} </span>
           {item.tags.map((tag) => <Tag key={'userTag' + item.id + tag}>{tag}</Tag>)}
         </Col>
         <Col flex="70px" style={{fontSize: "11px", textAlign: 'right', color: 'rgba(0,0,0,0.45)'}}>{moment(item.lastMessage.createdAt).format('MM-DD HH:mm')} </Col>
@@ -226,7 +226,8 @@ const ConversationList: FC = () => {
 
   const handleInputConfirm = () => {
     let tags: string[];
-    if (inputValue && currentUser.tags.filter((tag: string) => tag === inputValue).length === 0) {
+    if (inputValue === '') {}
+    else if (inputValue && currentUser.tags.filter((tag: string) => tag === inputValue).length === 0) {
       tags = [...currentUser.tags, inputValue]
       tagRun(currentUser.id, tags)
       message.success(`Tag "${inputValue}" Added`)
@@ -240,7 +241,6 @@ const ConversationList: FC = () => {
   
   const handleDeleteTag = (tag: string) => {
     let tags = currentUser.tags.filter((ele: string) => ele !== tag)
-    console.log(tags)
     tagRun(currentUser.id, tags)
     message.success(`Tag "${tag}" Deleted`)
   };
@@ -322,14 +322,13 @@ const ConversationList: FC = () => {
             renderItem={(item) => 
             <List.Item key={'message' + item.id} >
               <Row justify={item.incomingMessageId || item.isBroadcast?'end':'start'}>
-              {renderMessageComponent(item.data, item.type, item.id, item.incomingMessageId != null || item.isBroadcast, item.isBroadcast)}
+              {renderMessageComponent(item.data, item.type, item.id, item.incomingMessageId != null || item.isBroadcast, item.isBroadcast, searchQuery)}
               </Row>
               {item.data.quickReplies? <Row justify={item.incomingMessageId || item.isBroadcast?'end':'start'} style={{marginTop: '10px'}}>
-              {renderMessageComponent(item.data, 'quickReplies', item.id, item.incomingMessageId != null || item.isBroadcast, item.isBroadcast)}
+              {renderMessageComponent(item.data, 'quickReplies', item.id, item.incomingMessageId != null || item.isBroadcast, item.isBroadcast, searchQuery)}
               </Row>:<></>}
               <Row justify={item.incomingMessageId || item.isBroadcast?'end':'start'}>
               <div style={{fontSize: "11px", color: 'rgba(0,0,0,0.45)'}}>{moment(item.createdAt).format('MM-DD HH:mm')} </div></Row>
-              
             </List.Item>}/>   
         </ProCard>)}
         
@@ -340,7 +339,7 @@ const ConversationList: FC = () => {
                   <img alt="" src='https://gw.alipayobjects.com/zos/antfincdn/XAosXuNZyF/BiazfanxmamNRoxxVxka.png' />
                   <Space direction='vertical'>
                     <div className='idField'><UserOutlined /> ID: {currentUser.id}</div>
-                    <div ><FormOutlined className='infoLogo'/> Registration Date: {console.log(currentUser)} {moment(currentUser.createdAt).format('YYYY-MM-DD')}</div>
+                    <div ><FormOutlined className='infoLogo'/> Registration Date: {moment(currentUser.createdAt).format('YYYY-MM-DD')}</div>
                     <div ><ClockCircleOutlined className='infoLogo'/> Last Active: {moment(currentUser.lastActive.sentAt).toNow()}</div>
                     <div ><CommentOutlined className='infoLogo'/> Total Conversations: TBD</div>
                     <div ><MessageOutlined className='infoLogo'/> Total Messages: TBD</div>
@@ -354,15 +353,38 @@ const ConversationList: FC = () => {
                     <Tag closable onClose={() => handleDeleteTag(item)} key={'userTag' + item}>{item}</Tag>
                   ))}
                   {inputVisible && (
-                    <Input
+                    // <Select
+                    //   showSearch
+                    //   style={{ width: '100%' }}
+                    //   onChange={(e) => {console.log('onchange'm e);}} //setInputValue()}}
+                    //   onBlur={handleInputConfirm}
+                    //   // onPressEnter={handleInputConfirm}
+                    //   onSearch={tagsRun}
+                    //   onFocus={tagsRun}
+                    //   loading={tagsLoading}>
+                    //   {tags &&
+                    //     tags.map((i: string) => {
+                    //       return <Option key={i} value={i}>{i}</Option>;
+                    //     })}
+                    // </Select>
+
+                    <AutoComplete
+                      onSearch={tagsRun}
                       ref={ref}
-                      type="text"
+                      // options={options}
                       size="small"
                       style={{ width: 78 }}
+                      dropdownMatchSelectWidth={false}
                       value={inputValue}
-                      onChange={(e) => {setInputValue(e.target.value)}}
+                      onChange={(e) => {setInputValue(e)}}
                       onBlur={handleInputConfirm}
-                      onPressEnter={handleInputConfirm}/>
+                      // onPressEnter={handleInputConfirm}
+                      filterOption={(inputValue, option) =>
+                        option!.value.toUpperCase().indexOf(inputValue.toUpperCase()) !== -1
+                      }
+                    >
+                      {tags&&tags.map((tag: string) => (<Option key={tag} value={tag}>{tag}</Option>))}
+                    </AutoComplete>
                   )}
                   {!inputVisible && (
                     <Tag onClick={showInput} style={{ borderStyle: 'dashed' }}>
