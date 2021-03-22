@@ -8,7 +8,7 @@ import { queryBroadcastTemplateList, addBroadcastTemplate, updateBroadcastTempla
 import TemplateModal from './components/TemplateModal';
 import styles from './style.less';
 import { PageContainer } from '@ant-design/pro-layout';
-import TagSelect from '../components/TagSelect';
+import TagSelect from '../../../components/TagSelect';
 import StandardFormRow from '../components/StandardFormRow';
 
 const FormItem = Form.Item;

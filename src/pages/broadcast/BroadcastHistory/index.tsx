@@ -1,4 +1,4 @@
-import { Card, Form, Tag, Tooltip, Progress, Row, Switch, Col } from 'antd';
+import { Card, Form, Tag, Tooltip, Progress, Row, Switch, Col, Button } from 'antd';
 import React, { FC, useState } from 'react';
 import { useIntl, useRequest, FormattedMessage } from 'umi';
 
@@ -9,11 +9,12 @@ import ProTable from '@ant-design/pro-table';
 import moment from 'moment';
 import { queryBroadcastHistory, queryBroadcastHistoryList } from './service';
 import { PageContainer } from '@ant-design/pro-layout';
-import TagSelect from '../components/TagSelect';
+import TagSelect from '../../../components/TagSelect';
 import StandardFormRow from '../components/StandardFormRow';
 import BroadcastHistoryDrawer from './components/broadcastHistoryDrawerColumns';
 import { getTags } from '../components/BroadcastMeta/service';
 
+const { CheckableTag } = Tag;
 const FormItem = Form.Item;
 
 const BroadcastHistory: FC = () => {
@@ -165,18 +166,21 @@ const BroadcastHistory: FC = () => {
             }}
           >
             <StandardFormRow title="Tags" block>
-              <Row>
+              {/* <Row>
                 <Col span={2}>
                   <FormItem name="intersect">
                     <Switch checkedChildren="ALL" unCheckedChildren="OR" />
                   </FormItem>
-                </Col>
+                </Col> */}
                 <FormItem name="tags">
-                    <TagSelect hideCheckAll>
+                    {/* <Button key='tagClear' size='small' type='link' >Clear</Button>
+                    {tags && tags.map((tag) => 
+                      <CheckableTag key={'allTag' + tag} checked={false}>{tag}</CheckableTag>)} */}
+                    <TagSelect>
                       {tags && tags.map((tag, index) => <TagSelect.Option value={tag} key={'tagsSelect' + index}>{tag}</TagSelect.Option>)}
                     </TagSelect>
                   </FormItem>
-              </Row>
+              {/* </Row> */}
             </StandardFormRow>
             <StandardFormRow title="Status" last>
               <Row>

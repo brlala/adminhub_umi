@@ -1,0 +1,24 @@
+@import '~antd/es/style/themes/default.less';
+
+.ConvoLog {
+  height: calc(100vh - 227px);
+  
+  overflow: scroll;
+  // background: rgba(0,0,0,.02);
+  .ant-list-item {
+    border: 0px;
+  }
+
+  .ant-list-pagination {
+    position: sticky;
+    bottom: 0px;
+    margin: 0px;
+    padding: 12px;
+    background: #fff;
+    box-shadow: 0 10px 10px 10px rgba(0, 0, 0, 0.06);
+  }
+
+  .ant-spin-nested-loading {
+    min-height: calc(100vh - 275px);
+  }
+}

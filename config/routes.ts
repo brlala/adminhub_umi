@@ -116,6 +116,13 @@
     path: '/conversations',
     component: './ConversationList',
   },
+  // {
+  //   name: 'list.conversation',
+  //   icon: 'table',
+  //   hideInMenu: true,
+  //   path: '/conversations/:userId',
+  //   component: './ConversationList',
+  // },
   {
     name: 'list.grading-list',
     icon: 'EditOutlined',
