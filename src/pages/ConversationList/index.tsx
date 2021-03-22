@@ -41,9 +41,10 @@ import UserMetaDisplay from '@/components/BotUsers/UserMeta';
 
 moment.locale('en-us');
 const { Text } = Typography;
+const { CheckableTag } = Tag;
 
 const ConversationList: FC = () => {
-  const { data: tags } = useRequest(getTags);
+  const { data: tags } = useRequest('http://localhost:5000/broadcasts/user-tags');
   const [dropdownTag, setDropdownTag] = useState(false);
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [showConversationSearch, setShowConversationSearch] = useState(false);
@@ -91,6 +92,7 @@ const ConversationList: FC = () => {
       });
     },
     {
+      debounceInterval: 500,
       refreshDeps: [searchQuery, selectedTags],
       formatResult: (response) => {
         return { ...response.data, list: response.data.data };
@@ -101,18 +103,17 @@ const ConversationList: FC = () => {
       paginated: true,
     },
   );
-
+  
   const { data: convosData, loading: convosLoading, pagination: convosPagination } = useRequest(
     ({ current, pageSize }) => {
-      if (showConversationSearch)
-        return queryConversations({
-          current: current,
-          pageSize: pageSize,
-          searchQuery: searchQuery,
-        });
-      return {};
+      return queryConversations({
+        current: current,
+        pageSize: pageSize,
+        searchQuery: searchQuery,
+      });
     },
     {
+      debounceInterval: 500,
       refreshDeps: [searchQuery, selectedTags, showConversationSearch],
       formatResult: (response) => {
         return { ...response.data, list: response.data.data };
@@ -129,14 +130,14 @@ const ConversationList: FC = () => {
 
   const { data: convoData, loading: convoLoading, pagination: convoPagination } = useRequest(
     ({ current, pageSize }) => {
-      if (currentConvoList)
-        return queryConversation(currentConvoList[currentConvo], {
-          current: current,
-          pageSize: pageSize,
-        });
-      return {};
+      
+      currentConvoList?queryConversation(currentConvoList[currentConvo], {
+        current: current,
+        pageSize: pageSize,
+      }):{};
     },
     {
+      debounceInterval: 500,
       refreshDeps: [currentConvoList, currentConvo],
       formatResult: (response) => {
         console.log(response.data);
@@ -147,17 +148,13 @@ const ConversationList: FC = () => {
   );
 
   const { data: currentUser, run: currentRun } = useRequest(
-    (userId: string) => {
-      return queryCurrent(userId);
-    },
+    (userId: string) => ({url: `http://localhost:5000/botuser/${userId}`, getResponse: true }),
     { manual: true, onSuccess: (res) => metaRun(res.id) },
   );
 
   const { data: userMeta, run: metaRun, loading: metaLoading } = useRequest(
-    (userId: string) => {
-      return queryCurrent(userId);
-    },
-    { manual: true},
+    (userId: string) => ({url: `http://localhost:5000/botuser/${userId}`, getResponse: true }),
+    { manual: true },
   );
 
   const { data: messageData, loading: messageLoading, pagination: messagePagination } = useRequest(
@@ -165,6 +162,7 @@ const ConversationList: FC = () => {
       return queryMessages(currentUser.id, { current: current, pageSize: pageSize });
     },
     {
+      debounceInterval: 500,
       refreshDeps: [currentUser],
       formatResult: (response) => {
         return { ...response.data, list: response.data.data.reverse() };
@@ -239,7 +237,7 @@ const ConversationList: FC = () => {
 
   const UsersConversationList = (
     <List<ConversationUsers>
-      style={{ height: 'calc(100vh - 285px)', overflow: 'scroll' }}
+      style={{ height: 'calc(100vh - 280px)', overflow: 'scroll' }}
       dataSource={convosData?.list}
       loading={convosLoading}
       pagination={{
@@ -323,9 +321,22 @@ const ConversationList: FC = () => {
                 <span style={{ fontWeight: 'bolder', marginRight: '6px' }}>
                   {renderLabel(item?.fullname || '')}{' '}
                 </span>
-                {item.tags.map((tag) => (
-                  <Tag key={'userTag' + item.id + tag}>{tag}</Tag>
-                ))}
+                {selectedTags.map((tag) =>
+                  item.tags.indexOf(tag) > -1 ? (
+                    <CheckableTag key={'userTag' + item.id + tag} checked>
+                      {tag}
+                    </CheckableTag>
+                  ) : (
+                    <></>
+                  ),
+                )}
+                {item.tags.map((tag) =>
+                  selectedTags.indexOf(tag) > -1 ? (
+                    <></>
+                  ) : (
+                    <Tag key={'userTag' + item.id + tag}>{tag}</Tag>
+                  ),
+                )}
               </Col>
               <Col
                 flex="70px"
@@ -411,6 +422,7 @@ const ConversationList: FC = () => {
                   loading={convoLoading}
                   pagination={convoPagination}
                   style={{ height: 'calc(100vh - 285px)' }}
+                  searchQuery={searchQuery}
                 />
               )}
             </ProCard>
@@ -421,15 +433,14 @@ const ConversationList: FC = () => {
                   data={messageData.list}
                   loading={messageLoading}
                   pagination={messagePagination}
+                  searchQuery={searchQuery}
                 />
               )}
             </ProCard>
           ))}
 
         <ProCard colSpan="25%" loading={metaLoading}>
-          {!metaLoading && userMeta && (
-            <UserMetaDisplay userMeta={userMeta}/>
-          )}
+          {!metaLoading && userMeta && <UserMetaDisplay userMeta={userMeta} />}
         </ProCard>
       </ProCard>
     </PageContainer>

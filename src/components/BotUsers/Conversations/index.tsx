@@ -5,10 +5,10 @@ import { ConversationMessage } from 'models/messages';
 import moment from 'moment';
 import ProCard from '@ant-design/pro-card';
 
-const ConversationDisplay: FC<{ data: any; loading: any; pagination: any; style?: any }> = (
+const ConversationDisplay: FC<{ data: any; loading: any; pagination: any; style?: any; searchQuery?: string }> = (
   props,
 ) => {
-  const { data, loading, pagination, style } = props;
+  const { data, loading, pagination, style, searchQuery } = props;
   return (
     <ProCard ghost>
       <List<ConversationMessage>
@@ -33,7 +33,7 @@ const ConversationDisplay: FC<{ data: any; loading: any; pagination: any; style?
                 item.id,
                 item.incomingMessageId != null || item.isBroadcast,
                 item.isBroadcast,
-                '',
+                searchQuery?searchQuery: '',
               )}
             </Row>
             {item.data.quickReplies ? (
@@ -47,7 +47,7 @@ const ConversationDisplay: FC<{ data: any; loading: any; pagination: any; style?
                   item.id,
                   item.incomingMessageId != null || item.isBroadcast,
                   item.isBroadcast,
-                  '',
+                  searchQuery? searchQuery: '',
                 )}
               </Row>
             ) : (
