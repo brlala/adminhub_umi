@@ -1,6 +1,6 @@
 import React from 'react';
 import { MessageData } from 'models/messages';
-import { ButtonTemplateDisplayComponent, PostbackDisplayComponent, FileDisplayComponent, GenericTemplateDisplayComponent, ImageDisplayComponent, QuickReplyDisplayComponent, TextDisplayComponent, VideoDisplayComponent, AudiosDisplayComponent, ImagesDisplayComponent, VideosDisplayComponent } from '@/components/FlowItems/ReadMessage';
+import { ButtonTemplateDisplayComponent, PostbackDisplayComponent, FileDisplayComponent, GenericTemplateDisplayComponent, ImageDisplayComponent, QuickReplyDisplayComponent, TextDisplayComponent, VideoDisplayComponent, AudiosDisplayComponent, ImagesDisplayComponent, VideosDisplayComponent, StickerDisplayComponent } from '@/components/FlowItems/ReadMessage';
 
 export const renderMessageComponent = (component: MessageData, type: string, index: string, isBot: boolean, isBroadcast: boolean, searchQuery: string) => {
     let renderedComponent;
@@ -69,8 +69,13 @@ export const renderMessageComponent = (component: MessageData, type: string, ind
                 <FileDisplayComponent componentKey={index} componentData={component}/>
             );
             break;
+        case 'sticker':
+            renderedComponent = (
+                <StickerDisplayComponent componentKey={index} componentData={component}/>
+            );
+            break;
         default:
-        renderedComponent = <div key={index}>Cannot render {component}</div>;
+            renderedComponent = <div key={index}>{type}</div>;
     }
     return renderedComponent;
 };
