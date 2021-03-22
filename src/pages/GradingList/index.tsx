@@ -5,7 +5,13 @@ import { Input, List, message, Modal, Row, Slider, Space, Tag } from 'antd';
 import ProProvider from '@ant-design/pro-provider';
 import moment from 'moment';
 import { readMore } from '@/utils/utils';
-import { queryTopics, queryQuestionsFilter, skipMessage, queryGradings } from './service';
+import {
+  queryTopics,
+  queryQuestionsFilter,
+  skipMessage,
+  updateMessageAnswer,
+  queryGradings,
+} from './service';
 import { FrownOutlined, SmileOutlined } from '@ant-design/icons';
 import './index.less';
 import { useRequest } from 'umi';
@@ -206,6 +212,7 @@ export default () => {
   const [topics, setTopics] = useState([]);
   const [questions, setQuestions] = useState([]);
   const [convoId, setConvoId] = useState(null);
+  const [editableKeys, setEditableRowKeys] = useState<React.Key[]>([]);
   const values = useContext(ProProvider);
   const actionRef = useRef<ActionType>();
 
@@ -286,11 +293,15 @@ export default () => {
       valueType: 'accuracyRange',
       editable: false,
       width: '7%',
+      tooltip: '* signifies the response of the question is changed',
       render: (dom, record) => {
-        const unanswered = !(record.nlp?.nlpResponse?.matchedQuestions?.length > 0);
+        const unanswered = !(
+          record.nlp?.nlpResponse?.matchedQuestions?.length > 0 || record?.chatbot?.qnid
+        );
+        const graded = record?.adminportal?.graded ? '*' : '';
         return unanswered
           ? '-'
-          : `${(record.nlp.nlpResponse.matchedQuestions?.[0]?.score * 100).toFixed(2)}%`;
+          : `${graded + (record.nlp.nlpResponse.matchedQuestions?.[0]?.score * 100).toFixed(2)}%`;
       },
     },
     {
@@ -301,8 +312,9 @@ export default () => {
       hideInSearch: true,
       valueEnum: questions,
       render: (dom, record) => {
-        console.log(record);
-        const unanswered = !(record.nlp?.nlpResponse?.matchedQuestions?.length > 0);
+        const unanswered = !(
+          record.nlp?.nlpResponse?.matchedQuestions?.length > 0 || record?.chatbot?.qnid
+        );
         return unanswered ? '-' : `${record.answerQuestion?.text.EN}`;
       },
     },
@@ -312,7 +324,9 @@ export default () => {
       hideInSearch: true,
       editable: false,
       render: (dom, record) => {
-        const unanswered = !(record.nlp?.nlpResponse?.matchedQuestions?.length > 0);
+        const unanswered = !(
+          record.nlp?.nlpResponse?.matchedQuestions?.length > 0 || record?.chatbot?.qnid
+        );
         let tagColour;
         let tagKey;
         let tagText;
@@ -350,7 +364,9 @@ export default () => {
       valueType: 'option',
       width: '10%',
       render: (text, record, _, action) => {
-        const unanswered = !(record.nlp?.nlpResponse?.matchedQuestions?.length > 0);
+        const unanswered = !(
+          record.nlp?.nlpResponse?.matchedQuestions?.length > 0 || record?.chatbot?.qnid
+        );
         const skip = (
           <a
             key="delete"
@@ -410,8 +426,28 @@ export default () => {
         request={async (params, sorter, filter) => queryGradings({ sorter, filter, ...params })}
         rowKey="id"
         editable={{
+          editableKeys,
           type: 'single',
+          onSave: async (_, newLine) => {
+            const hide = message.loading('Saving');
+            try {
+              await updateMessageAnswer({
+                messageId: newLine.id,
+                messageResponse: newLine.questionResponse,
+                messageText: newLine.data.text,
+              });
+              hide();
+              message.success('Response saved');
+              // return true;
+            } catch (error) {
+              hide();
+              message.error('Response save fail, please retry!');
+              // return false;
+            }
+            actionRef.current?.reloadAndRest?.();
+          },
           actionRender: (row, config, dom) => [dom.save, dom.cancel],
+          onChange: setEditableRowKeys,
         }}
         pagination={{
           showQuickJumper: true,

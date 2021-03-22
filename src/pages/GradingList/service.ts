@@ -16,7 +16,6 @@ export async function queryQuestionsFilter(field: string) {
 }
 
 export async function skipMessage(params: { messageId: string }) {
-  console.log(params);
   return request('http://localhost:5000/gradings/', {
     method: 'DELETE',
     data: {
@@ -26,7 +25,6 @@ export async function skipMessage(params: { messageId: string }) {
 }
 
 export async function queryGradings(params?: QuestionListParams) {
-  console.log(params);
   let { sorter, filter, ...searchParam } = params;
   if (sorter == undefined) {
     sorter = {};
@@ -52,10 +50,13 @@ export async function queryGradings(params?: QuestionListParams) {
   });
 }
 
-export async function updateMessageAnswer(params: { messageId: string }) {
-  console.log(params);
+export async function updateMessageAnswer(params: {
+  messageResponse: string;
+  messageId: string;
+  messageText: string;
+}) {
   return request('http://localhost:5000/gradings/', {
-    method: 'DELETE',
+    method: 'PATCH',
     data: {
       ...params,
     },
