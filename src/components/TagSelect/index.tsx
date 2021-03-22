@@ -1,6 +1,5 @@
-import { DownOutlined, UpOutlined } from '@ant-design/icons';
-import { useBoolean, useControllableValue } from 'ahooks';
-import { Tag } from 'antd';
+import { useControllableValue } from 'ahooks';
+import { Button, Tag } from 'antd';
 import classNames from 'classnames';
 import React, { FC } from 'react';
 import styles from './index.less';
@@ -8,10 +7,10 @@ import styles from './index.less';
 const { CheckableTag } = Tag;
 
 export interface TagSelectOptionProps {
-  value: string | number;
+  value: string;
   style?: React.CSSProperties;
   checked?: boolean;
-  onChange?: (value: string | number, state: boolean) => void;
+  onChange?: (value: string, state: boolean) => void;
 }
 
 const TagSelectOption: React.FC<TagSelectOptionProps> & {
@@ -30,15 +29,15 @@ TagSelectOption.isTagSelectOption = true;
 
 type TagSelectOptionElement = React.ReactElement<TagSelectOptionProps, typeof TagSelectOption>;
 export interface TagSelectProps {
-  onChange?: (value: (string | number)[]) => void;
+  onChange?: (value: string[]) => void;
   expandable?: boolean;
-  value?: (string | number)[];
-  defaultValue?: (string | number)[];
+  value?: string[];
+  defaultValue?: string[];
   style?: React.CSSProperties;
+  hideClear?: boolean;
   hideCheckAll?: boolean;
   actionsText?: {
-    expandText?: React.ReactNode;
-    collapseText?: React.ReactNode;
+    clearText?: React.ReactNode;
     selectAllText?: React.ReactNode;
   };
   className?: string;
@@ -48,11 +47,17 @@ export interface TagSelectProps {
 }
 
 const TagSelect: FC<TagSelectProps> & { Option: typeof TagSelectOption } = (props) => {
-  const { children, hideCheckAll = false, singleOption = false, className, style, expandable, actionsText = {} } = props;
+  const {
+    children,
+    hideClear = false,
+    hideCheckAll = true,
+    singleOption = false,
+    className,
+    style,
+    actionsText = {},
+  } = props;
 
-  const [expand, { toggle }] = useBoolean();
-
-  const [value, setValue] = useControllableValue<(string | number)[]>(props);
+  const [value, setValue] = useControllableValue<string[]>(props);
 
   const isTagSelectOption = (node: TagSelectOptionElement) =>
     node &&
@@ -68,42 +73,44 @@ const TagSelect: FC<TagSelectProps> & { Option: typeof TagSelectOption } = (prop
   };
 
   const onSelectAll = (checked: boolean) => {
-    let checkedTags: (string | number)[] = [];
+    let checkedTags: string[] = [];
     if (checked) {
       checkedTags = getAllTags();
     }
     setValue(checkedTags);
   };
 
-  const handleTagChange = (tag: string | number, checked: boolean) => {
-    const checkedTags: (string | number)[] = [...(value || [])];
-    if (singleOption) { 
+  const handleTagChange = (tag: string, checked: boolean) => {
+    const checkedTags: string[] = [...(value || [])];
+    if (singleOption) {
       if (checked) {
-        setValue([tag])
+        setValue([tag]);
       } else {
-        setValue([])
+        setValue([]);
       }
-    } 
-    else{
+    } else {
       const index = checkedTags.indexOf(tag);
       if (checked && index === -1) {
         checkedTags.push(tag);
       } else if (!checked && index > -1) {
         checkedTags.splice(index, 1);
       }
-      setValue(checkedTags);}
+      setValue(checkedTags);
+    }
   };
 
   const checkedAll = getAllTags().length === value?.length;
-  const { expandText = 'Expand', collapseText = 'Collapse', selectAllText = 'All' } = actionsText;
+  const { clearText = 'Clear', selectAllText = 'All' } = actionsText;
 
-  const cls = classNames(styles.tagSelect, className, {
-    [styles.hasExpandTag]: expandable,
-    [styles.expanded]: expand,
-  });
+  const cls = classNames(styles.tagSelect, className);
 
   return (
     <div className={cls} style={style}>
+      {hideClear ? null : (
+        <Button key="tagClear" size="small" type="link" onClick={() => setValue([])}>
+          {clearText}
+        </Button>
+      )}
       {hideCheckAll ? null : (
         <CheckableTag checked={checkedAll} key="tag-select-__all__" onChange={onSelectAll}>
           {selectAllText}
@@ -121,25 +128,6 @@ const TagSelect: FC<TagSelectProps> & { Option: typeof TagSelectOption } = (prop
           }
           return child;
         })}
-      {expandable && (
-        <a
-          className={styles.trigger}
-          onClick={() => {
-            toggle();
-          }}
-        >
-          {expand ? (
-            <>
-              {collapseText} <UpOutlined />
-            </>
-          ) : (
-            <>
-              {expandText}
-              <DownOutlined />
-            </>
-          )}
-        </a>
-      )}
     </div>
   );
 };

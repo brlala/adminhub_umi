@@ -1,5 +1,5 @@
-import { request } from 'umi';
-import type { DropdownProps, ConversationParams } from './data.d';
+import request from 'umi-request';
+import type { ConversationParams } from './data.d';
 
 export async function queryConversationsUsers(params: ConversationParams) {
   return request('http://localhost:5000/conversations/', { params: params, getResponse: true });
@@ -12,11 +12,13 @@ export async function queryConversations(params: ConversationParams) {
   });
 }
 
-export async function queryConversation(convoId: string, params: ConversationParams) {
-  return request(`http://localhost:5000/conversations/convos/${convoId}`, {
-    params: params,
-    getResponse: true,
-  });
+export async function queryConversation(convoId: string|null, params: ConversationParams) {
+  if (convoId)
+    return request(`http://localhost:5000/conversations/convos/${convoId}`, {
+      params: params,
+      getResponse: true,
+    });
+  return {}
 }
 
 export async function queryMessages(userId: string, params: ConversationParams) {
@@ -35,18 +37,4 @@ export async function patchUserTags(userId: string, tags: string[]) {
     params: { tags: tags },
     method: 'patch',
   });
-}
-
-export async function queryTopics() {
-  const topics: string[] = await request('http://localhost:5000/questions/topics');
-  let results: DropdownProps[] = [];
-  topics.forEach((topic) => results.push({ label: topic, value: topic, key: topic }));
-  return results;
-}
-
-export async function queryFlowsFilter(field: string) {
-  const flows: any = await request(`http://localhost:5000/flows/fields?field=${field}`);
-  let results: DropdownProps[] = [];
-  flows.forEach((flow: any) => results.push({ label: flow.name, value: flow.id, key: flow.id }));
-  return results;
 }
