@@ -88,11 +88,11 @@ const Login: React.FC = () => {
         <div className={styles.top}>
           <div className={styles.header}>
             <Link to="/">
-              <img alt="logo" className={styles.logo} src="/logo.svg" />
-              <span className={styles.title}>Administrator Hub</span>
+              <img alt="logo" className={styles.logo} src="/logo.png" />
+              <span className={styles.title}>Pandai Client Portal</span>
             </Link>
           </div>
-          <div className={styles.desc}>A simplistic and intuitive Management Console</div>
+          <div className={styles.desc}>One-stop Content Management & Insight Generation </div>
         </div>
 
         <div className={styles.main}>

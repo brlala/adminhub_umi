@@ -129,7 +129,7 @@ const ConversationList: FC = () => {
   const { data: convoData, loading: convoLoading, pagination: convoPagination } = useRequest(
     ({ current, pageSize }) => {
       
-      currentConvoList?queryConversation(currentConvoList[currentConvo], {
+      return currentConvoList?queryConversation(currentConvoList[currentConvo], {
         current: current,
         pageSize: pageSize,
       }):{};
