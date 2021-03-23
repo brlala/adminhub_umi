@@ -1,5 +1,5 @@
 import request from 'umi-request';
-import { Params, BroadcastTemplateListItem, NewBroadcastTemplate } from './data.d';
+import { Params, BroadcastTemplateListItem, NewBroadcastTemplate } from './data';
 
 export async function queryBroadcastTemplateList(
   params: Params,

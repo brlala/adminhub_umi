@@ -7,7 +7,7 @@ import styles from './style.less';
 import ProCard from '@ant-design/pro-card';
 import { FooterToolbar, PageContainer } from '@ant-design/pro-layout';
 import { TextComponent, ImageComponent, VideoAttachmentComponent, GenericTemplateComponent, ButtonTemplateComponent, VideoComponent } from '@/components/FlowItems/UpdateFlow';
-import BroadcastMeta from '@/pages/broadcast/components/BroadcastMeta';
+import BroadcastMeta from '@/pages/Broadcast/components/BroadcastMeta';
 import { NewBroadcastEntry } from '../BroadcastTemplateList/data';
 import PhonePreview from '@/components/PhonePreview';
 

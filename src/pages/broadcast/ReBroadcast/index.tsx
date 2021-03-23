@@ -6,8 +6,8 @@ import { sendBroadcast } from './service';
 import styles from './style.less';
 import ProCard from '@ant-design/pro-card';
 import { PageContainer } from '@ant-design/pro-layout';
-import { NewBroadcastEntry } from '@/pages/broadcast/BroadcastTemplateList/data';
-import BroadcastMeta from '@/pages/broadcast/components/BroadcastMeta';
+import { NewBroadcastEntry } from '@/pages/Broadcast/BroadcastTemplateList/data';
+import BroadcastMeta from '@/pages/Broadcast/components/BroadcastMeta';
 import { queryBroadcastHistory } from '../BroadcastHistory/service';
 import PhonePreview from '@/components/PhonePreview';
 
