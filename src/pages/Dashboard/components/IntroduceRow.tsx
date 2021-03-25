@@ -60,6 +60,7 @@ const IntroduceRow = ({ loading, visitData }: { loading: boolean; visitData: Dat
         footer={<Field label="日访问量" value={numeral(1234).format('0,0')} />}
         contentHeight={46}
       >
+        {console.log(visitData)}
         <TinyArea
           color="#975FE4"
           xField="x"
@@ -67,7 +68,7 @@ const IntroduceRow = ({ loading, visitData }: { loading: boolean; visitData: Dat
           forceFit
           yField="y"
           smooth
-          data={visitData}
+          data={visitData.map(d => d.y)}
         />
       </ChartCard>
     </Col>
@@ -85,7 +86,7 @@ const IntroduceRow = ({ loading, visitData }: { loading: boolean; visitData: Dat
         footer={<Field label="转化率" value="60%" />}
         contentHeight={46}
       >
-        <TinyColumn xField="x" height={46} forceFit yField="y" data={visitData} />
+        <TinyColumn xField="x" height={46} forceFit yField="y" data={visitData.map(d => d.y)} />
       </ChartCard>
     </Col>
     <Col {...topColResponsiveProps}>

@@ -38,13 +38,13 @@
   },
   {
     name: 'dashboard',
-    icon: 'table',
+    icon: 'DotChartOutlined',
     path: '/dashboard',
     component: './Dashboard',
   },
   {
     name: 'list.question-list',
-    icon: 'table',
+    icon: 'QuestionOutlined',
     path: '/questions',
     component: './QuestionList',
   },
@@ -112,7 +112,7 @@
   },
   {
     name: 'list.conversation',
-    icon: 'table',
+    icon: 'CommentOutlined',
     path: '/conversations',
     component: './ConversationList',
   },

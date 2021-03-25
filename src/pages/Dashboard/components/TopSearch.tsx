@@ -77,7 +77,7 @@ const TopSearch = ({
           status="up"
           subTotal={17.1}
         />
-        <TinyArea xField="x" height={45} forceFit yField="y" smooth data={visitData2} />
+        <TinyArea xField="x" height={45} forceFit yField="y" smooth data={visitData2.map(d => d.y)} />
       </Col>
       <Col sm={12} xs={24} style={{ marginBottom: 24 }}>
         <NumberInfo
@@ -94,7 +94,7 @@ const TopSearch = ({
           subTotal={26.2}
           gap={8}
         />
-        <TinyArea xField="x" height={45} forceFit yField="y" smooth data={visitData2} />
+        <TinyArea xField="x" height={45} forceFit yField="y" smooth data={visitData2.map(d => d.y)} />
       </Col>
     </Row>
     <Table<any>

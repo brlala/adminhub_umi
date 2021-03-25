@@ -1,11 +1,11 @@
 import React, { useState, FC } from 'react';
 import { ProFormSelect, ProFormTextArea } from '@ant-design/pro-form';
-import { Button, Form, Input, message, Radio, Card, Space, Image, Tooltip } from 'antd';
+import { Button, Form, Input, message, Radio, Card, Space, Image, Tooltip, Row } from 'antd';
 import { queryFlowsFilter } from '@/pages/QuestionList/service';
 import { FormattedMessage } from '@@/plugin-locale/localeExports';
 import { Modal } from 'antd';
-const { TextArea } = Input;
-import { CloseOutlined, DeleteOutlined, FileAddOutlined, FunctionOutlined, LoadingOutlined, PaperClipOutlined, PlusOutlined, VideoCameraAddOutlined } from '@ant-design/icons';
+const { TextArea, Search } = Input;
+import { CloseOutlined, CloudUploadOutlined, DeleteOutlined, FileAddOutlined, FunctionOutlined, LoadingOutlined, PaperClipOutlined, PlusOutlined, VideoCameraAddOutlined } from '@ant-design/icons';
 import ImgCrop from 'antd-img-crop';
 import { Tabs } from 'antd';
 import './index.less';
@@ -112,6 +112,7 @@ export const ImageComponent: FC<AttachmentComponentDataProps> = (props) => {
   const { componentKey, componentData, onChange } = props
   const [previewImage, setPreviewImage] = useState(componentData.url);
   const [uploading, setUploading] = useState(componentData.url?true:false);
+  const [uploader, setUploader] = useState(true);
   const draggerProps = {
     key: 'image' + componentKey.toString(),
     accept: "image/*",
@@ -151,7 +152,11 @@ export const ImageComponent: FC<AttachmentComponentDataProps> = (props) => {
   }
 
   return (
-    <Card title='Image' size='small' style={{background: 'transparent'}} bordered={false} extra={deleteButton(componentKey, onChange)}>
+    <Card title={<Space>Image
+      <Radio.Group defaultValue={uploader} onChange={(e) => setUploader(e.target.value)}>
+        <Radio.Button value={true}>Upload</Radio.Button>
+        <Radio.Button value={false}>Input URL</Radio.Button>
+      </Radio.Group></Space>} size='small' style={{background: 'transparent'}} bordered={false} extra={deleteButton(componentKey, onChange)}>
       <Form.Item
         key={'component' + componentKey.toString() + 'image'}
         name={'component' + componentKey.toString() + 'image'}
@@ -164,11 +169,25 @@ export const ImageComponent: FC<AttachmentComponentDataProps> = (props) => {
               preview={{mask: <Button className='image-mask' shape="circle" size='large' onClick={removeImage}><DeleteOutlined/></Button>}}/>
           </Space>
           : 
-          <Dragger {...draggerProps}>
+          <>
+          {uploader?<Dragger {...draggerProps}>
             <p style={{marginBottom: 12}}> {uploading ? <LoadingOutlined /> : <PlusOutlined style={{ fontSize: '40px'}} />} </p>
             <p className="ant-upload-hint">{uploading ? "Uploading" : "Click or drag image here to upload"}</p>
-          </Dragger>
-          }
+          </Dragger>:
+          <Form.Item
+            key={'component' + componentKey.toString() + 'urlimage'}
+            name={'component' + componentKey.toString() + 'urlimage'}
+            initialValue={previewImage}
+            rules={[{ required: true, message: 'Image is required' }, { type: 'url', message: 'Image must be a valid URL' }]}
+          >
+            <Search placeholder="Image URL" allowClear enterButton={<CloudUploadOutlined/>} onSearch={(value) => {
+              setPreviewImage(value);onChange((prevState: any) => [...prevState].map((item, index) => {
+              if (index === componentKey) {
+                return { ...item, data: {url: value}}
+              }
+              else return item;
+            }))}} /> </Form.Item>
+          }</>}
       </Form.Item>
     </Card>
   );
