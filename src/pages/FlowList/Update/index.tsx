@@ -274,7 +274,8 @@ const NewFlow: FC = (props) => {
         <PageContainer
           title={<Space> 
             {name? name : 'New Flow'} <RightOutlined />
-            <Form.Item name="name" style={{margin: 0}}><Input placeholder="Flow Name"/></Form.Item>
+            <Form.Item name="name" style={{margin: 0}} //validateFirst hasFeedback
+            ><Input placeholder="Flow Name"/></Form.Item>
           </Space>}
       extra={flowId?<Button type="primary" danger onClick={handleDelete}><DeleteOutlined /> Delete </Button>:<></>}
     >

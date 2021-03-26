@@ -37,8 +37,14 @@
     ],
   },
   {
+    name: 'dashboard',
+    icon: 'DotChartOutlined',
+    path: '/dashboard',
+    component: './Dashboard',
+  },
+  {
     name: 'list.question-list',
-    icon: 'table',
+    icon: 'QuestionOutlined',
     path: '/questions',
     component: './QuestionList',
   },
@@ -63,12 +69,6 @@
     component: './FlowList/Update',
     hideInMenu: true,
   },
-  // {
-  //   name: 'list.broadcast-list',
-  //   icon: 'NotificationOutlined',
-  //   path: '/broadcast',
-  //   component: './BroadcastList',
-  // },
   {
     path: '/broadcasts',
     name: 'list.broadcast',
@@ -112,17 +112,10 @@
   },
   {
     name: 'list.conversation',
-    icon: 'table',
+    icon: 'CommentOutlined',
     path: '/conversations',
     component: './ConversationList',
   },
-  // {
-  //   name: 'list.conversation',
-  //   icon: 'table',
-  //   hideInMenu: true,
-  //   path: '/conversations/:userId',
-  //   component: './ConversationList',
-  // },
   {
     name: 'list.grading-list',
     icon: 'EditOutlined',

@@ -1,5 +1,5 @@
 import request from 'umi-request';
-import { Params, BroadcastHistoryListItem, BroadcastHistoryItem } from './data.d';
+import { Params, BroadcastHistoryListItem, BroadcastHistoryItem } from './data';
 
 export async function queryBroadcastHistoryList(
   params: Params

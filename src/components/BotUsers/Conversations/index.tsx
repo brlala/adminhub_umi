@@ -22,7 +22,7 @@ const ConversationDisplay: FC<{ data: any; loading: any; pagination: any; style?
         }}
         itemLayout="vertical"
         size="large"
-        style={style}
+        style={style?style:{}}
         className="ConvoLog"
         renderItem={(item) => (
           <List.Item key={'message' + item.id}>

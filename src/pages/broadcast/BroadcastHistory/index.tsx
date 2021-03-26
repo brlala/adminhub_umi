@@ -3,7 +3,7 @@ import React, { FC, useState } from 'react';
 import { useIntl, useRequest, FormattedMessage } from 'umi';
 
 import type { ProColumns } from '@ant-design/pro-table';
-import { BroadcastHistoryItem, BroadcastHistoryListItem } from './data.d';
+import { BroadcastHistoryItem, BroadcastHistoryListItem } from './data';
 import styles from './style.less';
 import ProTable from '@ant-design/pro-table';
 import moment from 'moment';

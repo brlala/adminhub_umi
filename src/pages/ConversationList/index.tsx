@@ -20,12 +20,10 @@ import {
   queryConversation,
   queryConversations,
   queryConversationsUsers,
-  queryCurrent,
   queryMessages,
 } from './service';
 import moment from 'moment';
 import { useRequest } from 'umi';
-import { getTags } from '../broadcast/components/BroadcastMeta/service';
 import {
   DownOutlined,
   FilterFilled,
@@ -131,13 +129,12 @@ const ConversationList: FC = () => {
   const { data: convoData, loading: convoLoading, pagination: convoPagination } = useRequest(
     ({ current, pageSize }) => {
       
-      currentConvoList?queryConversation(currentConvoList[currentConvo], {
+      return currentConvoList?queryConversation(currentConvoList[currentConvo], {
         current: current,
         pageSize: pageSize,
       }):{};
     },
     {
-      debounceInterval: 500,
       refreshDeps: [currentConvoList, currentConvo],
       formatResult: (response) => {
         console.log(response.data);
@@ -207,7 +204,7 @@ const ConversationList: FC = () => {
                   <div className="tagDropdown">
                     <TagSelect value={selectedTags} onChange={(value) => setSelectedTags(value)}>
                       {tags &&
-                        tags.map((tag, index) => (
+                        tags.map((tag: string, index: number) => (
                           <TagSelect.Option
                             value={tag}
                             key={'tagsSelect' + index}

@@ -4,7 +4,7 @@ import Meta from 'antd/lib/card/Meta';
 import styles from './index.less';
 import ProCard from '@ant-design/pro-card';
 import { MessageData } from 'models/messages';
-import {AudioOutlined, FileImageOutlined, LeftOutlined, NotificationOutlined, PaperClipOutlined, PictureOutlined, RightOutlined, VideoCameraOutlined } from '@ant-design/icons';
+import {AudioOutlined, FileImageOutlined, LeftOutlined, NotificationOutlined, PaperClipOutlined, PictureOutlined, RightOutlined, SmileOutlined, VideoCameraOutlined } from '@ant-design/icons';
 const { Text } = Typography;
 
 interface DisplayComponentProps {
@@ -196,6 +196,15 @@ export const ButtonTemplateDisplayComponent: FC<DisplayComponentProps> = (props)
 };
 
 
+export const StickerDisplayComponent: FC<DisplayComponentProps> = (props) => {
+  const { componentKey } = props;
+  return (
+    <ProCard key={componentKey} size="small" className={styles.TextComponent}>
+      <SmileOutlined /> Sticker
+    </ProCard>
+    )
+};
+
 export const AudiosDisplayComponent: FC<DisplayComponentProps> = (props) => {
   const { componentKey } = props;
   return (
@@ -204,7 +213,6 @@ export const AudiosDisplayComponent: FC<DisplayComponentProps> = (props) => {
     </ProCard>
     )
 };
-
 
 export const ImagesDisplayComponent: FC<DisplayComponentProps> = (props) => {
   const { componentKey } = props;

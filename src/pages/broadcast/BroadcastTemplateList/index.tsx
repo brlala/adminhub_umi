@@ -3,7 +3,7 @@ import { PlusOutlined, DeleteOutlined } from '@ant-design/icons';
 import React, { FC, useState } from 'react';
 import { Link, useRequest } from 'umi';
 
-import { BroadcastTemplateListItem } from './data.d';
+import { BroadcastTemplateListItem } from './data';
 import { queryBroadcastTemplateList, addBroadcastTemplate, updateBroadcastTemplate, deleteBroadcastTemplate } from './service';
 import TemplateModal from './components/TemplateModal';
 import styles from './style.less';

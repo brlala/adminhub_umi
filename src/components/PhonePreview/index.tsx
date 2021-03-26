@@ -1,4 +1,4 @@
-import { renderDisplayComponent } from '@/pages/broadcast/components/RenderFlowComponent';
+import { renderDisplayComponent } from '@/pages/Broadcast/components/RenderFlowComponent';
 import { LeftOutlined, WifiOutlined } from '@ant-design/icons';
 import { Space } from 'antd';
 import { FlowItem } from 'models/flows';
