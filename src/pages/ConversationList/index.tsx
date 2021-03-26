@@ -11,6 +11,7 @@ import {
   Input,
   Button,
   Tooltip,
+  Avatar,
 } from 'antd';
 import ProCard from '@ant-design/pro-card';
 // @ts-ignore
@@ -40,6 +41,12 @@ import UserMetaDisplay from '@/components/BotUsers/UserMeta';
 moment.locale('en-us');
 const { Text } = Typography;
 const { CheckableTag } = Tag;
+export const ColorList = [
+  { color: '#B3791B', backgroundColor: '#FDDC87' }, 
+  { color: '#287391', backgroundColor: '#87D6E4' }, 
+  { color: '#8A3035', backgroundColor: '#F4837D' }, 
+  { color: '#693C87', backgroundColor: '#D094D9' }, 
+  { color: '#39792F', backgroundColor: '#98D66D' }]
 
 const ConversationList: FC = () => {
   const { data: tags } = useRequest('http://localhost:5000/broadcasts/user-tags');
@@ -260,23 +267,28 @@ const ConversationList: FC = () => {
             key={'convoList' + item.user.id}
           />
           <Row wrap={false}>
-            <Col
-              flex="auto"
-              style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
-            >
-              <span style={{ fontWeight: 'bolder', marginRight: '6px' }}>{item.fullname} </span>
+            {item.fullname?<Col flex='45px'><Avatar style={ColorList[item.fullname.trim().charCodeAt(0)%5]}>{item.fullname.trim()[0]}</Avatar></Col>: <></>}
+            <Col flex='auto'>
+              <Row wrap={false}>
+                <Col
+                  flex="auto"
+                  style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
+                >
+                  <span style={{ fontWeight: 'bolder', marginRight: '6px' }}>{item.fullname} </span>
+                </Col>
+                <Col
+                  flex="70px"
+                  style={{ fontSize: '11px', textAlign: 'right', color: 'rgba(0,0,0,0.45)' }}
+                >
+                  {moment(item.lastMessageDate).format('MM-DD HH:mm')}{' '}
+                </Col>
+              </Row>
+              <Row style={{ width: '100%' }}>
+                <Text ellipsis style={{ fontSize: '12px', color: 'rgba(0,0,0,0.65)' }}>
+                  {item.convoCount} Conversations{' '}
+                </Text>
+              </Row>
             </Col>
-            <Col
-              flex="70px"
-              style={{ fontSize: '11px', textAlign: 'right', color: 'rgba(0,0,0,0.45)' }}
-            >
-              {moment(item.lastMessageDate).format('MM-DD HH:mm')}{' '}
-            </Col>
-          </Row>
-          <Row style={{ width: '100%' }}>
-            <Text ellipsis style={{ fontSize: '12px', color: 'rgba(0,0,0,0.65)' }}>
-              {item.convoCount} Conversations{' '}
-            </Text>
           </Row>
         </List.Item>
       )}
@@ -308,44 +320,51 @@ const ConversationList: FC = () => {
           onClick={() => {
             currentRun(item.id);
           }}
+
         >
           <div className="selectable">
+
             <Row wrap={false}>
-              <Col
-                flex="auto"
-                style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
-              >
-                <span style={{ fontWeight: 'bolder', marginRight: '6px' }}>
-                  {renderLabel(item?.fullname || '')}{' '}
-                </span>
-                {selectedTags.map((tag) =>
-                  item.tags.indexOf(tag) > -1 ? (
-                    <CheckableTag key={'userTag' + item.id + tag} checked>
-                      {tag}
-                    </CheckableTag>
-                  ) : (
-                    <></>
-                  ),
-                )}
-                {item.tags.map((tag) =>
-                  selectedTags.indexOf(tag) > -1 ? (
-                    <></>
-                  ) : (
-                    <Tag key={'userTag' + item.id + tag}>{tag}</Tag>
-                  ),
-                )}
+              {item.fullname?<Col flex='45px'><Avatar style={ColorList[item.fullname.trim().charCodeAt(0)%5]}>{item.fullname.trim()[0]}</Avatar></Col>: <></>}
+              <Col flex='auto'>
+                <Row wrap={false}>
+                  <Col
+                    flex="auto"
+                    style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
+                  >
+                    <span style={{ fontWeight: 'bolder', marginRight: '6px' }}>
+                      {renderLabel(item?.fullname || '')}{' '}
+                    </span>
+                    {selectedTags.map((tag) =>
+                      item.tags.indexOf(tag) > -1 ? (
+                        <CheckableTag key={'userTag' + item.id + tag} checked>
+                          {tag}
+                        </CheckableTag>
+                      ) : (
+                        <></>
+                      ),
+                    )}
+                    {item.tags.map((tag) =>
+                      selectedTags.indexOf(tag) > -1 ? (
+                        <></>
+                      ) : (
+                        <Tag key={'userTag' + item.id + tag}>{tag}</Tag>
+                      ),
+                    )}
+                  </Col>
+                  <Col
+                    flex="70px"
+                    style={{ fontSize: '11px', textAlign: 'right', color: 'rgba(0,0,0,0.45)' }}
+                  >
+                    {moment(item.lastMessage.createdAt).format('MM-DD HH:mm')}{' '}
+                  </Col>
+                </Row>
+                <Row style={{ width: '100%' }}>
+                  <Text ellipsis style={{ fontSize: '12px', color: 'rgba(0,0,0,0.65)' }}>
+                    {item.lastMessage.message}{' '}
+                  </Text>
+                </Row>
               </Col>
-              <Col
-                flex="70px"
-                style={{ fontSize: '11px', textAlign: 'right', color: 'rgba(0,0,0,0.45)' }}
-              >
-                {moment(item.lastMessage.createdAt).format('MM-DD HH:mm')}{' '}
-              </Col>
-            </Row>
-            <Row style={{ width: '100%' }}>
-              <Text ellipsis style={{ fontSize: '12px', color: 'rgba(0,0,0,0.65)' }}>
-                {item.lastMessage.message}{' '}
-              </Text>
             </Row>
           </div>
         </List.Item>

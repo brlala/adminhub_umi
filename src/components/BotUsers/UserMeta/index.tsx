@@ -1,5 +1,5 @@
 import React, { FC, useRef, useState } from 'react';
-import { AutoComplete, Divider, Input, message, Space, Tag } from 'antd';
+import { AutoComplete, Avatar, Divider, Input, message, Space, Tag } from 'antd';
 import moment from 'moment';
 import {
   UserOutlined,
@@ -11,11 +11,19 @@ import {
   PlusOutlined,
 } from '@ant-design/icons';
 import { useRequest } from 'umi';
-import { patchUserTags, queryCurrent } from '@/pages/ConversationList/service';
-import { getTags } from '@/pages/broadcast/NewBroadcast/service';
+import { patchUser, queryCurrent } from '@/pages/ConversationList/service';
+import { getTags } from '@/pages/Broadcast/NewBroadcast/service';
 
 moment.locale('en-us');
 const { Option } = AutoComplete;
+const { TextArea } = Input;
+
+export const ColorList = [
+  { color: '#B3791B', backgroundColor: '#FDDC87' }, 
+  { color: '#287391', backgroundColor: '#87D6E4' }, 
+  { color: '#8A3035', backgroundColor: '#F4837D' }, 
+  { color: '#693C87', backgroundColor: '#D094D9' }, 
+  { color: '#39792F', backgroundColor: '#98D66D' }]
 
 const UserMetaDisplay: FC<{ userMeta: any }> = (props) => {
   const { userMeta } = props;
@@ -24,6 +32,8 @@ const UserMetaDisplay: FC<{ userMeta: any }> = (props) => {
   const ref = useRef<Input | null>(null);
   const [inputVisible, setInputVisible] = useState<boolean>(false);
   const [inputValue, setInputValue] = useState<string>('');
+  const [noteVisible, setNoteVisible] = useState<boolean>(false);
+  const [noteValue, setNoteValue] = useState<string>('');
 
   const { data: userTags, refresh: tagsRefresh } = useRequest(
     () => {
@@ -36,20 +46,39 @@ const UserMetaDisplay: FC<{ userMeta: any }> = (props) => {
     } },
   );
 
-  const { run: tagRun } = useRequest(
+  const { data: userNote, refresh: noteRefresh } = useRequest(
+    () => {
+      return queryCurrent(userMeta.id);
+    },
+    { 
+      refreshDeps: [userMeta],
+      formatResult: (response) => {
+      return response.data.note;
+    } },
+  );
+
+  const { run } = useRequest(
     (userId: string, tags: string[]) => {
-      return patchUserTags(userId, tags);
+      return patchUser(userId, tags, noteValue);
     },
     {
       manual: true,
       onSuccess: () => {
         tagsRefresh();
+        noteRefresh();
       },
     },
   );
 
   const showInput = () => {
     setInputVisible(true);
+    if (ref.current) {
+      ref.current?.focus();
+    }
+  };
+
+  const showNote = () => {
+    setNoteVisible(true);
     if (ref.current) {
       ref.current?.focus();
     }
@@ -63,7 +92,7 @@ const UserMetaDisplay: FC<{ userMeta: any }> = (props) => {
       userTags.filter((tag: string) => tag === inputValue).length === 0
     ) {
       tags = [...userTags, inputValue];
-      tagRun(userMeta.id, tags);
+      run(userMeta.id, tags);
       message.success(`Tag "${inputValue}" Added`);
     } else {
       message.info(`Tag "${inputValue}" already exists`);
@@ -72,18 +101,23 @@ const UserMetaDisplay: FC<{ userMeta: any }> = (props) => {
     setInputValue('');
   };
 
+  const handleNoteConfirm = () => {
+    run(userMeta.id, userMeta.tags);
+    message.success(`Note updated`);
+    setNoteVisible(false);
+    setNoteValue('');
+  };
+
   const handleDeleteTag = (tag: string) => {
     let tags = userTags.filter((ele: string) => ele !== tag);
-    tagRun(userMeta.id, tags);
+    run(userMeta.id, tags);
     message.success(`Tag "${tag}" Deleted`);
   };
   return (
     <div>
       <div className="avatarHolder">
-        <img
-          alt=""
-          src="https://gw.alipayobjects.com/zos/antfincdn/XAosXuNZyF/BiazfanxmamNRoxxVxka.png"
-        />
+        {userMeta.firstName?<Avatar size={96} style={ColorList[userMeta.firstName.charCodeAt(0)%5]} > <div style={{fontSize: '64px'}}>{userMeta.firstName[0]}</div></Avatar>:
+        <Avatar size={96} style={ColorList[userMeta.facebook.id.charCodeAt(0)%5]} > <div style={{fontSize: '64px'}}>{userMeta.facebook.id[0]}</div></Avatar>}
       </div>
       <div className="avatarHolder">
         <Space direction="vertical">
@@ -158,6 +192,23 @@ const UserMetaDisplay: FC<{ userMeta: any }> = (props) => {
           <FormOutlined className="infoLogo" />
           Notes
         </div>
+        
+        {noteVisible && (
+          <TextArea
+            ref={ref}
+            value={noteValue}
+            onChange={(e) => {
+              setNoteValue(e.target.value);
+            }}
+            onBlur={handleNoteConfirm}
+          />
+        )}
+        {!noteVisible && (<>
+          {userNote?<div onClick={showNote} >{userNote}</div>:
+            <Tag onClick={showNote} style={{ borderStyle: 'dashed' }}>
+              <PlusOutlined />
+            </Tag>}</>
+        )}
       </div>
     </div>
   );

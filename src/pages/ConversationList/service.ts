@@ -32,9 +32,9 @@ export async function queryCurrent(userId: string) {
   return request(`http://localhost:5000/botuser/${userId}`, { getResponse: true });
 }
 
-export async function patchUserTags(userId: string, tags: string[]) {
+export async function patchUser(userId: string, tags: string[], note: string) {
   return request(`http://localhost:5000/botuser/${userId}`, {
-    params: { tags: tags },
+    data: { tags, note },
     method: 'patch',
   });
 }
