@@ -161,24 +161,21 @@ export const ImageComponent: FC<AttachmentComponentDataProps> = (props) => {
         key={'component' + componentKey.toString() + 'image'}
         name={'component' + componentKey.toString() + 'image'}
         initialValue={previewImage}
-        rules={[{ required: true, message: 'Image is required' }]}
+        rules={[{ type: 'url', message: 'Image must be a valid URL' }]}
       >
-        {previewImage? 
+        {uploader? <>{previewImage? 
           <Space>
             <Image className='ImageComponent' key={componentKey} src={previewImage} 
               preview={{mask: <Button className='image-mask' shape="circle" size='large' onClick={removeImage}><DeleteOutlined/></Button>}}/>
           </Space>
-          : 
-          <>
-          {uploader?<Dragger {...draggerProps}>
-            <p style={{marginBottom: 12}}> {uploading ? <LoadingOutlined /> : <PlusOutlined style={{ fontSize: '40px'}} />} </p>
-            <p className="ant-upload-hint">{uploading ? "Uploading" : "Click or drag image here to upload"}</p>
-          </Dragger>:
+          : <Dragger {...draggerProps}>
+          <p style={{marginBottom: 12}}> {uploading ? <LoadingOutlined /> : <PlusOutlined style={{ fontSize: '40px'}} />} </p>
+          <p className="ant-upload-hint">{uploading ? "Uploading" : "Click or drag image here to upload"}</p>
+        </Dragger>}</>: <>
           <Form.Item
             key={'component' + componentKey.toString() + 'urlimage'}
             name={'component' + componentKey.toString() + 'urlimage'}
             initialValue={previewImage}
-            rules={[{ required: true, message: 'Image is required' }, { type: 'url', message: 'Image must be a valid URL' }]}
           >
             <Search placeholder="Image URL" allowClear enterButton={<CloudUploadOutlined/>} onSearch={(value) => {
               setPreviewImage(value);onChange((prevState: any) => [...prevState].map((item, index) => {
@@ -187,7 +184,12 @@ export const ImageComponent: FC<AttachmentComponentDataProps> = (props) => {
               }
               else return item;
             }))}} /> </Form.Item>
-          }</>}
+            {previewImage? 
+          <Space>
+            <Image className='ImageComponent' key={componentKey} src={previewImage} 
+              preview={{mask: <Button className='image-mask' shape="circle" size='large' onClick={removeImage}><DeleteOutlined/></Button>}}/>
+          </Space>:<></>}</>
+          }
       </Form.Item>
     </Card>
   );
