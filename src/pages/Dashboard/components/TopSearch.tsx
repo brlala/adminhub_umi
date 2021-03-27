@@ -3,7 +3,7 @@ import { Card, Col, Row, Table, Tooltip } from 'antd';
 import { TinyArea } from '@ant-design/charts';
 import React from 'react';
 import numeral from 'numeral';
-import { DataItem } from '../data';
+import { DataItem } from '../data.d';
 
 import NumberInfo from './NumberInfo';
 import Trend from './Trend';
@@ -77,7 +77,7 @@ const TopSearch = ({
           status="up"
           subTotal={17.1}
         />
-        <TinyArea xField="x" height={45} forceFit yField="y" smooth data={visitData2.map(d => d.y)} />
+        <TinyArea xField="x" height={45} forceFit yField="y" smooth data={visitData2} />
       </Col>
       <Col sm={12} xs={24} style={{ marginBottom: 24 }}>
         <NumberInfo
@@ -94,7 +94,7 @@ const TopSearch = ({
           subTotal={26.2}
           gap={8}
         />
-        <TinyArea xField="x" height={45} forceFit yField="y" smooth data={visitData2.map(d => d.y)} />
+        <TinyArea xField="x" height={45} forceFit yField="y" smooth data={visitData2} />
       </Col>
     </Row>
     <Table<any>

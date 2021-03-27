@@ -5,7 +5,7 @@ import { Col, Row, Tooltip } from 'antd';
 import React from 'react';
 import numeral from 'numeral';
 import { ChartCard, Field } from './Charts';
-import { DataItem } from '../data';
+import type { DataItem } from '../data.d';
 import Trend from './Trend';
 import Yuan from '../utils/Yuan';
 import styles from '../style.less';
@@ -60,7 +60,6 @@ const IntroduceRow = ({ loading, visitData }: { loading: boolean; visitData: Dat
         footer={<Field label="日访问量" value={numeral(1234).format('0,0')} />}
         contentHeight={46}
       >
-        {console.log(visitData)}
         <TinyArea
           color="#975FE4"
           xField="x"
@@ -68,7 +67,7 @@ const IntroduceRow = ({ loading, visitData }: { loading: boolean; visitData: Dat
           forceFit
           yField="y"
           smooth
-          data={visitData.map(d => d.y)}
+          data={visitData.map((d) => d.y)}
         />
       </ChartCard>
     </Col>
@@ -86,7 +85,7 @@ const IntroduceRow = ({ loading, visitData }: { loading: boolean; visitData: Dat
         footer={<Field label="转化率" value="60%" />}
         contentHeight={46}
       >
-        <TinyColumn xField="x" height={46} forceFit yField="y" data={visitData.map(d => d.y)} />
+        <TinyColumn xField="x" height={46} forceFit yField="y" data={visitData.map((d) => d.y)} />
       </ChartCard>
     </Col>
     <Col {...topColResponsiveProps}>

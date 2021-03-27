@@ -1,6 +1,6 @@
 import moment from 'moment';
 import { Request, Response } from 'express';
-import { AnalysisData, RadarData, DataItem } from './data';
+import { AnalysisData, RadarData, DataItem } from './data.d';
 
 // mock data
 const visitData: DataItem[] = [];
@@ -186,7 +186,7 @@ radarOriginData.forEach((item) => {
   });
 });
 
-export const getFakeChartData: AnalysisData = {
+const getFakeChartData: AnalysisData = {
   visitData,
   visitData2,
   salesData,

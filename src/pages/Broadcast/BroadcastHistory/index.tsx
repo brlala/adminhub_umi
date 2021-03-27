@@ -7,12 +7,13 @@ import { BroadcastHistoryItem, BroadcastHistoryListItem } from './data';
 import styles from './style.less';
 import ProTable from '@ant-design/pro-table';
 import moment from 'moment';
-import { queryBroadcastHistory, queryBroadcastHistoryList } from './service';
+
 import { PageContainer } from '@ant-design/pro-layout';
 import TagSelect from '../../../components/TagSelect';
 import StandardFormRow from '../components/StandardFormRow';
 import BroadcastHistoryDrawer from './components/broadcastHistoryDrawerColumns';
 import { getTags } from '../components/BroadcastMeta/service';
+import { queryBroadcastHistory, queryBroadcastHistoryList } from './service';
 
 const { CheckableTag } = Tag;
 const FormItem = Form.Item;
@@ -73,18 +74,24 @@ const BroadcastHistory: FC = () => {
       hideInSearch: true,
       render: (_, object, index) => (
         <>
-          {object.sendToAll? <Tag color='green' key="everyone">Everyone</Tag>: ""}
+          {object.sendToAll ? (
+            <Tag color="green" key="everyone">
+              Everyone
+            </Tag>
+          ) : (
+            ''
+          )}
           {object.tags.map((tag) => {
             return (
-              <Tag color='geekblue' key={index + 'tag' + tag}>
+              <Tag color="geekblue" key={index + 'tag' + tag}>
                 {tag.toUpperCase()}
               </Tag>
             );
           })}
           {object.exclude.map((tag) => {
             return (
-              <Tag color='red' key={index + 'tag' + tag}>
-                {"- " + tag.toUpperCase()}
+              <Tag color="red" key={index + 'tag' + tag}>
+                {'- ' + tag.toUpperCase()}
               </Tag>
             );
           })}
@@ -125,12 +132,12 @@ const BroadcastHistory: FC = () => {
       sorter: (a, b) => a.total - b.total,
       render: (_, object) => (
         <>
-          <Tooltip
-            title={object.sent + ' / ' + object.total}
-          >
-            <Progress percent={(object.processed * 100) / object.total} 
-              success={{percent: (object.sent * 100) / object.total}}
-              strokeColor='red' showInfo={false}
+          <Tooltip title={object.sent + ' / ' + object.total}>
+            <Progress
+              percent={(object.processed * 100) / object.total}
+              success={{ percent: (object.sent * 100) / object.total }}
+              strokeColor="red"
+              showInfo={false}
             />
           </Tooltip>
         </>
@@ -172,14 +179,19 @@ const BroadcastHistory: FC = () => {
                     <Switch checkedChildren="ALL" unCheckedChildren="OR" />
                   </FormItem>
                 </Col> */}
-                <FormItem name="tags">
-                    {/* <Button key='tagClear' size='small' type='link' >Clear</Button>
-                    {tags && tags.map((tag) => 
+              <FormItem name="tags">
+                {/* <Button key='tagClear' size='small' type='link' >Clear</Button>
+                    {tags && tags.map((tag) =>
                       <CheckableTag key={'allTag' + tag} checked={false}>{tag}</CheckableTag>)} */}
-                    <TagSelect>
-                      {tags && tags.map((tag, index) => <TagSelect.Option value={tag} key={'tagsSelect' + index}>{tag}</TagSelect.Option>)}
-                    </TagSelect>
-                  </FormItem>
+                <TagSelect>
+                  {tags &&
+                    tags.map((tag, index) => (
+                      <TagSelect.Option value={tag} key={'tagsSelect' + index}>
+                        {tag}
+                      </TagSelect.Option>
+                    ))}
+                </TagSelect>
+              </FormItem>
               {/* </Row> */}
             </StandardFormRow>
             <StandardFormRow title="Status" last>
@@ -197,20 +209,19 @@ const BroadcastHistory: FC = () => {
           </Form>
         </Card>
       </div>
-        <ProTable<BroadcastHistoryListItem>
-          headerTitle={intl.formatMessage({
-            id: 'pages.broadcast.history',
-            defaultMessage: 'Broadcast History',
-          })}
-          rowKey="id"
-          search={false}
-          loading={loading}
-          dataSource={list}
-          columns={columns}
-        />
+      <ProTable<BroadcastHistoryListItem>
+        headerTitle={intl.formatMessage({
+          id: 'pages.broadcast.history',
+          defaultMessage: 'Broadcast History',
+        })}
+        rowKey="id"
+        search={false}
+        loading={loading}
+        dataSource={list}
+        columns={columns}
+      />
 
-        <BroadcastHistoryDrawer visible={visible} current={current} onClose={onClose} />
-      
+      <BroadcastHistoryDrawer visible={visible} current={current} onClose={onClose} />
     </PageContainer>
   );
 };

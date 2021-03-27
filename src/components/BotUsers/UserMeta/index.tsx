@@ -12,7 +12,7 @@ import {
 } from '@ant-design/icons';
 import { useRequest } from 'umi';
 import { patchUserTags, queryCurrent } from '@/pages/ConversationList/service';
-import { getTags } from '@/pages/broadcast/NewBroadcast/service';
+import { getTags } from '@/pages/Broadcast/NewBroadcast/service';
 
 moment.locale('en-us');
 const { Option } = AutoComplete;
@@ -29,11 +29,12 @@ const UserMetaDisplay: FC<{ userMeta: any }> = (props) => {
     () => {
       return queryCurrent(userMeta.id);
     },
-    { 
+    {
       refreshDeps: [userMeta],
       formatResult: (response) => {
-      return response.data.tags;
-    } },
+        return response.data.tags;
+      },
+    },
   );
 
   const { run: tagRun } = useRequest(
@@ -58,10 +59,7 @@ const UserMetaDisplay: FC<{ userMeta: any }> = (props) => {
   const handleInputConfirm = () => {
     let tags: string[];
     if (inputValue === '') {
-    } else if (
-      inputValue &&
-      userTags.filter((tag: string) => tag === inputValue).length === 0
-    ) {
+    } else if (inputValue && userTags.filter((tag: string) => tag === inputValue).length === 0) {
       tags = [...userTags, inputValue];
       tagRun(userMeta.id, tags);
       message.success(`Tag "${inputValue}" Added`);
@@ -113,11 +111,12 @@ const UserMetaDisplay: FC<{ userMeta: any }> = (props) => {
           <TagsOutlined className="infoLogo" />
           Tags
         </div>
-        {userTags&& userTags.map((item: string) => (
-          <Tag closable onClose={() => handleDeleteTag(item)} key={'userTag' + item}>
-            {item}
-          </Tag>
-        ))}
+        {userTags &&
+          userTags.map((item: string) => (
+            <Tag closable onClose={() => handleDeleteTag(item)} key={'userTag' + item}>
+              {item}
+            </Tag>
+          ))}
         {inputVisible && (
           <AutoComplete
             onSearch={tagsRun}
