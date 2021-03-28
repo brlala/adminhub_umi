@@ -111,6 +111,7 @@ const Analysis: FC<AnalysisProps> = () => {
             salesData={data?.salesData || []}
             isActive={isActive}
             handleRangePickerChange={handleRangePickerChange}
+            offlineChartData={data?.offlineChartData || []}
             loading={loading}
             selectDate={selectDate}
           />
@@ -144,7 +145,7 @@ const Analysis: FC<AnalysisProps> = () => {
             </Suspense>
           </Col>
         </Row>
-
+{/* 
         <Suspense fallback={null}>
           <OfflineData
             activeKey={activeKey}
@@ -153,7 +154,7 @@ const Analysis: FC<AnalysisProps> = () => {
             offlineChartData={data?.offlineChartData || []}
             handleTabChange={handleTabChange}
           />
-        </Suspense>
+        </Suspense> */}
       </>
     </GridContent>
   );

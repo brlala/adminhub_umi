@@ -44,10 +44,19 @@ const OfflineData = ({
   offlineChartData: DataItem[];
   handleTabChange: (activeKey: string) => void;
 }) => (
-  <Card loading={loading} className={styles.offlineCard} bordered={false} style={{ marginTop: 32 }}>
-    <Tabs activeKey={activeKey} onChange={handleTabChange}>
+  <Card
+    loading={loading}
+    bordered={false}
+    title="Daily Users"
+    // extra={dropdownGroup}
+    style={{
+      height: '100%',
+      marginTop: 32
+    }}
+    className={styles.offlineCard}>
+    {/* <Tabs activeKey={activeKey} onChange={handleTabChange}>
       {offlineData.map((shop) => (
-        <TabPane tab={<CustomTab data={shop} currentTabKey={activeKey} />} key={shop.name}>
+        <TabPane tab={<CustomTab data={shop} currentTabKey={activeKey} />} key={shop.name}> */}
           <div style={{ padding: '0 24px' }}>
             <Line
               forceFit
@@ -68,9 +77,9 @@ const OfflineData = ({
               }}
             />
           </div>
-        </TabPane>
+        {/* </TabPane>
       ))}
-    </Tabs>
+    </Tabs> */}
   </Card>
 );
 

@@ -1,7 +1,7 @@
 import { Card, Col, DatePicker, Row, Tabs } from 'antd';
 import { RangePickerProps } from 'antd/es/date-picker/generatePicker';
 import moment from 'moment';
-import { Column } from '@ant-design/charts';
+import { Column, Line } from '@ant-design/charts';
 
 import React from 'react';
 import numeral from 'numeral';
@@ -17,7 +17,7 @@ const { TabPane } = Tabs;
 const rankingListData: { title: string; total: number }[] = [];
 for (let i = 0; i < 7; i += 1) {
   rankingListData.push({
-    title: `工专路 ${i} 号店`,
+    title: `Item ranking ${i}`,
     total: 323234,
   });
 }
@@ -27,12 +27,14 @@ const SalesCard = ({
   salesData,
   isActive,
   handleRangePickerChange,
+  offlineChartData,
   loading,
   selectDate,
 }: {
   rangePickerValue: RangePickerValue;
   isActive: (key: TimeType) => string;
   salesData: DataItem[];
+  offlineChartData: DataItem[];
   loading: boolean;
   handleRangePickerChange: (dates: RangePickerValue, dateStrings: [string, string]) => void;
   selectDate: (key: TimeType) => void;
@@ -44,16 +46,16 @@ const SalesCard = ({
           <div className={styles.salesExtraWrap}>
             <div className={styles.salesExtra}>
               <a className={isActive('today')} onClick={() => selectDate('today')}>
-                今日
+                Past 30 Days
               </a>
               <a className={isActive('week')} onClick={() => selectDate('week')}>
-                本周
+                WTD
               </a>
               <a className={isActive('month')} onClick={() => selectDate('month')}>
-                本月
+                MTD
               </a>
               <a className={isActive('year')} onClick={() => selectDate('year')}>
-                本年
+                YTD
               </a>
             </div>
             <RangePicker
@@ -64,12 +66,38 @@ const SalesCard = ({
           </div>
         }
         size="large"
-        tabBarStyle={{ marginBottom: 24 }}
+        tabBarStyle={{ marginBottom: 24, paddingLeft: 24 }}
       >
-        <TabPane tab="销售额" key="sales">
+        <TabPane tab="Users" key="sales">
           <Row>
             <Col xl={16} lg={12} md={12} sm={24} xs={24}>
-              <div className={styles.salesBar}>
+            <div className={styles.salesBar}>
+              <Line
+                forceFit
+                height={300}
+                data={offlineChartData}
+                responsive
+                xField="date"
+                yField="value"
+                seriesField="type"
+                interactions={[
+                  {
+                    type: 'slider',
+                    cfg: {},
+                  },
+                ]}
+                animate
+                smooth
+                yAxis= {{
+                  grid: null,
+                  label: null
+                }}
+                legend={{
+                  position: 'top-center',
+                }}
+              />
+            </div>
+              {/* <div className={styles.salesBar}>
                 <Column
                   height={300}
                   forceFit
@@ -90,22 +118,22 @@ const SalesCard = ({
                   }}
                   title={{
                     visible: true,
-                    text: '销售趋势',
+                    text: 'Users Trend',
                     style: {
                       fontSize: 14,
                     },
                   }}
                   meta={{
                     y: {
-                      alias: '销售量',
+                      alias: 'Users',
                     },
                   }}
                 />
-              </div>
+              </div> */}
             </Col>
             <Col xl={8} lg={12} md={12} sm={24} xs={24}>
               <div className={styles.salesRank}>
-                <h4 className={styles.rankingTitle}>门店销售额排名</h4>
+                <h4 className={styles.rankingTitle}>Top Users</h4>
                 <ul className={styles.rankingList}>
                   {rankingListData.map((item, i) => (
                     <li key={item.title}>
@@ -125,7 +153,7 @@ const SalesCard = ({
             </Col>
           </Row>
         </TabPane>
-        <TabPane tab="访问量" key="views">
+        <TabPane tab="Conversations" key="views">
           <Row>
             <Col xl={16} lg={12} md={12} sm={24} xs={24}>
               <div className={styles.salesBar}>
@@ -149,14 +177,14 @@ const SalesCard = ({
                   }}
                   title={{
                     visible: true,
-                    text: '访问量趋势',
+                    text: 'Conversations Trend',
                     style: {
                       fontSize: 14,
                     },
                   }}
                   meta={{
                     y: {
-                      alias: '访问量',
+                      alias: 'Conversations',
                     },
                   }}
                 />
@@ -164,7 +192,7 @@ const SalesCard = ({
             </Col>
             <Col xl={8} lg={12} md={12} sm={24} xs={24}>
               <div className={styles.salesRank}>
-                <h4 className={styles.rankingTitle}>门店访问量排名</h4>
+                <h4 className={styles.rankingTitle}>Top Questions</h4>
                 <ul className={styles.rankingList}>
                   {rankingListData.map((item, i) => (
                     <li key={item.title}>

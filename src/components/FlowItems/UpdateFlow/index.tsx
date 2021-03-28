@@ -5,7 +5,7 @@ import { queryFlowsFilter } from '@/pages/QuestionList/service';
 import { FormattedMessage } from '@@/plugin-locale/localeExports';
 import { Modal } from 'antd';
 const { TextArea, Search } = Input;
-import { CloseOutlined, CloudUploadOutlined, DeleteOutlined, FileAddOutlined, FunctionOutlined, LoadingOutlined, PaperClipOutlined, PlusOutlined, VideoCameraAddOutlined } from '@ant-design/icons';
+import { CloseOutlined, CloudUploadOutlined, DeleteOutlined, FileAddOutlined, FunctionOutlined, LeftOutlined, LoadingOutlined, PaperClipOutlined, PlusOutlined, RightOutlined, VideoCameraAddOutlined } from '@ant-design/icons';
 import ImgCrop from 'antd-img-crop';
 import { Tabs } from 'antd';
 import './index.less';
@@ -161,7 +161,6 @@ export const ImageComponent: FC<AttachmentComponentDataProps> = (props) => {
         key={'component' + componentKey.toString() + 'image'}
         name={'component' + componentKey.toString() + 'image'}
         initialValue={previewImage}
-        rules={[{ type: 'url', message: 'Image must be a valid URL' }]}
       >
         {uploader? <>{previewImage? 
           <Space>
@@ -177,7 +176,7 @@ export const ImageComponent: FC<AttachmentComponentDataProps> = (props) => {
             name={'component' + componentKey.toString() + 'urlimage'}
             initialValue={previewImage}
           >
-            <Search placeholder="Image URL" allowClear enterButton={<CloudUploadOutlined/>} onSearch={(value) => {
+            <Search placeholder="Image URL" allowClear disabled={previewImage !== ''} enterButton={<CloudUploadOutlined/>} onSearch={(value) => {
               setPreviewImage(value);onChange((prevState: any) => [...prevState].map((item, index) => {
               if (index === componentKey) {
                 return { ...item, data: {url: value}}
@@ -199,6 +198,7 @@ export const VideoComponent: FC<AttachmentComponentDataProps> = (props) => {
   const { componentKey, componentData, onChange } = props
   const [previewImage, setPreviewImage] = useState(componentData.url);
   const [uploading, setUploading] = useState(componentData.url?true:false);
+  const [uploader, setUploader] = useState(true);
   const draggerProps = {
     key: 'video' + componentKey.toString(),
     accept: "video/*",
@@ -238,7 +238,11 @@ export const VideoComponent: FC<AttachmentComponentDataProps> = (props) => {
   }
 
   return (
-    <Card title='Video' size='small' style={{background: 'transparent'}} bordered={false} 
+    <Card title={<Space>Video
+      <Radio.Group defaultValue={uploader} onChange={(e) => setUploader(e.target.value)}>
+        <Radio.Button value={true}>Upload</Radio.Button>
+        <Radio.Button value={false}>Input URL</Radio.Button>
+      </Radio.Group></Space>} size='small' style={{background: 'transparent'}} bordered={false} 
       extra={<Space> {previewImage?
         <Tooltip placement="top" title='Remove Video'>
           <Button shape="circle" onClick={removeImage}><DeleteOutlined/></Button>
@@ -248,24 +252,40 @@ export const VideoComponent: FC<AttachmentComponentDataProps> = (props) => {
         key={'component' + componentKey.toString() + 'image'}
         name={'component' + componentKey.toString() + 'image'}
         initialValue={previewImage}
-        rules={[{ required: true, message: 'Image is required' }]}
       >
-        {previewImage? 
+        {uploader? <>{previewImage? 
           <Space>
             <video
               key={componentKey}
               className='ImageComponent'
               controls
               src={componentData.url}/>
-            {/* <VideoDisplayComponent componentKey={componentKey.toString()} componentData={{url: previewImage}}/>
-            <Button shape="round" onClick={() => setPreviewImage('')}><DeleteOutlined/></Button> */}
           </Space>
-          : 
-          <Dragger {...draggerProps}>
-            <p style={{marginBottom: 12}}> {uploading ? <LoadingOutlined /> : <VideoCameraAddOutlined style={{ fontSize: '40px'}} />} </p>
-            <p className="ant-upload-hint">{uploading ? "Uploading" : "Click or drag video here to upload"}</p>
-          </Dragger>
-          }
+          : <Dragger {...draggerProps}>
+          <p style={{marginBottom: 12}}> {uploading ? <LoadingOutlined /> : <VideoCameraAddOutlined style={{ fontSize: '40px'}} />} </p>
+          <p className="ant-upload-hint">{uploading ? "Uploading" : "Click or drag video here to upload"}</p>
+        </Dragger>}</>: <>
+          <Form.Item
+            key={'component' + componentKey.toString() + 'urlimage'}
+            name={'component' + componentKey.toString() + 'urlimage'}
+            initialValue={previewImage}
+          >
+            <Search placeholder="Video URL" allowClear disabled={previewImage !== ''} enterButton={<CloudUploadOutlined/>} onSearch={(value) => {
+              setPreviewImage(value);onChange((prevState: any) => [...prevState].map((item, index) => {
+              if (index === componentKey) {
+                return { ...item, data: {url: value}}
+              }
+              else return item;
+            }))}} /> </Form.Item>
+            {previewImage? 
+          <Space>
+            <video
+              key={componentKey}
+              className='ImageComponent'
+              controls
+              src={componentData.url}/>
+          </Space>:<></>}</>
+        }
       </Form.Item>
     </Card>
   );
@@ -353,11 +373,15 @@ export const GenericTemplateComponent: FC<GenericTemplateComponentDataProps> = (
   };
 
   const remove = (idx: number) => {
+    console.log('Remove index', idx)
     onChange((prevState: any) => [...prevState].map((item, index) => {
       if (index === componentKey) {
         const newPanes = item.data.elements
+
+        console.log('newPanes bef', newPanes)
         newPanes.splice(idx, 1)
         setPanes(newPanes)
+        console.log('newPanes aft', newPanes, panes)
         return { ...item, data: { elements: newPanes }}
       } 
       else return item}))
@@ -370,14 +394,16 @@ export const GenericTemplateComponent: FC<GenericTemplateComponentDataProps> = (
       <div className="card-container">
         <Tabs
           type="editable-card"
+          animated={true}
           size='small'
-          onChange={(activeKey: string) => {setActiveKey(parseInt(activeKey))}}
+          onChange={(key: string) => {setActiveKey(parseInt(key))}}
           activeKey={activeKey?.toString()}
           onEdit={onEdit}
           hideAdd={!(panes.length < 10)} >
           {panes.map((pane, index: number) => {
             return (
-              <TabPane tab={index + 1} key={index.toString()} closable={panes.length !== 1} forceRender>
+              <TabPane tab={panes.length !== 1 && index === activeKey?<><LeftOutlined style={{marginRight: '0px'}}/> {index + 1} <RightOutlined style={{marginRight: '0px'}}/></>:index + 1} 
+                key={index.toString()} closable={panes.length !== 1 && index == activeKey}>
                 <TemplateComponent componentKey={index} componentData={pane} onChange={onChange} parentKey={componentKey} />
               </TabPane>
             );
