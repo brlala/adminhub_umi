@@ -187,7 +187,7 @@ radarOriginData.forEach((item) => {
   });
 });
 
-export const getFakeChartData: AnalysisData = {
+const getFakeChartData: AnalysisData = {
   visitData,
   visitData2,
   salesData,

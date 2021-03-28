@@ -39,11 +39,12 @@ const UserMetaDisplay: FC<{ userMeta: any }> = (props) => {
     () => {
       return queryCurrent(userMeta.id);
     },
-    { 
+    {
       refreshDeps: [userMeta],
       formatResult: (response) => {
-      return response.data.tags;
-    } },
+        return response.data.tags;
+      },
+    },
   );
 
   const { data: userNote, refresh: noteRefresh } = useRequest(
@@ -88,10 +89,7 @@ const UserMetaDisplay: FC<{ userMeta: any }> = (props) => {
   const handleInputConfirm = () => {
     let tags: string[];
     if (inputValue === '') {
-    } else if (
-      inputValue &&
-      userTags.filter((tag: string) => tag === inputValue).length === 0
-    ) {
+    } else if (inputValue && userTags.filter((tag: string) => tag === inputValue).length === 0) {
       tags = [...userTags, inputValue];
       run(userMeta.id, tags);
       message.success(`Tag "${inputValue}" Added`);
@@ -152,11 +150,12 @@ const UserMetaDisplay: FC<{ userMeta: any }> = (props) => {
           <TagsOutlined className="infoLogo" />
           Tags
         </div>
-        {userTags&& userTags.map((item: string) => (
-          <Tag closable onClose={() => handleDeleteTag(item)} key={'userTag' + item}>
-            {item}
-          </Tag>
-        ))}
+        {userTags &&
+          userTags.map((item: string) => (
+            <Tag closable onClose={() => handleDeleteTag(item)} key={'userTag' + item}>
+              {item}
+            </Tag>
+          ))}
         {inputVisible && (
           <AutoComplete
             onSearch={tagsRun}

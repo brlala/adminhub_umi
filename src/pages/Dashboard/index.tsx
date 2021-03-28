@@ -7,7 +7,7 @@ import { RangePickerProps } from 'antd/es/date-picker/generatePicker';
 import moment from 'moment';
 import { useRequest } from 'umi';
 
-import { demoChartData } from './service';
+import { fakeChartData } from './service';
 import PageLoading from './components/PageLoading';
 import { TimeType } from './components/SalesCard';
 import { getTimeDistance } from './utils/utils';
@@ -36,9 +36,8 @@ const Analysis: FC<AnalysisProps> = () => {
     getTimeDistance('year'),
   );
 
-  const { loading, data } = useRequest(demoChartData);
+  const { loading, data } = useRequest(fakeChartData);
 
-  {console.log('data', data)}
   const selectDate = (type: TimeType) => {
     setRangePickerValue(getTimeDistance(type));
   };
