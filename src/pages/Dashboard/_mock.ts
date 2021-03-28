@@ -127,7 +127,6 @@ for (let i = 0; i < 10; i += 1) {
 const offlineChartData = [];
 for (let i = 0; i < 20; i += 1) {
   const date = moment(new Date().getDate() + i * 24 * 60 * 60 * 1000).format('MM-DD');
-  console.log('date', date)
   offlineChartData.push({
     date,
     type: 'Active Users',
