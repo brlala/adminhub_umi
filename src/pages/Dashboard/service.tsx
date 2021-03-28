@@ -1,5 +1,4 @@
-import request from 'umi-request';
-import { AnalysisData } from './data';
+import { AnalysisData } from './data.d';
 import { getFakeChartData } from './_mock';
 
 export async function demoChartData(): Promise<{ data: AnalysisData }> {

@@ -5,9 +5,8 @@ import { Col, Row, Tooltip } from 'antd';
 import React from 'react';
 import numeral from 'numeral';
 import { ChartCard, Field } from './Charts';
-import { DataItem } from '../data';
+import { DataItem } from '../data.d';
 import Trend from './Trend';
-import Yuan from '../utils/Yuan';
 import styles from '../style.less';
 
 const topColResponsiveProps = {
@@ -24,23 +23,23 @@ const IntroduceRow = ({ loading, visitData }: { loading: boolean; visitData: Dat
     <Col {...topColResponsiveProps}>
       <ChartCard
         bordered={false}
-        title="总销售额"
+        title="Total User Messages"
         action={
-          <Tooltip title="指标说明">
+          <Tooltip title="Total number of messages sent by users">
             <InfoCircleOutlined />
           </Tooltip>
         }
         loading={loading}
-        total={() => <Yuan>126560</Yuan>}
-        footer={<Field label="日销售额" value={`￥${numeral(12423).format('0,0')}`} />}
+        total='1,126,560'
+        footer={<Field label="Daily User Messages" value='12,423' />}
         contentHeight={46}
       >
         <Trend flag="up" style={{ marginRight: 16 }}>
-          周同比
+          Monthly Trend
           <span className={styles.trendText}>12%</span>
         </Trend>
         <Trend flag="down">
-          日同比
+          Weekly Trend
           <span className={styles.trendText}>11%</span>
         </Trend>
       </ChartCard>
@@ -50,23 +49,21 @@ const IntroduceRow = ({ loading, visitData }: { loading: boolean; visitData: Dat
       <ChartCard
         bordered={false}
         loading={loading}
-        title="访问量"
+        title="Total Users"
         action={
-          <Tooltip title="指标说明">
+          <Tooltip title="Total Users">
             <InfoCircleOutlined />
           </Tooltip>
         }
-        total={numeral(8846).format('0,0')}
-        footer={<Field label="日访问量" value={numeral(1234).format('0,0')} />}
+        total='108,846'
+        footer={<Field label="Daily New Users" value='5' />}
         contentHeight={46}
       >
         {console.log(visitData)}
         <TinyArea
           color="#975FE4"
-          xField="x"
+          line={{size: 0}}
           height={46}
-          forceFit
-          yField="y"
           smooth
           data={visitData.map(d => d.y)}
         />
@@ -76,14 +73,14 @@ const IntroduceRow = ({ loading, visitData }: { loading: boolean; visitData: Dat
       <ChartCard
         bordered={false}
         loading={loading}
-        title="支付笔数"
+        title="Total Conversations"
         action={
-          <Tooltip title="指标说明">
+          <Tooltip title="Conversations is consecutive user messages with no more than 3 minutes break">
             <InfoCircleOutlined />
           </Tooltip>
         }
         total={numeral(6560).format('0,0')}
-        footer={<Field label="转化率" value="60%" />}
+        footer={<Field label="Returning User Rate" value="60%" />}
         contentHeight={46}
       >
         <TinyColumn xField="x" height={46} forceFit yField="y" data={visitData.map(d => d.y)} />
@@ -93,7 +90,7 @@ const IntroduceRow = ({ loading, visitData }: { loading: boolean; visitData: Dat
       <ChartCard
         loading={loading}
         bordered={false}
-        title="运营活动效果"
+        title="Campaign Score Board"
         action={
           <Tooltip title="指标说明">
             <InfoCircleOutlined />
@@ -103,11 +100,11 @@ const IntroduceRow = ({ loading, visitData }: { loading: boolean; visitData: Dat
         footer={
           <div style={{ whiteSpace: 'nowrap', overflow: 'hidden' }}>
             <Trend flag="up" style={{ marginRight: 16 }}>
-              周同比
+              Monthly Trend
               <span className={styles.trendText}>12%</span>
             </Trend>
             <Trend flag="down">
-              日同比
+              Weekly Trend
               <span className={styles.trendText}>11%</span>
             </Trend>
           </div>

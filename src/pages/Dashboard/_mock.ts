@@ -1,6 +1,6 @@
 import moment from 'moment';
 import { Request, Response } from 'express';
-import { AnalysisData, RadarData, DataItem } from './data';
+import { AnalysisData, RadarData, DataItem } from './data.d';
 
 // mock data
 const visitData: DataItem[] = [];
@@ -34,7 +34,7 @@ const searchData = [];
 for (let i = 0; i < 50; i += 1) {
   searchData.push({
     index: i + 1,
-    keyword: `搜索关键词-${i}`,
+    keyword: `Keyword-${i}`,
     count: Math.floor(Math.random() * 1000),
     range: Math.floor(Math.random() * 100),
     status: Math.floor((Math.random() * 10) % 2),
@@ -42,77 +42,77 @@ for (let i = 0; i < 50; i += 1) {
 }
 const salesTypeData = [
   {
-    x: '家用电器',
+    x: 'Product A',
     y: 4544,
   },
   {
-    x: '食用酒水',
+    x: 'Product B',
     y: 3321,
   },
   {
-    x: '个护健康',
+    x: 'PRoduct C',
     y: 3113,
   },
   {
-    x: '服饰箱包',
+    x: 'Promotions',
     y: 2341,
   },
   {
-    x: '母婴产品',
+    x: 'Packages',
     y: 1231,
   },
   {
-    x: '其他',
+    x: 'Others',
     y: 1231,
   },
 ];
 
 const salesTypeDataOnline = [
   {
-    x: '家用电器',
+    x: 'Product A',
     y: 244,
   },
   {
-    x: '食用酒水',
+    x: 'Product B',
     y: 321,
   },
   {
-    x: '个护健康',
+    x: 'Product C',
     y: 311,
   },
   {
-    x: '服饰箱包',
+    x: 'Promotions',
     y: 41,
   },
   {
-    x: '母婴产品',
+    x: 'Packages',
     y: 121,
   },
   {
-    x: '其他',
+    x: 'Others',
     y: 111,
   },
 ];
 
 const salesTypeDataOffline = [
   {
-    x: '家用电器',
+    x: 'Product A',
     y: 99,
   },
   {
-    x: '食用酒水',
+    x: 'Product B',
     y: 188,
   },
   {
-    x: '个护健康',
+    x: 'Product C',
     y: 344,
   },
   {
-    x: '服饰箱包',
+    x: 'Promotions',
     y: 255,
   },
   {
-    x: '其他',
+    x: 'Others',
     y: 65,
   },
 ];
@@ -126,15 +126,16 @@ for (let i = 0; i < 10; i += 1) {
 }
 const offlineChartData = [];
 for (let i = 0; i < 20; i += 1) {
-  const date = moment(new Date().getTime() + 1000 * 60 * 30 * i).format('HH:mm');
+  const date = moment(new Date().getDate() + i * 24 * 60 * 60 * 1000).format('MM-DD');
+  console.log('date', date)
   offlineChartData.push({
     date,
-    type: '客流量',
+    type: 'Active Users',
     value: Math.floor(Math.random() * 100) + 10,
   });
   offlineChartData.push({
     date,
-    type: '支付笔数',
+    type: 'New Users',
     value: Math.floor(Math.random() * 100) + 10,
   });
 }

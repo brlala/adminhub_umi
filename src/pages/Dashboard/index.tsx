@@ -11,7 +11,7 @@ import { demoChartData } from './service';
 import PageLoading from './components/PageLoading';
 import { TimeType } from './components/SalesCard';
 import { getTimeDistance } from './utils/utils';
-import { AnalysisData } from './data';
+import { AnalysisData } from './data.d';
 import styles from './style.less';
 
 const IntroduceRow = React.lazy(() => import('./components/IntroduceRow'));
@@ -112,6 +112,7 @@ const Analysis: FC<AnalysisProps> = () => {
             salesData={data?.salesData || []}
             isActive={isActive}
             handleRangePickerChange={handleRangePickerChange}
+            offlineChartData={data?.offlineChartData || []}
             loading={loading}
             selectDate={selectDate}
           />
@@ -145,7 +146,7 @@ const Analysis: FC<AnalysisProps> = () => {
             </Suspense>
           </Col>
         </Row>
-
+{/* 
         <Suspense fallback={null}>
           <OfflineData
             activeKey={activeKey}
@@ -154,7 +155,7 @@ const Analysis: FC<AnalysisProps> = () => {
             offlineChartData={data?.offlineChartData || []}
             handleTabChange={handleTabChange}
           />
-        </Suspense>
+        </Suspense> */}
       </>
     </GridContent>
   );

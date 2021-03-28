@@ -52,8 +52,9 @@ const UserMetaDisplay: FC<{ userMeta: any }> = (props) => {
     },
     { 
       refreshDeps: [userMeta],
+      onSuccess: (response) => setNoteValue(response),
       formatResult: (response) => {
-      return response.data.note;
+      return response.data.chatbot.note;
     } },
   );
 
@@ -196,15 +197,17 @@ const UserMetaDisplay: FC<{ userMeta: any }> = (props) => {
         {noteVisible && (
           <TextArea
             ref={ref}
+            autoSize={{maxRows: 6}}
             value={noteValue}
             onChange={(e) => {
               setNoteValue(e.target.value);
             }}
+            
             onBlur={handleNoteConfirm}
           />
         )}
         {!noteVisible && (<>
-          {userNote?<div onClick={showNote} >{userNote}</div>:
+          {userNote?<div onClick={showNote} style={{whiteSpace: "pre-wrap", height: '150px', overflow: 'scroll'}} >{userNote}</div>:
             <Tag onClick={showNote} style={{ borderStyle: 'dashed' }}>
               <PlusOutlined />
             </Tag>}</>
