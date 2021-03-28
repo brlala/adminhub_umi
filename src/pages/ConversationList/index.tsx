@@ -267,7 +267,14 @@ const ConversationList: FC = () => {
             key={'convoList' + item.user.id}
           />
           <Row wrap={false}>
-            {item.fullname?<Col flex='45px'><Avatar style={ColorList[item.fullname.trim().charCodeAt(0)%5]}>{item.fullname.trim()[0]}</Avatar></Col>: <></>}
+            {item.fullname?<Col flex='45px'>
+                <img
+                  style={{height: '35px'}}
+                  alt=""
+                  src="https://gw.alipayobjects.com/zos/antfincdn/XAosXuNZyF/BiazfanxmamNRoxxVxka.png"
+                />
+              {/* <Avatar style={ColorList[item.fullname.trim().charCodeAt(0)%5]}>{item.fullname.trim()[0]}</Avatar> */}
+              </Col>: <></>}
             <Col flex='auto'>
               <Row wrap={false}>
                 <Col
@@ -325,7 +332,14 @@ const ConversationList: FC = () => {
           <div className="selectable">
 
             <Row wrap={false}>
-              {item.fullname?<Col flex='45px'><Avatar style={ColorList[item.fullname.trim().charCodeAt(0)%5]}>{item.fullname.trim()[0]}</Avatar></Col>: <></>}
+              {item.fullname?<Col flex='45px'>
+                <img
+                  style={{height: '35px'}}
+                  alt=""
+                  src="https://gw.alipayobjects.com/zos/antfincdn/XAosXuNZyF/BiazfanxmamNRoxxVxka.png"
+                />
+                {/* <Avatar style={ColorList[item.fullname.trim().charCodeAt(0)%5]}>{item.fullname.trim()[0]}</Avatar> */}
+                </Col>: <></>}
               <Col flex='auto'>
                 <Row wrap={false}>
                   <Col

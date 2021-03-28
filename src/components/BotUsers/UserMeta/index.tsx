@@ -117,8 +117,12 @@ const UserMetaDisplay: FC<{ userMeta: any }> = (props) => {
   return (
     <div>
       <div className="avatarHolder">
-        {userMeta.firstName?<Avatar size={96} style={ColorList[userMeta.firstName.charCodeAt(0)%5]} > <div style={{fontSize: '64px'}}>{userMeta.firstName[0]}</div></Avatar>:
-        <Avatar size={96} style={ColorList[userMeta.facebook.id.charCodeAt(0)%5]} > <div style={{fontSize: '64px'}}>{userMeta.facebook.id[0]}</div></Avatar>}
+        <img
+          alt=""
+          src="https://gw.alipayobjects.com/zos/antfincdn/XAosXuNZyF/BiazfanxmamNRoxxVxka.png"
+        />
+        {/* {userMeta.firstName?<Avatar size={96} style={ColorList[userMeta.firstName.charCodeAt(0)%5]} > <div style={{fontSize: '64px'}}>{userMeta.firstName[0]}</div></Avatar>:
+        <Avatar size={96} style={ColorList[userMeta.facebook.id.charCodeAt(0)%5]} > <div style={{fontSize: '64px'}}>{userMeta.facebook.id[0]}</div></Avatar>} */}
       </div>
       <div className="avatarHolder">
         <Space direction="vertical">
