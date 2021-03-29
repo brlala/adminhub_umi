@@ -59,12 +59,13 @@ const IntroduceRow = ({ loading, visitData }: { loading: boolean; visitData: Dat
         footer={<Field label="Daily New Users" value='5' />}
         contentHeight={46}
       >
+        {console.log(visitData)}
         <TinyArea
           color="#975FE4"
           line={{size: 0}}
           height={46}
           smooth
-          data={visitData.map((d) => d.y)}
+          data={visitData.map(d => d.y)}
         />
       </ChartCard>
     </Col>
@@ -82,7 +83,7 @@ const IntroduceRow = ({ loading, visitData }: { loading: boolean; visitData: Dat
         footer={<Field label="Returning User Rate" value="60%" />}
         contentHeight={46}
       >
-        <TinyColumn xField="x" height={46} forceFit yField="y" data={visitData.map((d) => d.y)} />
+        <TinyColumn xField="x" height={46} forceFit yField="y" data={visitData.map(d => d.y)} />
       </ChartCard>
     </Col>
     <Col {...topColResponsiveProps}>
