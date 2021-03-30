@@ -32,7 +32,7 @@ export async function queryTopics() {
   const topics: string[] = await request('http://localhost:5000/questions/topics');
   let results: DropdownProps[] = [];
   topics.forEach((topic) => results.push({ label: topic, value: topic, id: topic }));
-  return results;
+  return {data: results};
 }
 
 export async function queryFlowsFilter(field: string) {

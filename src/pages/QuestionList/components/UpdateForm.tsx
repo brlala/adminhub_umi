@@ -13,6 +13,7 @@ import { editQuestion, queryFlowsFilter, queryTopics } from '@/pages/QuestionLis
 import { FormattedMessage } from '@@/plugin-locale/localeExports';
 import PlusOutlined from '@ant-design/icons/lib/icons/PlusOutlined';
 import moment from 'moment';
+import { useRequest } from 'umi';
 
 export type FormValueType = {
   target?: string;
@@ -57,11 +58,11 @@ const NewForm: React.FC<NewFormProps> = ({
 }) => {
   const [responseType, setResponseType] = useState<string>();
   const [newTopic, setNewTopic] = useState<string>('');
+  const [flow, setFlow] = useState<string>('');
   const [topics, setTopics] = useState<DropdownProps[]>([]);
-  const [flows, setFlows] = useState<DropdownProps[]>([]);
   const [questionBody, setQuestionBody] = useState({});
   const dateFormat = 'YYYY/MM/DD';
-  const onDropdownTopicChange = (event) => {
+  const onDropdownTopicChange = (event: any) => {
     setNewTopic(event.target.value);
   };
 
@@ -79,7 +80,8 @@ const NewForm: React.FC<NewFormProps> = ({
       }
 
       const responseSelect = values.answerFlow?.name ? 'flow' : 'text';
-      const flowResponseId = responseSelect === 'flow' ? values.answerFlow.id : null;
+      const flowResponseId = responseSelect === 'flow' ? flow : null;
+      console.log(flow)
 
       const body = {
         id: values.id,
@@ -98,10 +100,20 @@ const NewForm: React.FC<NewFormProps> = ({
     }
   }, [editModalVisible]);
 
+  const { data, refresh } = useRequest(queryTopics, 
+    {
+      formatResult: (response) => {
+        console.log('response', response)
+        return [ ...topics, ...response.data];
+      }
+    });
+    
   const addNewTopic = () => {
-    const topic: DropdownProps = { key: newTopic, value: newTopic, label: newTopic };
+    if (newTopic === '') return 
+    const topic: DropdownProps = { id: newTopic, value: newTopic, label: newTopic };
     setTopics([topic, ...topics]);
     setNewTopic('');
+    refresh();
   };
 
   let responseArea;
@@ -111,17 +123,6 @@ const NewForm: React.FC<NewFormProps> = ({
         width="xl"
         label="Response"
         name="textResponse"
-        // rules={[
-        //   {
-        //     required: true,
-        //     message: (
-        //       <FormattedMessage
-        //         id="pages.searchTable.response"
-        //         defaultMessage="Response is required"
-        //       />
-        //     ),
-        //   },
-        // ]}
       />
     );
   } else {
@@ -131,30 +132,20 @@ const NewForm: React.FC<NewFormProps> = ({
         name="flowResponse"
         label="Response"
         showSearch
+        fieldProps={{ onSelect: (e, option) => {
+          setFlow(option.id)
+        }}}
         // @ts-ignore
         request={async () => {
-          const flowsRequest = await queryFlowsFilter('name,params');
-          setFlows(flowsRequest);
+          return await queryFlowsFilter('name,params');
         }}
-        options={flows}
-        // rules={[
-        //   {
-        //     required: true,
-        //     message: (
-        //       <FormattedMessage
-        //         id="pages.searchTable.response"
-        //         defaultMessage="Response is required"
-        //       />
-        //     ),
-        //   },
-        // ]}
       />
     );
   }
   return (
     <StepsForm
       onFinish={async (valueStore) => {
-        const newValues = { ...valueStore, responseType, id: questionBody.id };
+        const newValues = { ...valueStore, responseType, id: questionBody.id, flowResponse: flow };
         const success = await handleEdit((newValues as unknown) as newQuestionItem);
         if (success) {
           handleEditModalVisible(false);
@@ -196,12 +187,7 @@ const NewForm: React.FC<NewFormProps> = ({
         }}
       >
         <ProFormSelect
-          // @ts-ignore
-          request={async () => {
-            const t = await queryTopics();
-            setTopics(t);
-          }}
-          options={topics}
+          options={data}
           fieldProps={{
             dropdownRender: (menu) => (
               <div>
@@ -253,10 +239,6 @@ const NewForm: React.FC<NewFormProps> = ({
           ]}
           placeholder="Please type the main question"
         />
-        {/*<ProFormTextArea width="xs" label="Variations" name="variations" />*/}
-        {/*<ProFormTextArea width="sm" label="Variations" name="variations" />*/}
-        {/*<ProFormTextArea width="md" label="Variations" name="variations" />*/}
-        {/*<ProFormTextArea width="lg" label="Variations" name="variations" />*/}
         <ProFormTextArea width="xl" label="Variations" name="variations" />
       </StepsForm.StepForm>
       <StepsForm.StepForm

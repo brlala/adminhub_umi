@@ -9,16 +9,10 @@ import { CloseOutlined, CloudUploadOutlined, DeleteOutlined, FileAddOutlined, Fu
 import ImgCrop from 'antd-img-crop';
 import { Tabs } from 'antd';
 import './index.less';
-import { DropdownProps } from '@/pages/QuestionList/data';
 import Dragger from 'antd/lib/upload/Dragger'
 import { AttachmentComponentDataProps, TextComponentDataProps, GenericTemplateComponentDataProps, TemplateComponentDataProps, ButtonTemplateComponentDataProps, FlowComponentDataProps,QuickReplyComponentDataProps, Buttons, CustomComponentDataProps, InputComponentDataProps, QrButtons } from './data';
 import ButtonGroup from 'antd/lib/button/button-group';
-import { request, useRequest } from 'umi';
-import { valuesIn } from 'lodash';
-
 const { TabPane } = Tabs;
-const { Text } = Typography;
-const { Option } = Select;
 
 export const handleDelete = (componentKey: number, onChange: any) => {
   onChange((prevState: any[]) => {

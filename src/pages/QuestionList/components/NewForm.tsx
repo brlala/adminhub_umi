@@ -12,7 +12,7 @@ import type { ActionType } from '@ant-design/pro-table';
 import { addQuestion, queryFlowsFilter, queryTopics } from '@/pages/QuestionList/service';
 import { FormattedMessage } from '@@/plugin-locale/localeExports';
 import PlusOutlined from '@ant-design/icons/lib/icons/PlusOutlined';
-import styles from './NewForm.less';
+import { useRequest } from 'umi';
 
 export type FormValueType = {
   target?: string;
@@ -49,18 +49,28 @@ const handleAdd = async (fields: newQuestionItem) => {
 const NewForm: React.FC<NewFormProps> = ({ createModalVisible, handleModalVisible, actionRef }) => {
   const [responseType, setResponseType] = useState<string>('text');
   const [newTopic, setNewTopic] = useState<string>('');
+  const [flow, setFlow] = useState<string>('');
   const [topics, setTopics] = useState<DropdownProps[]>([]);
-  const [flows, setFlows] = useState<DropdownProps[]>([]);
   const [form] = Form.useForm();
 
-  const onDropdownTopicChange = (event) => {
+  const onDropdownTopicChange = (event: any) => {
     setNewTopic(event.target.value);
   };
 
+  const { data, refresh } = useRequest(queryTopics, 
+    {
+      formatResult: (response) => {
+        console.log('response', response)
+        return [ ...topics, ...response.data];
+      }
+    });
+
   const addNewTopic = () => {
-    const topic: DropdownProps = { key: newTopic, value: newTopic, label: newTopic };
+    if (newTopic === '') return 
+    const topic: DropdownProps = { id: newTopic, value: newTopic, label: newTopic };
     setTopics([topic, ...topics]);
     setNewTopic('');
+    refresh();
   };
 
   let responseArea;
@@ -89,20 +99,15 @@ const NewForm: React.FC<NewFormProps> = ({ createModalVisible, handleModalVisibl
     responseArea = (
       <ProFormSelect
         width="xl"
-        prop
         name="flowResponse"
         label="Response"
         showSearch
-        // request={async () => {
-        //   const topics = await queryTopics();
-        //   setTopics(topics);
-        // }}
-        // options={topics}
+        fieldProps={{ onSelect: (e, option) => {
+          setFlow(option.id)
+        }}}
         request={async () => {
-          const flows = await queryFlowsFilter('name,params');
-          setFlows(flows);
+          return await queryFlowsFilter('name,params');
         }}
-        options={flows}
         rules={[
           {
             required: true,
@@ -120,7 +125,7 @@ const NewForm: React.FC<NewFormProps> = ({ createModalVisible, handleModalVisibl
   return (
     <StepsForm
       onFinish={async (values) => {
-        const newValues = { ...values, responseType };
+        const newValues = { ...values, responseType, flowResponse: flow };
         console.log(newValues);
         const success = await handleAdd((newValues as unknown) as newQuestionItem);
         if (success) {
@@ -159,11 +164,7 @@ const NewForm: React.FC<NewFormProps> = ({ createModalVisible, handleModalVisibl
         }}
       >
         <ProFormSelect
-          request={async () => {
-            return await queryTopics();
-            // setTopics(topics);
-          }}
-          // options={topics}
+          options={data}
           fieldProps={{
             dropdownRender: (menu) => (
               <div>
@@ -215,10 +216,6 @@ const NewForm: React.FC<NewFormProps> = ({ createModalVisible, handleModalVisibl
           ]}
           placeholder="Please type the main question"
         />
-        {/*<ProFormTextArea width="xs" label="Variations" name="variations" />*/}
-        {/*<ProFormTextArea width="sm" label="Variations" name="variations" />*/}
-        {/*<ProFormTextArea width="md" label="Variations" name="variations" />*/}
-        {/*<ProFormTextArea width="lg" label="Variations" name="variations" />*/}
         <ProFormTextArea
           width="xl"
           label="Variations"

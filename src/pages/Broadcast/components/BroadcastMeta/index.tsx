@@ -94,7 +94,7 @@ const BroadcastMeta: FC = (props) => {
           >
             {tags &&
               tags.map((i: string) => {
-                return <Option key={i}>{i}</Option>;
+                return <Option key={i} value={i}>{i}</Option>;
               })}
           </Select>
         </FormItem>
