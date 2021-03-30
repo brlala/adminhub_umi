@@ -26,10 +26,15 @@ import {
 import moment from 'moment';
 import { useRequest } from 'umi';
 import {
+  ArrowLeftOutlined,
+  ArrowRightOutlined,
   DownOutlined,
   FilterFilled,
   FilterOutlined,
+  LeftCircleOutlined,
+  LeftOutlined,
   ReloadOutlined,
+  RightOutlined,
   SearchOutlined,
   UpOutlined,
 } from '@ant-design/icons';
@@ -37,6 +42,7 @@ import { BotUsers, ConversationUsers } from './data';
 import TagSelect from '../../components/TagSelect';
 import ConversationDisplay from '@/components/BotUsers/Conversations';
 import UserMetaDisplay from '@/components/BotUsers/UserMeta';
+import { faArrowCircleRight } from '@fortawesome/free-solid-svg-icons';
 
 moment.locale('en-us');
 const { Text } = Typography;
@@ -284,10 +290,10 @@ const ConversationList: FC = () => {
                   <span style={{ fontWeight: 'bolder', marginRight: '6px' }}>{item.fullname} </span>
                 </Col>
                 <Col
-                  flex="70px"
+                  flex="120px"
                   style={{ fontSize: '11px', textAlign: 'right', color: 'rgba(0,0,0,0.45)' }}
                 >
-                  {moment(item.lastMessageDate).format('MM-DD HH:mm')}{' '}
+                  {moment(item.lastMessageDate).format('YYYY-MM-DD HH:mm')}{' '}
                 </Col>
               </Row>
               <Row style={{ width: '100%' }}>
@@ -367,10 +373,10 @@ const ConversationList: FC = () => {
                     )}
                   </Col>
                   <Col
-                    flex="70px"
+                    flex="120px"
                     style={{ fontSize: '11px', textAlign: 'right', color: 'rgba(0,0,0,0.45)' }}
                   >
-                    {moment(item.lastMessage.createdAt).format('MM-DD HH:mm')}{' '}
+                    {moment(item.lastMessage.createdAt).format('YYYY-MM-DD HH:mm')}{' '}
                   </Col>
                 </Row>
                 <Row style={{ width: '100%' }}>
@@ -450,7 +456,14 @@ const ConversationList: FC = () => {
                 <ConversationDisplay
                   data={convoData.list}
                   loading={convoLoading}
-                  pagination={convoPagination}
+                  pagination={{...convoPagination, 
+                    showSizeChanger: true,
+                    itemRender: (page, type: 'page' | 'prev' | 'next', originalElement) => {
+                    if (type === 'prev') return <a style={{marginRight: '10px'}}><LeftOutlined/> Newer</a>
+                    else if (type === 'next') return <a style={{marginLeft: '10px'}}>Older <RightOutlined/></a>
+                    return originalElement
+
+                  }}}
                   style={{ height: 'calc(100vh - 285px)' }}
                   searchQuery={searchQuery}
                 />
@@ -462,7 +475,13 @@ const ConversationList: FC = () => {
                 <ConversationDisplay
                   data={messageData.list}
                   loading={messageLoading}
-                  pagination={messagePagination}
+                  pagination={{...messagePagination, 
+                    itemRender: (page, type: 'page' | 'prev' | 'next', originalElement) => {
+                    if (type === 'prev') return <a style={{marginRight: '10px'}}><LeftOutlined/> Newer</a>
+                    else if (type === 'next') return <a style={{marginLeft: '10px'}}>Older <RightOutlined/></a>
+                    return originalElement
+
+                  }}}
                   searchQuery={searchQuery}
                 />
               )}

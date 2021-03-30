@@ -31,14 +31,14 @@ export async function queryQuestions(params?: QuestionListParams) {
 export async function queryTopics() {
   const topics: string[] = await request('http://localhost:5000/questions/topics');
   let results: DropdownProps[] = [];
-  topics.forEach((topic) => results.push({ label: topic, value: topic, key: topic }));
+  topics.forEach((topic) => results.push({ label: topic, value: topic, id: topic }));
   return results;
 }
 
 export async function queryFlowsFilter(field: string) {
   const flows: any = await request(`http://localhost:5000/flows/fields?field=${field}`);
   let results: DropdownProps[] = [];
-  flows.forEach((flow: any) => results.push({ label: flow.name, value: flow.id, key: flow.id }));
+  flows.forEach((flow: any) => results.push({ label: flow.name, value: flow.name, id: flow.id }));
   return results;
 }
 

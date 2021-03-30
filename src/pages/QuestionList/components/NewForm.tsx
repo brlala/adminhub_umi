@@ -160,10 +160,10 @@ const NewForm: React.FC<NewFormProps> = ({ createModalVisible, handleModalVisibl
       >
         <ProFormSelect
           request={async () => {
-            const topics = await queryTopics();
-            setTopics(topics);
+            return await queryTopics();
+            // setTopics(topics);
           }}
-          options={topics}
+          // options={topics}
           fieldProps={{
             dropdownRender: (menu) => (
               <div>
