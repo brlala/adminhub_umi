@@ -1,17 +1,18 @@
-import React, { FC, Suspense, useState } from 'react';
+import type { FC } from 'react';
+import React, { Suspense, useState } from 'react';
 import { EllipsisOutlined } from '@ant-design/icons';
 import { Col, Dropdown, Menu, Row } from 'antd';
 import { GridContent } from '@ant-design/pro-layout';
-import { RadioChangeEvent } from 'antd/es/radio';
-import { RangePickerProps } from 'antd/es/date-picker/generatePicker';
-import moment from 'moment';
+import type { RadioChangeEvent } from 'antd/es/radio';
+import type { RangePickerProps } from 'antd/es/date-picker/generatePicker';
+import type moment from 'moment';
 import { useRequest } from 'umi';
 
 import { demoChartData } from './service';
 import PageLoading from './components/PageLoading';
-import { TimeType } from './components/TrendlineCard';
+import type { TimeType } from './components/TrendlineCard';
 import { getTimeDistance } from './utils/utils';
-import { AnalysisData } from './data.d';
+import type { AnalysisData } from './data.d';
 import styles from './style.less';
 import { WordCloud } from '@ant-design/charts';
 import TopQuestions from './components/TopQuestions';
@@ -20,7 +21,7 @@ const IntroduceRow = React.lazy(() => import('./components/IntroduceRow'));
 const SalesCard = React.lazy(() => import('./components/TrendlineCard'));
 const TopSearch = React.lazy(() => import('./components/TopSearch'));
 const ProportionSales = React.lazy(() => import('./components/ProportionSales'));
-const WordCloudCard = React.lazy(() => import('./components/WordCloud'))
+const WordCloudCard = React.lazy(() => import('./components/WordCloud'));
 
 type RangePickerValue = RangePickerProps<moment.Moment>['value'];
 
@@ -38,9 +39,11 @@ const Analysis: FC<AnalysisProps> = () => {
   );
 
   const { loading, data } = useRequest(demoChartData);
-  console.log('data', 'data')
+  console.log('data', 'data');
 
-  {console.log('data', data)}
+  {
+    console.log('data', data);
+  }
   const selectDate = (type: TimeType) => {
     setRangePickerValue(getTimeDistance(type));
   };
@@ -99,19 +102,18 @@ const Analysis: FC<AnalysisProps> = () => {
     <GridContent>
       <>
         <Suspense fallback={<PageLoading />}>
-          <IntroduceRow/>
+          <IntroduceRow />
         </Suspense>
 
         <Suspense fallback={null}>
-              <SalesCard
-                rangePickerValue={rangePickerValue}
-                salesData={data?.salesData || []}
-                handleRangePickerChange={handleRangePickerChange}
-                offlineChartData={data?.offlineChartData || []}           
-                loading={loading}
-                selectDate={selectDate}
-              />
-            </Suspense>
+          <SalesCard
+            rangePickerValue={rangePickerValue}
+            salesData={data?.salesData || []}
+            handleRangePickerChange={handleRangePickerChange}
+            offlineChartData={data?.offlineChartData || []}
+            selectDate={selectDate}
+          />
+        </Suspense>
         {/* <Row
           gutter={24}
         >
@@ -121,7 +123,7 @@ const Analysis: FC<AnalysisProps> = () => {
                 rangePickerValue={rangePickerValue}
                 salesData={data?.salesData || []}
                 handleRangePickerChange={handleRangePickerChange}
-                offlineChartData={data?.offlineChartData || []}           
+                offlineChartData={data?.offlineChartData || []}
                 loading={loading}
                 selectDate={selectDate}
               />
@@ -136,7 +138,7 @@ const Analysis: FC<AnalysisProps> = () => {
               />
             </Suspense>
           </Col>
-          
+
         </Row> */}
 
         <Row
