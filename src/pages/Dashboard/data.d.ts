@@ -44,3 +44,32 @@ export interface AnalysisData {
   salesTypeDataOffline: DataItem[];
   radarData: RadarData[];
 }
+
+
+export interface SummaryBoxData {
+  daily: number;
+  monthlyTarget: {count: number, target: number};
+  monthlyTrend: number;
+  total: number;
+  weeklyTarget: {count: number, target: number};
+  weeklyTrend: number;
+}
+
+export interface UserTrendData{
+  date: string; 
+  newUser: number; 
+  activeUser: number; 
+  total: number;
+}
+
+export interface MessageTrendData{
+  date: string; 
+  postback: number; 
+  message: number; 
+  total: number;
+}
+
+export interface ConversationTrendData{
+  date: string; 
+  total: number;
+}

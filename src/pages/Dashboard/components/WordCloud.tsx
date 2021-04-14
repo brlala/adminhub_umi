@@ -1,9 +1,9 @@
 import { FireFilled, InfoCircleOutlined } from '@ant-design/icons';
 import { Card, Col, Row, Table, Tooltip } from 'antd';
-import { TinyArea } from '@ant-design/charts';
+import { TinyArea, WordCloud } from '@ant-design/charts';
 import React from 'react';
 import numeral from 'numeral';
-import { DataItem } from '../data.d';
+import { DataItem } from '../data';
 
 import NumberInfo from './NumberInfo';
 import Trend from './Trend';
@@ -60,7 +60,7 @@ const columns = [
   },
 ];
 
-const TopSearch = ({
+const WordCloudCard = ({
   visitData2,
   searchData,
   dropdownGroup,
@@ -70,65 +70,34 @@ const TopSearch = ({
   searchData: DataItem[];
 }) => {
 
-  const { data, loading } = useRequest('http://localhost:5000/dashboard/bottom-part/questions-trend')
-  const dataSoure = data?.table||[]
-  return (
-  <Card
+  const { data, loading } = useRequest('http://localhost:5000/dashboard/bottom-part/word-cloud')
+  var config = {
+    data: data,
+    height: 300,
+    wordField: 'id',
+    weightField: 'count',
+    colorField: 'id',
+    wordStyle: {
+      fontFamily: 'Helvetica Neue',
+      fontSize: [16, 64],
+      rotation: 0,
+    },
+    random: function random() {
+      return 0.5;
+    },
+  };
+  return <Card
     loading={loading}
     bordered={false}
-    title="Trending Questions"
-    extra={dropdownGroup}
+    title="Word Cloud"
     style={{
       height: '100%',
     }}
   >
-    {/* <Row gutter={68}>
-      <Col sm={12} xs={24} style={{ marginBottom: 24 }}>
-        <NumberInfo
-          subTitle={
-            <span>
-              Total Number
-              <Tooltip title="指标说明">
-                <InfoCircleOutlined style={{ marginLeft: 8 }} />
-              </Tooltip>
-            </span>
-          }
-          gap={8}
-          total={numeral(12321).format('0,0')}
-          status="up"
-          subTotal={17.1}
-        />
-        <TinyArea xField="x" height={45} forceFit yField="y" smooth data={visitData2.map(d => d.y)} />
-      </Col>
-      <Col sm={12} xs={24} style={{ marginBottom: 24 }}>
-        <NumberInfo
-          subTitle={
-            <span>
-              Average Number
-              <Tooltip title="指标说明">
-                <InfoCircleOutlined style={{ marginLeft: 8 }} />
-              </Tooltip>
-            </span>
-          }
-          total={2.7}
-          status="down"
-          subTotal={26.2}
-          gap={8}
-        />
-        <TinyArea xField="x" height={45} forceFit yField="y" smooth data={visitData2.map(d => d.y)} />
-      </Col>
-    </Row> */}
-    <Table<any>
-      rowKey={(record) => record.index}
-      size="small"
-      columns={columns}
-      dataSource={dataSoure}
-      pagination={{
-        style: { marginBottom: 0 },
-        pageSize: 10,
-      }}
-    />
+    <div>
+      <WordCloud {...config} />
+    </div>
   </Card>
-)};
+};
 
-export default TopSearch;
+export default WordCloudCard;
