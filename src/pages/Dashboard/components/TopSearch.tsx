@@ -98,6 +98,7 @@ const TopSearch = ({
     <Row gutter={68}>
       <Col sm={12} xs={24} style={{ marginBottom: 24 }}>
         <NumberInfo
+          style={{ paddingLeft: 24 }}
           subTitle={
             <span>
               Total Number
@@ -115,6 +116,7 @@ const TopSearch = ({
       </Col>
       <Col sm={12} xs={24} style={{ marginBottom: 24 }}>
         <NumberInfo
+          style={{ paddingLeft: 24 }}
           subTitle={
             <span>
               Average Number
