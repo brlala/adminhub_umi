@@ -67,7 +67,7 @@ const SummaryCard: FC<SummaryCardProps> = (props) => {
             <Col span={12}>
               <div>
                 MTD
-                {data?.monthlyTrend && data?.monthlyTrend != 0?<Trend flag={data?.monthlyTrend > 0?"up":"down"} className={styles.trendText}>{data?.monthlyTrend}%</Trend>
+                {data?.monthlyTrend && data?.monthlyTarget.count != 0?<Trend flag={data?.monthlyTrend > 0?"up":"down"} className={styles.trendText}>{data?.monthlyTrend}%</Trend>
                 :<span className={styles.trendText}>-</span>}
                 <div className={styles.targetText}><span className={styles.progressText}>{data?.monthlyTarget.count}</span> / {data?.monthlyTarget.target}</div>
               </div>
@@ -75,7 +75,7 @@ const SummaryCard: FC<SummaryCardProps> = (props) => {
             </Col>
             <Col span={12}>
               <div> WTD 
-                {data?.weeklyTrend && data?.weeklyTrend != 0?<Trend flag={data?.weeklyTrend > 0?"up":"down"} className={styles.trendText}>{data?.weeklyTrend}%</Trend>
+                {data?.weeklyTrend && data?.weeklyTarget.count != 0?<Trend flag={data?.weeklyTrend > 0?"up":"down"} className={styles.trendText}>{data?.weeklyTrend}%</Trend>
                 :<span className={styles.trendText}>-</span>}
                 <div className={styles.targetText}><span className={styles.progressText}>{data?.weeklyTarget.count}</span> / {data?.weeklyTarget.target}</div>
               </div>

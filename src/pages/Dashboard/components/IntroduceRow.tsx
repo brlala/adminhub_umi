@@ -1,6 +1,7 @@
 import { Col, Row } from 'antd';
 import React from 'react';
 import { useRequest } from 'umi';
+import LiquidCard from './LiquidBox';
 import SummaryCard from './SummaryBox';
 
 const topColResponsiveProps = {
@@ -16,6 +17,7 @@ const IntroduceRow = () => {
   const { data: messageData, loading: messageLoading } = useRequest('http://localhost:5000/dashboard/top-part/messages')
   const { data: userData, loading: userLoading } = useRequest('http://localhost:5000/dashboard/top-part/users')
   const { data: conversationData, loading: conversationLoading } = useRequest('http://localhost:5000/dashboard/top-part/conversations')
+  const { data: answerRate, loading: answerRateLoading } = useRequest('http://localhost:5000/dashboard/top-part/answer-rate')
   
   console.log('messageData', messageData)
   return (
@@ -43,6 +45,14 @@ const IntroduceRow = () => {
         title="Conversations"
         tooltip="Conversations is consecutive user messages with no more than 3 minutes break"
         data={conversationData}/>
+    </Col>
+    <Col {...topColResponsiveProps}>
+      <LiquidCard
+        loading={answerRateLoading}
+        bordered={false}
+        title="Answered Rate"
+        tooltip="Amount of questions answered over amount of questions asked"
+        data={answerRate}/>
     </Col>
 
     {/* <Col {...topColResponsiveProps}>

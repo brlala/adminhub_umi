@@ -41,25 +41,14 @@ const ProportionSales = ({
   >
     <div>
       <Pie
-        height={340}
+        // height={340}
         radius={0.8}
         angleField="count"
         colorField="id"
         innerRadius={0.5}
         data={data as any}
-        label= {{
-          type: 'spider',
-          offset: '-50%',
-          content: '{value}',
-          style: {
-            textAlign: 'center',
-            fontSize: 14,
-          },
-          formatter: (text, item) => {
-            // eslint-disable-next-line no-underscore-dangle
-            return `${item._origin.x}: ${numeral(item._origin.y).format('0,0')}`;
-          }
-        }}
+        label={false}
+        legend={{position: 'bottom', layout: 'vertical'}}
         statistic={{
           title: false,
           content: {

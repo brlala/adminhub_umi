@@ -14,6 +14,7 @@ import { getTimeDistance } from './utils/utils';
 import { AnalysisData } from './data.d';
 import styles from './style.less';
 import { WordCloud } from '@ant-design/charts';
+import TopQuestions from './components/TopQuestions';
 
 const IntroduceRow = React.lazy(() => import('./components/IntroduceRow'));
 const SalesCard = React.lazy(() => import('./components/TrendlineCard'));
@@ -101,7 +102,17 @@ const Analysis: FC<AnalysisProps> = () => {
           <IntroduceRow/>
         </Suspense>
 
-        <Row
+        <Suspense fallback={null}>
+              <SalesCard
+                rangePickerValue={rangePickerValue}
+                salesData={data?.salesData || []}
+                handleRangePickerChange={handleRangePickerChange}
+                offlineChartData={data?.offlineChartData || []}           
+                loading={loading}
+                selectDate={selectDate}
+              />
+            </Suspense>
+        {/* <Row
           gutter={24}
         >
         <Col xl={16} lg={24} md={24} sm={24} xs={24}>
@@ -118,7 +129,7 @@ const Analysis: FC<AnalysisProps> = () => {
           </Col>
           <Col xl={8} lg={24} md={24} sm={24} xs={24}>
             <Suspense fallback={null}>
-              <WordCloudCard
+              <TopQuestions
                 visitData2={data?.visitData2 || []}
                 searchData={data?.searchData || []}
                 dropdownGroup={dropdownGroup}
@@ -126,7 +137,7 @@ const Analysis: FC<AnalysisProps> = () => {
             </Suspense>
           </Col>
           
-        </Row>
+        </Row> */}
 
         <Row
           gutter={24}
@@ -143,13 +154,22 @@ const Analysis: FC<AnalysisProps> = () => {
               />
             </Suspense>
           </Col>
-          <Col xl={12} lg={24} md={24} sm={24} xs={24}>
+          <Col xl={6} lg={24} md={24} sm={24} xs={24}>
             <Suspense fallback={null}>
               <ProportionSales
                 dropdownGroup={dropdownGroup}
                 salesType={salesType}
                 salesPieData={salesPieData || []}
                 handleChangeSalesType={handleChangeSalesType}
+              />
+            </Suspense>
+          </Col>
+          <Col xl={6} lg={24} md={24} sm={24} xs={24}>
+            <Suspense fallback={null}>
+              <WordCloudCard
+                visitData2={data?.visitData2 || []}
+                searchData={data?.searchData || []}
+                dropdownGroup={dropdownGroup}
               />
             </Suspense>
           </Col>

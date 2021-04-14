@@ -55,6 +55,12 @@ export interface SummaryBoxData {
   weeklyTrend: number;
 }
 
+export interface LiquidData {
+  total: {rate: number};
+  monthly: {rate: number};
+  weekly: {rate: number};
+}
+
 export interface UserTrendData{
   date: string; 
   newUser: number; 
