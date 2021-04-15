@@ -1,18 +1,17 @@
 import React, { useState, FC } from 'react';
 import { ProFormSelect, ProFormTextArea } from '@ant-design/pro-form';
-import { Button, Form, Input, message, Radio, Card, Space, Image, Tooltip, Row } from 'antd';
+import { Button, Form, Input, message, Radio, Card, Space, Image, Tooltip, Typography, Select } from 'antd';
 import { queryFlowsFilter } from '@/pages/QuestionList/service';
 import { FormattedMessage } from '@@/plugin-locale/localeExports';
 import { Modal } from 'antd';
 const { TextArea, Search } = Input;
-import { CloseOutlined, CloudUploadOutlined, DeleteOutlined, FileAddOutlined, FunctionOutlined, LeftOutlined, LoadingOutlined, PaperClipOutlined, PlusOutlined, RightOutlined, VideoCameraAddOutlined } from '@ant-design/icons';
+import { CloseOutlined, CloudUploadOutlined, DeleteOutlined, FileAddOutlined, FunctionOutlined, LeftCircleFilled, LeftCircleOutlined, LeftOutlined, LoadingOutlined, PaperClipOutlined, PlusOutlined, RightCircleOutlined, RightOutlined, VideoCameraAddOutlined } from '@ant-design/icons';
 import ImgCrop from 'antd-img-crop';
 import { Tabs } from 'antd';
 import './index.less';
-import { DropdownProps } from '@/pages/QuestionList/data';
 import Dragger from 'antd/lib/upload/Dragger'
 import { AttachmentComponentDataProps, TextComponentDataProps, GenericTemplateComponentDataProps, TemplateComponentDataProps, ButtonTemplateComponentDataProps, FlowComponentDataProps,QuickReplyComponentDataProps, Buttons, CustomComponentDataProps, InputComponentDataProps, QrButtons } from './data';
-
+import ButtonGroup from 'antd/lib/button/button-group';
 const { TabPane } = Tabs;
 
 export const handleDelete = (componentKey: number, onChange: any) => {
@@ -347,46 +346,101 @@ export const FileComponent: FC<AttachmentComponentDataProps> = (props) => {
 
 export const GenericTemplateComponent: FC<GenericTemplateComponentDataProps> = (props) => {
   const { componentKey, componentData, onChange, current } = props
-  const [activeKey, setActiveKey] = useState<number>(0);
-  const [panes, setPanes] = useState(componentData.elements)
+  let initalPanes = componentData.elements.map((element, index) => {return { ...element, key: index}});
+  const [panes, setPanes] = useState(initalPanes)
+  const [maxKey, setMaxKey] = useState(componentData.elements.length)
+  const [activeKey, setActiveKey] = useState<number>(panes.length > 0?panes[0].key:maxKey);
   
   const onEdit = (targetKey: any, action: string) => {
     if (action === 'add') {
       add();
+    } else if (action === 'left') {
+      moveLeft();
+    } else if (action === 'right') {
+      moveRight();
     } else {
-      remove(parseInt(targetKey))
+      remove()
     }
   };
 
   const add = () => {
-    let activeIndex: number = 0
+    setMaxKey(prev => prev + 1)
+    setPanes((prev) => { return [...prev, { key: maxKey, title: {}, buttons: [], subtitle: {}, imageUrl: "", fileName: "" }]})
     onChange((prevState: any) => [...prevState].map((item, index) => {
       if (index === componentKey) {
-        activeIndex = item.data.elements.length
-        setPanes([...item.data.elements, { title: null, buttons: [], subtitle: null, imageUrl: "", fileName: "" }])
         return { ...item, data: {elements: 
-          [...item.data.elements, { title: null, buttons: [], subtitle: null, imageUrl: "", fileName: "" }]
+          [...item.data.elements, { title: {}, buttons: [], subtitle: {}, imageUrl: "", fileName: "" }]
         }}
       } 
       else return item}))
-    setActiveKey(activeIndex)
+    setActiveKey(maxKey)
   };
 
-  const remove = (idx: number) => {
-    console.log('Remove index', idx)
+  const remove = () => {
+    let removeIndex: number = 0;
+    let newPanes: any[] = [];
     onChange((prevState: any) => [...prevState].map((item, index) => {
       if (index === componentKey) {
-        const newPanes = item.data.elements
-
-        console.log('newPanes bef', newPanes)
-        newPanes.splice(idx, 1)
-        setPanes(newPanes)
-        console.log('newPanes aft', newPanes, panes)
-        return { ...item, data: { elements: newPanes }}
+        panes.map((pane, index) => {
+          if (pane.key === activeKey) removeIndex = index;
+          else newPanes = [...newPanes, pane]
+        })
+        let newElements = item.data.elements;
+        newElements.splice(removeIndex, 1)
+        return { ...item, data: { elements: newElements }}
       } 
       else return item}))
-    setActiveKey(Math.max(idx - 1, 0))
+    setPanes(newPanes)
+    setActiveKey(newPanes[Math.max(removeIndex - 1, 0)].key)
   };
+
+
+  const moveLeft = () => {
+    console.log('Current index', activeKey)
+    let newPanes = panes;
+    let moveIndex: number = 0;
+    panes.map((pane, index) => {if (pane.key === activeKey) moveIndex = index;})
+    let temp = newPanes[moveIndex - 1];
+    newPanes[moveIndex - 1] = newPanes[moveIndex];
+    newPanes[moveIndex] = temp;
+    setPanes(newPanes)
+
+    onChange((prevState: any) => [...prevState].map((item, index) => {
+      if (index === componentKey) {
+        let newElements = item.data.elements;
+        let temp = newElements[moveIndex - 1];
+        newElements[moveIndex - 1] = newElements[moveIndex];
+        newElements[moveIndex] = temp;
+        return { ...item, data: { elements: newElements }}
+      } 
+      else return item}))
+      
+    setActiveKey(newPanes[Math.max(moveIndex - 1, 0)].key)
+  };
+
+  const moveRight = () => {
+    console.log('Current index', activeKey)
+    let newPanes = panes;
+    let moveIndex: number = 0;
+    panes.map((pane, index) => {if (pane.key === activeKey) moveIndex = index;})
+    let temp = newPanes[moveIndex + 1];
+    newPanes[moveIndex + 1] = newPanes[moveIndex];
+    newPanes[moveIndex] = temp;
+    setPanes(newPanes)
+
+    onChange((prevState: any) => [...prevState].map((item, index) => {
+      if (index === componentKey) {
+        let newElements = item.data.elements;
+        let temp = newElements[moveIndex + 1];
+        newElements[moveIndex + 1] = newElements[moveIndex];
+        newElements[moveIndex] = temp;
+        return { ...item, data: { elements: newElements }}
+      } 
+      else return item}))
+      
+    setActiveKey(newPanes[Math.max(moveIndex + 1, 0)].key)
+  };
+
 
   return (
     <Card title='Generic Template' size='small' bordered={false} style={{background: 'transparent'}}
@@ -395,6 +449,10 @@ export const GenericTemplateComponent: FC<GenericTemplateComponentDataProps> = (
         <Tabs
           type="editable-card"
           animated={true}
+          tabBarExtraContent={{
+          right: panes.length !== 1?<ButtonGroup>
+            <Button size='small' disabled={activeKey===panes[0].key} onClick={moveLeft} >Move Left</Button>
+            <Button size='small' disabled={activeKey===panes[panes.length - 1].key} onClick={moveRight} >Move Right</Button></ButtonGroup>: <></>}}
           size='small'
           onChange={(key: string) => {setActiveKey(parseInt(key))}}
           activeKey={activeKey?.toString()}
@@ -402,9 +460,10 @@ export const GenericTemplateComponent: FC<GenericTemplateComponentDataProps> = (
           hideAdd={!(panes.length < 10)} >
           {panes.map((pane, index: number) => {
             return (
-              <TabPane tab={panes.length !== 1 && index === activeKey?<><LeftOutlined style={{marginRight: '0px'}}/> {index + 1} <RightOutlined style={{marginRight: '0px'}}/></>:index + 1} 
-                key={index.toString()} closable={panes.length !== 1 && index == activeKey}>
-                <TemplateComponent componentKey={index} componentData={pane} onChange={onChange} parentKey={componentKey} />
+              <TabPane tab={pane.title.EN? pane.title.EN.length > 5? pane.title.EN.substring(0, 5) + '...': pane.title.EN.substring(0, 5) : 'New Tab'}
+                key={pane.key} closable={panes.length !== 1 && pane.key == activeKey}>
+                <TemplateComponent componentKey={index} componentData={pane} setPanes={setPanes} onChange={onChange} parentKey={componentKey} />
+                {/* {panes.length !== 1 && index === activeKey?<ButtonGroup><Button>Move Left</Button><Button>Move Right</Button></ButtonGroup>: <></>} */}
               </TabPane>
             );
           })}
@@ -415,11 +474,12 @@ export const GenericTemplateComponent: FC<GenericTemplateComponentDataProps> = (
 };
 
 export const TemplateComponent: FC<TemplateComponentDataProps> = (props) => {
-  const { componentKey, componentData, onChange, parentKey } = props
+  const { componentKey, componentData, setPanes, onChange, parentKey } = props
   const [previewImage, setPreviewImage] = useState(componentData.imageUrl);
   const [uploading, setUploading] = useState(componentData.imageUrl?true:false);
   const [selectedButton, setSelectedButton] = useState<Partial<Buttons>>();
-  const [selectedButtonIndex, setSelectedButtonIndex] = useState<number>();
+  const [selectedButtonIndex, setSelectedButtonIndex] = useState<number>(0);
+  const [selectedFlow, setSelectedFlow] = useState<string>();
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [buttons, setButtons] = useState(componentData.buttons);
   const [wordCount, setWordCount] = useState(0);
@@ -431,6 +491,27 @@ export const TemplateComponent: FC<TemplateComponentDataProps> = (props) => {
   };
 
   const handleOkModal = () => {
+    setIsModalVisible(false);
+  };
+
+  const handleDeleteModal = () => {
+    let newButtons = buttons?buttons:[];
+    newButtons.splice(selectedButtonIndex, 1)
+    setButtons(newButtons)
+
+    onChange((prevState: any) => [...prevState].map((item, index) => {
+      if (index === parentKey) {
+        return { ...item, data: {elements: 
+          item.data.elements.map((pane: any, paneIndex: number) => {
+            if (paneIndex === componentKey) {
+              return { ...pane, buttons: buttons}
+            }
+            else return pane;})
+        }}
+      }
+      else return item;
+    }))
+    message.success('Button deleted');
     setIsModalVisible(false);
   };
 
@@ -499,6 +580,11 @@ export const TemplateComponent: FC<TemplateComponentDataProps> = (props) => {
               allowClear
               placeholder="Title"
               onChange={(e) => {
+                setPanes((prevState: any) => [...prevState].map((pane, index) => {
+                  if (index === componentKey) {
+                    return { ...pane, title: { EN: e.target.value }}
+                  }
+                  else return pane;}))
                 onChange((prevState: any) => [...prevState].map((item, index) => {
                   if (index === parentKey) {
                     return { ...item, data: {elements: 
@@ -567,6 +653,9 @@ export const TemplateComponent: FC<TemplateComponentDataProps> = (props) => {
             destroyOnClose={true}
             width={450}
             footer={[
+              <Button type="primary" danger onClick={handleDeleteModal}>
+                Delete
+              </Button>,
               <Button key="back" onClick={handleCancelModal}>
                 Cancel
               </Button>,
@@ -582,7 +671,7 @@ export const TemplateComponent: FC<TemplateComponentDataProps> = (props) => {
                   if (index === parentKey) {
                     let updatedButton: Buttons;
                     if (values.type === 'postback')
-                      {updatedButton = {...values, title: {EN: values.title}, payload: {flowId: values.flowId}}}
+                      {updatedButton = {...values, title: {EN: values.title}, payload: {flowId: selectedFlow}}}
                     else {updatedButton = {...values, title: {EN: values.title}}}
                     return { ...item, data: {elements: 
                       item.data.elements.map((pane: any, paneIndex: number) => {
@@ -653,6 +742,9 @@ export const TemplateComponent: FC<TemplateComponentDataProps> = (props) => {
                     label="Flow Response"
                     initialValue={selectedButton?.type === 'postback' ? selectedButton?.payload?.flowId : null}
                     showSearch
+                    fieldProps={{ onSelect: (e, option) => {
+                      setSelectedFlow(option.id)
+                    }}}
                     // @ts-ignore
                     request={async () => {
                       return await queryFlowsFilter('name,params');
@@ -670,7 +762,8 @@ export const TemplateComponent: FC<TemplateComponentDataProps> = (props) => {
 export const ButtonTemplateComponent: FC<ButtonTemplateComponentDataProps> = (props) => {
   const { componentKey, componentData, onChange } = props;
   const [selectedButton, setSelectedButton] = useState<Partial<Buttons>>();
-  const [selectedButtonIndex, setSelectedButtonIndex] = useState<number>();
+  const [selectedButtonIndex, setSelectedButtonIndex] = useState<number>(0);
+  const [selectedFlow, setSelectedFlow] = useState<string>();
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [wordCount, setWordCount] = useState(0);
 
@@ -680,6 +773,16 @@ export const ButtonTemplateComponent: FC<ButtonTemplateComponentDataProps> = (pr
   };
 
   const handleOkModal = () => {
+    setIsModalVisible(false);
+  };
+
+  const handleDeleteModal = () => {
+    let newButtons = componentData?.buttons||[];
+    newButtons.splice(selectedButtonIndex, 1)
+    onChange((prevState: any) => [...prevState].map((item, index) => {
+      if (index === componentKey) {
+        return { ...item, data: {...item.data, buttons: newButtons}}}}))
+    message.success('Button deleted');
     setIsModalVisible(false);
   };
 
@@ -745,6 +848,9 @@ export const ButtonTemplateComponent: FC<ButtonTemplateComponentDataProps> = (pr
           centered
           width={450}
           footer={[
+            <Button type="primary" danger onClick={handleDeleteModal}>
+              Delete
+            </Button>,
             <Button key="back" onClick={handleCancelModal}>
               Cancel
             </Button>,
@@ -759,7 +865,7 @@ export const ButtonTemplateComponent: FC<ButtonTemplateComponentDataProps> = (pr
                 if (index === componentKey) {
                   let updatedButton: Buttons;
                   if (values.type === 'postback')
-                    {updatedButton = {...values, title: {EN: values.title}, payload: {flowId: values.flowId}}}
+                    {updatedButton = {...values, title: {EN: values.title}, payload: {flowId: selectedFlow}}}
                   else {updatedButton = {...values, title: {EN: values.title}, url: values.url}}
                   if (selectedButtonIndex === item.data.buttons.length) {
                     return { ...item, data: {...item.data, buttons: [...item.data.buttons, updatedButton]}}}
@@ -812,6 +918,9 @@ export const ButtonTemplateComponent: FC<ButtonTemplateComponentDataProps> = (pr
                   name="flowId"
                   label="Flow Response"
                   showSearch
+                  fieldProps={{ onSelect: (e, option) => {
+                    setSelectedFlow(option.id)
+                  }}}
                   // @ts-ignore
                   request={async () => {
                     return await queryFlowsFilter('name,params');
@@ -837,7 +946,7 @@ export const FlowComponent: FC<FlowComponentDataProps> = (props) => {
           onChange((prevState: any) =>
             [...prevState].map((item, index) => {
               if (index === componentKey) {
-                return {...item, data: {...item.data, flow: {flowId: e, name: option.label}} };
+                return {...item, data: {...item.data, flow: {flowId: option.id, name: option.label}} };
               } else return item;
             }),
           );
@@ -865,8 +974,9 @@ export const QuickReplyComponent: React.FC<QuickReplyComponentDataProps> = (prop
   const { componentKey, componentData, onChange } = props
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectRow, setSelectRow] = useState<QrButtons>();
+  const [selectedFlow, setSelectedFlow] = useState<string>();
+  const [selectedButtonIndex, setSelectedButtonIndex] = useState<number>(0);
   const [wordCount, setWordCount] = useState(0);
-  const [flows, setFlows] = useState<DropdownProps[]>([]);
   const addNewQuickReplyButton = (
     <Button
       type="dashed"
@@ -874,7 +984,6 @@ export const QuickReplyComponent: React.FC<QuickReplyComponentDataProps> = (prop
       icon={<PlusOutlined />}
       onClick={() => {
         showModal();
-        setSelectRow(null);
       }}
     >
       Quick Reply
@@ -889,6 +998,16 @@ export const QuickReplyComponent: React.FC<QuickReplyComponentDataProps> = (prop
     setIsModalVisible(false);
   };
 
+  const handleDeleteModal = () => {
+    let newButtons = componentData?.quickReplies||[];
+    newButtons.splice(selectedButtonIndex, 1)
+    onChange((prevState: any) => [...prevState].map((item, index) => {
+      if (index === componentKey) {
+        return { ...item, data: { ...item.data, quickReplies: newButtons}}}}))
+    message.success('Button deleted');
+    setIsModalVisible(false);
+  };
+
   const handleCancelModal = () => {
     setIsModalVisible(false);
   };
@@ -897,12 +1016,13 @@ export const QuickReplyComponent: React.FC<QuickReplyComponentDataProps> = (prop
     <Card title='Quick Replies' size='small' style={{background: 'transparent'}} bordered={false} extra={deleteButton(componentKey, onChange)}>
       <Form.Item style={{ marginTop: -6 }} >
         <Space wrap>
-          {componentData.quickReplies.map((button) => (
+          {componentData.quickReplies.map((button, index) => (
             <Button
               block
               style={{borderRadius: '4px'}}
               onClick={() => {
                 setSelectRow(button);
+                setSelectedButtonIndex(index);
                 showModal();
               }}>
               {button.text.EN}
@@ -919,6 +1039,9 @@ export const QuickReplyComponent: React.FC<QuickReplyComponentDataProps> = (prop
           width={450}
           centered
           footer={[
+            <Button type="primary" danger onClick={handleDeleteModal}>
+              Delete
+            </Button>,
             <Button key="back" onClick={handleCancelModal}>
               Cancel
             </Button>,
@@ -930,9 +1053,10 @@ export const QuickReplyComponent: React.FC<QuickReplyComponentDataProps> = (prop
           <Form
             id="my-form"
             onFinish={async (values) => {
+              console.log(values)
               onChange((prevState: any) => [...prevState].map((item, index) => {
                 if (index === componentKey) {
-                  return { ...item, data: { ...item.data, quickReplies: [...item.data.quickReplies, {payload: {flowId: values.flowId}, text: {EN: values.text}}]}}
+                  return { ...item, data: { ...item.data, quickReplies: [...item.data.quickReplies, {payload: {flowId: selectedFlow}, text: {EN: values.text}}]}}
                 }
                 else return item;
               }))
@@ -953,12 +1077,13 @@ export const QuickReplyComponent: React.FC<QuickReplyComponentDataProps> = (prop
               label="Flow Response"
               initialValue={selectRow?.payload.flowId}
               showSearch
+              fieldProps={{ onSelect: (e, option) => {
+                setSelectedFlow(option.id)
+              }}}
               // @ts-ignore
               request={async () => {
-                const flowsRequest = await queryFlowsFilter('name,params');
-                setFlows(flowsRequest);
+                return await queryFlowsFilter('name,params');
               }}
-              options={flows}
             />
           </Form>
         </Modal>

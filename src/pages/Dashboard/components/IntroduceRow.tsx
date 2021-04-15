@@ -1,13 +1,8 @@
-import { InfoCircleOutlined } from '@ant-design/icons';
-import { TinyArea, TinyColumn, Progress } from '@ant-design/charts';
-import { Col, Row, Tooltip } from 'antd';
-
+import { Col, Row } from 'antd';
 import React from 'react';
-import numeral from 'numeral';
-import { ChartCard, Field } from './Charts';
-import { DataItem } from '../data.d';
-import Trend from './Trend';
-import styles from '../style.less';
+import { useRequest } from 'umi';
+import LiquidCard from './LiquidBox';
+import SummaryCard from './SummaryBox';
 
 const topColResponsiveProps = {
   xs: 24,
@@ -18,34 +13,49 @@ const topColResponsiveProps = {
   style: { marginBottom: 24 },
 };
 
-const IntroduceRow = ({ loading, visitData }: { loading: boolean; visitData: DataItem[] }) => (
+const IntroduceRow = () => {
+  const { data: messageData, loading: messageLoading } = useRequest('http://localhost:5000/dashboard/top-part/messages')
+  const { data: userData, loading: userLoading } = useRequest('http://localhost:5000/dashboard/top-part/users')
+  const { data: conversationData, loading: conversationLoading } = useRequest('http://localhost:5000/dashboard/top-part/conversations')
+  const { data: answerRate, loading: answerRateLoading } = useRequest('http://localhost:5000/dashboard/top-part/answer-rate')
+  
+  console.log('messageData', messageData)
+  return (
   <Row gutter={24}>
     <Col {...topColResponsiveProps}>
-      <ChartCard
+      <SummaryCard
+        loading={userLoading}
         bordered={false}
-        title="Total User Messages"
-        action={
-          <Tooltip title="Total number of messages sent by users">
-            <InfoCircleOutlined />
-          </Tooltip>
-        }
-        loading={loading}
-        total='1,126,560'
-        footer={<Field label="Daily User Messages" value='12,423' />}
-        contentHeight={46}
-      >
-        <Trend flag="up" style={{ marginRight: 16 }}>
-          Monthly Trend
-          <span className={styles.trendText}>12%</span>
-        </Trend>
-        <Trend flag="down">
-          Weekly Trend
-          <span className={styles.trendText}>11%</span>
-        </Trend>
-      </ChartCard>
+        title="Users"
+        tooltip="Total number of messages sent by users"
+        data={userData}/>
+    </Col>
+    <Col {...topColResponsiveProps}>
+      <SummaryCard
+        loading={messageLoading}
+        bordered={false}
+        title="User Messages"
+        tooltip="Total number of messages sent by users"
+        data={messageData}/>
+    </Col>
+    <Col {...topColResponsiveProps}>
+      <SummaryCard
+        loading={conversationLoading}
+        bordered={false}
+        title="Conversations"
+        tooltip="Conversations is consecutive user messages with no more than 3 minutes break"
+        data={conversationData}/>
+    </Col>
+    <Col {...topColResponsiveProps}>
+      <LiquidCard
+        loading={answerRateLoading}
+        bordered={false}
+        title="Answered Rate"
+        tooltip="Amount of questions answered over amount of questions asked"
+        data={answerRate}/>
     </Col>
 
-    <Col {...topColResponsiveProps}>
+    {/* <Col {...topColResponsiveProps}>
       <ChartCard
         bordered={false}
         loading={loading}
@@ -127,8 +137,8 @@ const IntroduceRow = ({ loading, visitData }: { loading: boolean; visitData: Dat
           ]}
         />
       </ChartCard>
-    </Col>
+    </Col> */}
   </Row>
-);
+)};
 
 export default IntroduceRow;

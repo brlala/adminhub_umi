@@ -1,17 +1,24 @@
-import React, { FC } from 'react';
+import React, { FC, useEffect } from 'react';
 import { List, Row } from 'antd';
 import { renderMessageComponent } from '@/pages/ConversationList/RenderMessage';
 import { ConversationMessage } from 'models/messages';
 import moment from 'moment';
 import ProCard from '@ant-design/pro-card';
+import $ from 'jquery';
 
 const ConversationDisplay: FC<{ data: any; loading: any; pagination: any; style?: any; searchQuery?: string }> = (
   props,
 ) => {
   const { data, loading, pagination, style, searchQuery } = props;
+
+  useEffect(() => {
+    $('#convoList').scrollTop($('#convoList').prop("scrollHeight"));
+  });
+  
   return (
     <ProCard ghost>
       <List<ConversationMessage>
+        id='convoList'
         dataSource={data}
         loading={loading}
         pagination={{
@@ -55,7 +62,7 @@ const ConversationDisplay: FC<{ data: any; loading: any; pagination: any; style?
             )}
             <Row justify={item.incomingMessageId || item.isBroadcast ? 'end' : 'start'}>
               <div style={{ fontSize: '11px', color: 'rgba(0,0,0,0.45)' }}>
-                {moment(item.createdAt).format('MM-DD HH:mm')}{' '}
+                {moment(item.createdAt).format('YYYY-MM-DD HH:mm')}{' '}
               </div>
             </Row>
           </List.Item>

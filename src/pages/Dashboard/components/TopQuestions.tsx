@@ -3,7 +3,7 @@ import { Card, Col, Row, Table, Tooltip } from 'antd';
 import { TinyArea } from '@ant-design/charts';
 import React from 'react';
 import numeral from 'numeral';
-import { DataItem } from '../data.d';
+import { DataItem } from '../data';
 
 import NumberInfo from './NumberInfo';
 import Trend from './Trend';
@@ -72,7 +72,7 @@ const columns = [
   },
 ];
 
-const TopSearch = ({
+const TopQuestions = ({
   visitData2,
   searchData,
   dropdownGroup,
@@ -82,7 +82,7 @@ const TopSearch = ({
   searchData: DataItem[];
 }) => {
 
-  const { data, loading } = useRequest('http://localhost:5000/dashboard/bottom-part/questions-trend')
+  const { data, loading } = useRequest('http://localhost:5000/dashboard/middle-part/top-question')
   const dataSoure = data?.table||[]
   console.log('data?.total.history', data?.average.history)
   return (
@@ -95,44 +95,6 @@ const TopSearch = ({
       height: '100%',
     }}
   >
-    <Row gutter={68}>
-      <Col sm={12} xs={24} style={{ marginBottom: 24 }}>
-        <NumberInfo
-          style={{ paddingLeft: 24 }}
-          subTitle={
-            <span>
-              Total Number
-              <Tooltip title="指标说明">
-                <InfoCircleOutlined style={{ marginLeft: 8 }} />
-              </Tooltip>
-            </span>
-          }
-          gap={8}
-          total={numeral(data?.total.value).format('0,0')}
-          status={data?.total.trend<0?'down':'up'}
-          subTotal={numeral(data?.total.trend).format('0.0%')}
-        />
-        <TinyArea height={45} smooth data={data?.total.history.map((d:any) => d.count)} />
-      </Col>
-      <Col sm={12} xs={24} style={{ marginBottom: 24 }}>
-        <NumberInfo
-          style={{ paddingLeft: 24 }}
-          subTitle={
-            <span>
-              Average Number
-              <Tooltip title="指标说明">
-                <InfoCircleOutlined style={{ marginLeft: 8 }} />
-              </Tooltip>
-            </span>
-          }
-          total={numeral(data?.average.value).format('0,0')}
-          status={data?.average.trend<0?'down':'up'}
-          subTotal={numeral(data?.average.trend).format('0.0%')}
-          gap={8}
-        />
-        <TinyArea height={45} smooth data={data?.average.history.map((d:any) => d.average)} tooltip={{formatter: (datum: any) => numeral(datum).format('0.0')}}/>
-      </Col>
-    </Row>
     <Table<any>
       rowKey={(record) => record.index}
       size="small"
@@ -146,4 +108,4 @@ const TopSearch = ({
   </Card>
 )};
 
-export default TopSearch;
+export default TopQuestions;

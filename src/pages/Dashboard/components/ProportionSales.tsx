@@ -5,22 +5,31 @@ import React from 'react';
 import { DataItem } from '../data.d';
 import styles from '../style.less';
 import { Pie } from '@ant-design/charts';
+import { useRequest } from 'umi';
 
 const { Text } = Typography;
 
 const ProportionSales = ({
   dropdownGroup,
   salesType,
-  loading,
   salesPieData,
   handleChangeSalesType,
 }: {
-  loading: boolean;
   dropdownGroup: React.ReactNode;
   salesType: 'all' | 'online' | 'stores';
   salesPieData: DataItem[];
   handleChangeSalesType?: (e: RadioChangeEvent) => void;
-}) => (
+}) => {
+  const { data, loading } = useRequest('http://localhost:5000/dashboard/bottom-part/top-topics',
+  {formatResult: (response) => { 
+    let total = 0;
+    let selectedPie: any[] = []
+    response.data.map((piece: any) => total += piece.count)
+    response.data.map((piece: any) => {if (piece.count/total > 0.1) {selectedPie = [...selectedPie, piece]; total -= piece.count}})
+    selectedPie = [...selectedPie, {count: total, id: "Others"}]
+    return selectedPie
+   }})
+  return (
   <Card
     loading={loading}
     className={styles.salesCard}
@@ -29,41 +38,29 @@ const ProportionSales = ({
     style={{
       height: '100%',
     }}
-    extra={
-      <div className={styles.salesCardExtra}>
-        {dropdownGroup}
-        <div className={styles.salesTypeRadio}>
-          <Radio.Group value={salesType} onChange={handleChangeSalesType}>
-            <Radio.Button value="all">All</Radio.Button>
-            <Radio.Button value="online">Text</Radio.Button>
-            <Radio.Button value="stores">Click</Radio.Button>
-          </Radio.Group>
-        </div>
-      </div>
-    }
   >
     <div>
-      <Text>Topics</Text>
       <Pie
-        height={340}
+        // height={340}
         radius={0.8}
-        angleField="y"
-        colorField="x"
-        innerRadius={0.6}
-        data={salesPieData as any}
-        label= {{
-          type: 'spider',
-          offset: '-50%',
-          content: '{value}',
-          style: {
-            textAlign: 'center',
-            fontSize: 14,
-          },
-          formatter: (text, item) => {
-            // eslint-disable-next-line no-underscore-dangle
-            return `${item._origin.x}: ${numeral(item._origin.y).format('0,0')}`;
-          }
-        }}
+        angleField="count"
+        colorField="id"
+        innerRadius={0.5}
+        data={data as any}
+        label={false}
+        color={[
+          '#40a2ff',
+          '#13c2c2',
+          '#50cb73',
+          '#A0D911',
+          '#fbd445',
+          '#FAAD14',
+          '#FF745A',
+          '#f2637b',
+          '#9761e5',
+          '#bfbfbf',
+        ]}
+        legend={{position: 'bottom', layout: 'vertical'}}
         statistic={{
           title: false,
           content: {
@@ -73,13 +70,13 @@ const ProportionSales = ({
               textOverflow: 'ellipsis',
             },
             formatter: function formatter() {
-              return 'Sales';
+              return 'Topics';
             },
           }}
         }
       />
     </div>
   </Card>
-);
+)};
 
 export default ProportionSales;

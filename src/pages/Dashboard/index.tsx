@@ -9,16 +9,18 @@ import { useRequest } from 'umi';
 
 import { demoChartData } from './service';
 import PageLoading from './components/PageLoading';
-import { TimeType } from './components/SalesCard';
+import { TimeType } from './components/TrendlineCard';
 import { getTimeDistance } from './utils/utils';
 import { AnalysisData } from './data.d';
 import styles from './style.less';
+import { WordCloud } from '@ant-design/charts';
+import TopQuestions from './components/TopQuestions';
 
 const IntroduceRow = React.lazy(() => import('./components/IntroduceRow'));
-const SalesCard = React.lazy(() => import('./components/SalesCard'));
+const SalesCard = React.lazy(() => import('./components/TrendlineCard'));
 const TopSearch = React.lazy(() => import('./components/TopSearch'));
 const ProportionSales = React.lazy(() => import('./components/ProportionSales'));
-const OfflineData = React.lazy(() => import('./components/OfflineData'));
+const WordCloudCard = React.lazy(() => import('./components/WordCloud'))
 
 type RangePickerValue = RangePickerProps<moment.Moment>['value'];
 
@@ -31,12 +33,12 @@ type SalesType = 'all' | 'online' | 'stores';
 
 const Analysis: FC<AnalysisProps> = () => {
   const [salesType, setSalesType] = useState<SalesType>('all');
-  const [currentTabKey, setCurrentTabKey] = useState<string>('');
   const [rangePickerValue, setRangePickerValue] = useState<RangePickerValue>(
     getTimeDistance('year'),
   );
 
   const { loading, data } = useRequest(demoChartData);
+  console.log('data', 'data')
 
   {console.log('data', data)}
   const selectDate = (type: TimeType) => {
@@ -93,30 +95,49 @@ const Analysis: FC<AnalysisProps> = () => {
     setSalesType(e.target.value);
   };
 
-  const handleTabChange = (key: string) => {
-    setCurrentTabKey(key);
-  };
-
-  const activeKey = currentTabKey || (data?.offlineData[0] && data?.offlineData[0].name) || '';
-
   return (
     <GridContent>
       <>
         <Suspense fallback={<PageLoading />}>
-          <IntroduceRow loading={loading} visitData={data?.visitData || []} />
+          <IntroduceRow/>
         </Suspense>
 
         <Suspense fallback={null}>
-          <SalesCard
-            rangePickerValue={rangePickerValue}
-            salesData={data?.salesData || []}
-            isActive={isActive}
-            handleRangePickerChange={handleRangePickerChange}
-            offlineChartData={data?.offlineChartData || []}
-            loading={loading}
-            selectDate={selectDate}
-          />
-        </Suspense>
+              <SalesCard
+                rangePickerValue={rangePickerValue}
+                salesData={data?.salesData || []}
+                handleRangePickerChange={handleRangePickerChange}
+                offlineChartData={data?.offlineChartData || []}           
+                loading={loading}
+                selectDate={selectDate}
+              />
+            </Suspense>
+        {/* <Row
+          gutter={24}
+        >
+        <Col xl={16} lg={24} md={24} sm={24} xs={24}>
+            <Suspense fallback={null}>
+              <SalesCard
+                rangePickerValue={rangePickerValue}
+                salesData={data?.salesData || []}
+                handleRangePickerChange={handleRangePickerChange}
+                offlineChartData={data?.offlineChartData || []}           
+                loading={loading}
+                selectDate={selectDate}
+              />
+            </Suspense>
+          </Col>
+          <Col xl={8} lg={24} md={24} sm={24} xs={24}>
+            <Suspense fallback={null}>
+              <TopQuestions
+                visitData2={data?.visitData2 || []}
+                searchData={data?.searchData || []}
+                dropdownGroup={dropdownGroup}
+              />
+            </Suspense>
+          </Col>
+          
+        </Row> */}
 
         <Row
           gutter={24}
@@ -127,35 +148,32 @@ const Analysis: FC<AnalysisProps> = () => {
           <Col xl={12} lg={24} md={24} sm={24} xs={24}>
             <Suspense fallback={null}>
               <TopSearch
-                loading={loading}
                 visitData2={data?.visitData2 || []}
                 searchData={data?.searchData || []}
                 dropdownGroup={dropdownGroup}
               />
             </Suspense>
           </Col>
-          <Col xl={12} lg={24} md={24} sm={24} xs={24}>
+          <Col xl={6} lg={24} md={24} sm={24} xs={24}>
             <Suspense fallback={null}>
               <ProportionSales
                 dropdownGroup={dropdownGroup}
                 salesType={salesType}
-                loading={loading}
                 salesPieData={salesPieData || []}
                 handleChangeSalesType={handleChangeSalesType}
               />
             </Suspense>
           </Col>
+          <Col xl={6} lg={24} md={24} sm={24} xs={24}>
+            <Suspense fallback={null}>
+              <WordCloudCard
+                visitData2={data?.visitData2 || []}
+                searchData={data?.searchData || []}
+                dropdownGroup={dropdownGroup}
+              />
+            </Suspense>
+          </Col>
         </Row>
-{/* 
-        <Suspense fallback={null}>
-          <OfflineData
-            activeKey={activeKey}
-            loading={loading}
-            offlineData={data?.offlineData || []}
-            offlineChartData={data?.offlineChartData || []}
-            handleTabChange={handleTabChange}
-          />
-        </Suspense> */}
       </>
     </GridContent>
   );

@@ -32,7 +32,7 @@ export type newQuestionItem = {
 export type DropdownProps = {
   value: string;
   label: string;
-  key: string;
+  id:string;
 };
 
 export type VariationListItem = {

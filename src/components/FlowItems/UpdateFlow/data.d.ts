@@ -43,6 +43,7 @@ current: any;
 export type TemplateComponentDataProps = {
     componentKey: number;
     componentData: Templates;
+    setPanes: (prevState: any) => void;
     onChange: (prevState: any) => void;
     parentKey: number;
   };
