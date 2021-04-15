@@ -48,6 +48,18 @@ const ProportionSales = ({
         innerRadius={0.5}
         data={data as any}
         label={false}
+        color={[
+          '#40a2ff',
+          '#13c2c2',
+          '#50cb73',
+          '#A0D911',
+          '#fbd445',
+          '#FAAD14',
+          '#FF745A',
+          '#f2637b',
+          '#9761e5',
+          '#bfbfbf',
+        ]}
         legend={{position: 'bottom', layout: 'vertical'}}
         statistic={{
           title: false,
