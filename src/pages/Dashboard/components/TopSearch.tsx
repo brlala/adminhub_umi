@@ -110,7 +110,7 @@ const TopSearch = ({
           gap={8}
           total={numeral(data?.total.value).format('0,0')}
           status={data?.total.trend<0?'down':'up'}
-          subTotal={numeral(data?.total.trend).format('0.0%')}
+          subTotal={numeral(data?.total.trend).format('0.00%')}
         />
         <TinyArea height={45} smooth data={data?.total.history.map((d:any) => d.count)} />
       </Col>
@@ -127,7 +127,7 @@ const TopSearch = ({
           }
           total={numeral(data?.average.value).format('0,0')}
           status={data?.average.trend<0?'down':'up'}
-          subTotal={numeral(data?.average.trend).format('0.0%')}
+          subTotal={numeral(data?.average.trend).format('0.00%')}
           gap={8}
         />
         <TinyArea height={45} smooth data={data?.average.history.map((d:any) => d.average)} tooltip={{formatter: (datum: any) => numeral(datum).format('0.0')}}/>

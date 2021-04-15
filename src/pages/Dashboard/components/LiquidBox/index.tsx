@@ -95,7 +95,7 @@ const LiquidCard: FC<LiquidCardProps> = (props) => {
               </Tooltip></span>
             </div>
             <Row gutter={20}>
-            <Col><div className={styles.total}>{numeral(data?.total.rate).format('0.0%')}</div></Col>
+            <Col><div className={styles.total}>{numeral(data?.total.rate).format('0.00%')}</div></Col>
             <Col><Gauge {...config} chartRef={(chartRef) => (ref = chartRef)} /></Col></Row>
            {/* <Liquid {...config} /> */}
           </div>

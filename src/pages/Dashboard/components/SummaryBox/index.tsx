@@ -67,7 +67,7 @@ const SummaryCard: FC<SummaryCardProps> = (props) => {
             <Col span={12}>
               <div>
                 MTD
-                {data?.monthlyTrend && data?.monthlyTarget.count != 0?<Trend flag={data?.monthlyTrend > 0?"up":"down"} className={styles.trendText}>{data?.monthlyTrend}%</Trend>
+                {data?.monthlyTrend && data?.monthlyTarget.count != 0?<Trend flag={data?.monthlyTrend > 0?"up":"down"} className={styles.trendText}>{numeral(data?.monthlyTrend).format('0.0%')}</Trend>
                 :<span className={styles.trendText}>-</span>}
                 <div className={styles.targetText}><span className={styles.progressText}>{data?.monthlyTarget.count}</span> / {data?.monthlyTarget.target}</div>
               </div>
