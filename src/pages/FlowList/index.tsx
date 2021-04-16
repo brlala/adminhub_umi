@@ -2,7 +2,7 @@ import { PlusOutlined } from '@ant-design/icons';
 import { Button, Drawer, message, Slider, Space, Tag } from 'antd';
 import React, { useRef, useState } from 'react';
 // @ts-ignore
-import { FormattedMessage, useIntl } from 'umi';
+import { FormattedMessage, useIntl, Link } from 'umi';
 import { FooterToolbar, PageContainer } from '@ant-design/pro-layout';
 import type { ActionType, ProColumns } from '@ant-design/pro-table';
 import ProTable from '@ant-design/pro-table';
@@ -12,7 +12,6 @@ import type { FlowListItem } from './data.d';
 import { queryFlows, removeFlows, updateRule } from './service';
 import moment from 'moment';
 import { changeLanguage } from '@/utils/language';
-import { Link } from '@umijs/preset-dumi/lib/theme';
 import PhonePreview from '@/components/PhonePreview';
 
 /**
@@ -95,7 +94,6 @@ const FlowList: React.FC = () => {
         );
       },
     },
-
     {
       title: <FormattedMessage id="pages.flow.size.sizeLabel" defaultMessage="Size" />,
       dataIndex: 'size',
@@ -131,7 +129,7 @@ const FlowList: React.FC = () => {
       hideInTable: true,
       render: (dom, entity) => {
         console.log(entity.flow);
-        return <PhonePreview data={entity.flow} editMode={false}/>;
+        return <PhonePreview data={entity.flow} editMode={false} />;
       },
     },
     {
@@ -181,11 +179,18 @@ const FlowList: React.FC = () => {
       valueType: 'option',
       hideInTable: true,
       render: (_, record) => [
-        <Button type='text' style={{color: 'red'}} onClick={()=> {handleRemove([record]); 
-          setSelectedRows([]);
-          actionRef.current?.reloadAndRest?.();setShowDetail(false)}}>
+        <Button
+          type="text"
+          style={{ color: 'red' }}
+          onClick={() => {
+            handleRemove([record]);
+            setSelectedRows([]);
+            actionRef.current?.reloadAndRest?.();
+            setShowDetail(false);
+          }}
+        >
           <FormattedMessage id="pages.searchTable.delete" defaultMessage="Delete" />
-        </Button>
+        </Button>,
       ],
     },
     {
@@ -193,9 +198,9 @@ const FlowList: React.FC = () => {
       dataIndex: 'option',
       valueType: 'option',
       render: (_, record) => [
-        <Link to={"/flows/" + record.id}>
+        <Link to={'/flows/' + record.id}>
           <FormattedMessage id="pages.searchTable.edit" defaultMessage="Edit" />
-        </Link>
+        </Link>,
       ],
     },
   ];
