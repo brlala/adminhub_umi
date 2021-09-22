@@ -115,7 +115,7 @@
     "mockjs": "^1.1.0",
     "prettier": "^2.2.1",
     "pro-download": "^1.0.1",
-    "puppeteer-core": "^8.0.0",
+    "puppeteer-core": "^10.4.0",
     "stylelint": "^13.12.0",
     "typescript": "^4.2.3"
   },
